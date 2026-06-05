@@ -16,7 +16,7 @@ services:
       - postgres
     env_file: .env.local
     ports:
-      - "{PORT}:{PORT}"
+      - "3205:3205"
     volumes:
       - ./backend/src:/app/src
 
@@ -25,7 +25,8 @@ services:
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:3001
+      VITE_API_URL: http://localhost:3205
+      API_URL: http://api:3205
 
 volumes:
   pgdata:
