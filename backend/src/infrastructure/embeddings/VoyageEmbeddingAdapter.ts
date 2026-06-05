@@ -35,7 +35,11 @@ const BATCH_DELAY_MS = 200;
 
 export class VoyageEmbeddingAdapter implements EmbeddingPort {
   private readonly apiKey: string;
-  private readonly model = "voyage-3-lite";
+
+  // See https://docs.voyageai.com/docs/embeddings
+  // voyage-3-lite : 512
+
+  private readonly model = "voyage-4-lite";
   private readonly apiUrl = "https://api.voyageai.com/v1/embeddings";
 
   constructor(apiKey: string = config.embeddings.voyage.apiKey) {
