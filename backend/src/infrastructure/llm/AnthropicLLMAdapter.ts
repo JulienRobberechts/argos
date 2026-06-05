@@ -20,7 +20,7 @@ export class AnthropicLLMAdapter implements LLMPort {
   ): Promise<string> {
     let fullContent = "";
 
-    const stream = await this.client.messages.stream({
+    const stream = this.client.messages.stream({
       model: this.model,
       max_tokens: this.maxTokens,
       messages: [{ role: "user", content: prompt }],

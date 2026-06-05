@@ -28,8 +28,8 @@
     "@types/node": "^20.0.0",
     "@types/pdf-parse": "^1.1.4",
     "@types/pg": "^8.11.6",
-    "@typescript-eslint/eslint-plugin": "^7.0.0",
-    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.60.1",
+    "@typescript-eslint/parser": "^8.60.1",
     "tsx": "^4.11.0",
     "typescript": "^5.4.0",
     "vitest": "^1.6.0"
