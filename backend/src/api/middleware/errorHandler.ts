@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
+import config from "../../config";
 
 export function errorHandler(
   err: unknown,
@@ -18,7 +19,7 @@ export function errorHandler(
     return;
   }
 
-  if (process.env.NODE_ENV !== "production" && err instanceof Error) {
+  if (config.server.nodeEnv !== "production" && err instanceof Error) {
     console.error(err.stack);
   }
 

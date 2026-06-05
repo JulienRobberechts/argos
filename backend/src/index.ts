@@ -4,8 +4,10 @@ import path from "path";
 
 dotenv.config({ path: path.join(__dirname, "../../.env.local") });
 
+import config from "./config";
+
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = config.server.port;
 
 app.use(express.json());
 

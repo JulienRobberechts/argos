@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { LLMPort } from "../../domain/ports/LLMPort";
+import config from "../../config";
 
 export class AnthropicLLMAdapter implements LLMPort {
   private readonly client: Anthropic;
@@ -7,8 +8,8 @@ export class AnthropicLLMAdapter implements LLMPort {
   private readonly maxTokens: number;
 
   constructor(
-    apiKey: string = process.env.ANTHROPIC_API_KEY ?? "",
-    maxTokens = parseInt(process.env.LLM_MAX_TOKENS ?? "1024", 10),
+    apiKey: string = config.llm.apiKey,
+    maxTokens = config.llm.maxTokens,
   ) {
     this.client = new Anthropic({ apiKey });
     this.maxTokens = maxTokens;

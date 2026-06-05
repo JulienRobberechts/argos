@@ -1,9 +1,8 @@
 import { Pool } from "pg";
+import config from "../../config";
 
 const pool = new Pool({
-  connectionString:
-    process.env.DATABASE_URL ||
-    "postgresql://devknowledge:devknowledge@localhost:5432/devknowledge",
+  connectionString: config.db.connectionString,
 });
 
 export default pool;

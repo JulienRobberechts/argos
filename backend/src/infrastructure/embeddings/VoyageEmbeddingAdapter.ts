@@ -1,4 +1,5 @@
 import { EmbeddingPort } from "../../domain/ports/EmbeddingPort";
+import config from "../../config";
 
 interface VoyageEmbeddingItem {
   embedding: number[];
@@ -34,7 +35,7 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
   private readonly model = "voyage-3-lite";
   private readonly apiUrl = "https://api.voyageai.com/v1/embeddings";
 
-  constructor(apiKey: string = process.env.VOYAGE_API_KEY ?? "") {
+  constructor(apiKey: string = config.embeddings.apiKey) {
     this.apiKey = apiKey;
   }
 
