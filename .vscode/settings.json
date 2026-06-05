@@ -1,0 +1,3 @@
+{
+  "vitest.rootConfig": "./backend/vitest.config.ts"
+}

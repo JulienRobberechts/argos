@@ -128,6 +128,13 @@ describe.skipIf(!VOYAGE_API_KEY)(
       it(`top-${topK} results for "${question}" contain "${expectedKeyword}"`, async () => {
         const results = await search.execute(question, topK, 0.0);
         expect(results.length).toBeGreaterThan(0);
+
+        // display retrieved chunks for debugging
+        console.log(
+          `Question: ${question}\nRetrieved chunks:\n${results
+            .map((r, i) => `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`)
+            .join("\n")}\n`,
+        );
         const combined = results
           .map((r) => r.chunk.content)
           .join(" ")
