@@ -66,6 +66,7 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
 
   private async embedBatch(texts: string[]): Promise<number[][]> {
     return withRetry(async () => {
+      // should we use input_type in body? seems to be optional and defaults to None
       const response = await fetch(this.apiUrl, {
         method: "POST",
         headers: {
