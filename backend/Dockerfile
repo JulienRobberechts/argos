@@ -4,4 +4,4 @@ COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 3205
-CMD ["npm", "run", "dev"]
+CMD ["sh", "-c", "npm run migrate && npm run dev"]
