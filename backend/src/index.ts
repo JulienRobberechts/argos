@@ -52,12 +52,17 @@ const ingestDocument = new IngestDocument(
   embeddingAdapter,
   fileParser,
   chunkingStrategy,
+  { chunkSize: config.rag.chunkSize, chunkOverlap: config.rag.chunkOverlap },
 );
 const searchKnowledge = new SearchKnowledge(chunkRepo, embeddingAdapter);
 const askQuestion = new AskQuestion(
   searchKnowledge,
   llmAdapter,
   conversationRepo,
+  {
+    retrievalLimit: config.rag.retrievalLimit,
+    retrievalMinScore: config.rag.retrievalMinScore,
+  },
 );
 
 const app = express();
