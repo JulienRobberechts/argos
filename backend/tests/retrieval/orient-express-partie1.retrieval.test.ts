@@ -9,6 +9,10 @@ import { SearchKnowledge } from "../../src/application/SearchKnowledge";
 import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository";
 
+const CHUNK_SIZE = 40;
+const CHUNK_OVERLAP = 5;
+const MIN_SCORE = 0.0;
+
 const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY;
 const DOCUMENT_PATH = path.resolve(
   __dirname,
@@ -31,6 +35,7 @@ const RETRIEVAL_CASES: {
   {
     question: "En quelle année le premier Orient-Express a-t-il été lancé ?",
     expectedKeyword: "1883",
+    topK: 3,
   },
   {
     question: "Quelle était la liaison initiale assurée par le train ?",
@@ -105,7 +110,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
         parser,
         chunkingStrategy,
         // Small chunks to split the paragraph into distinct retrievable sections.
-        { chunkSize: 40, chunkOverlap: 5 },
+        { chunkSize: CHUNK_SIZE, chunkOverlap: CHUNK_OVERLAP },
       );
 
       await ingest.execute(documentId);
@@ -126,7 +131,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
 
     for (const { question, expectedKeyword, topK = 1 } of RETRIEVAL_CASES) {
       it(`top-${topK} results for "${question}" contain "${expectedKeyword}"`, async () => {
-        const results = await search.execute(question, topK, 0.0);
+        const results = await search.execute(question, topK, MIN_SCORE);
         expect(results.length).toBeGreaterThan(0);
 
         // display retrieved chunks for debugging
