@@ -1,5 +1,8 @@
 import { EmbeddingPort } from "../../domain/ports/EmbeddingPort";
 import config from "../../config";
+import { Logger } from "../logger/Logger";
+
+const logger = new Logger("VoyageEmbeddingAdapter");
 
 interface VoyageEmbeddingItem {
   embedding: number[];
@@ -66,6 +69,12 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
 
   private async embedBatch(texts: string[]): Promise<number[][]> {
     return withRetry(async () => {
+      logger.debug("Voyage API request", {
+        model: this.model,
+        inputCount: texts.length,
+      });
+      const start = Date.now();
+
       // should we use input_type in body? seems to be optional and defaults to None
       const response = await fetch(this.apiUrl, {
         method: "POST",
@@ -78,10 +87,16 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
 
       if (!response.ok) {
         const body = await response.text();
+        logger.error("Voyage API error", { status: response.status, body });
         throw new Error(`Voyage API error: ${response.status} ${body}`);
       }
 
       const data = (await response.json()) as VoyageResponse;
+      logger.debug("Voyage API response", {
+        model: this.model,
+        inputCount: texts.length,
+        durationMs: Date.now() - start,
+      });
       return data.data
         .sort((a, b) => a.index - b.index)
         .map((d) => d.embedding);

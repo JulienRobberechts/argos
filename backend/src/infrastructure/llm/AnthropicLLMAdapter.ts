@@ -1,6 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { LLMPort } from "../../domain/ports/LLMPort";
 import config from "../../config";
+import { Logger } from "../logger/Logger";
+
+const logger = new Logger("AnthropicLLMAdapter");
 
 export class AnthropicLLMAdapter implements LLMPort {
   private readonly client: Anthropic;
@@ -22,6 +25,13 @@ export class AnthropicLLMAdapter implements LLMPort {
   ): Promise<string> {
     let fullContent = "";
 
+    logger.info("Anthropic LLM request", {
+      model: this.model,
+      maxTokens: this.maxTokens,
+      promptLength: prompt.length,
+    });
+    const start = Date.now();
+
     const stream = this.client.messages.stream({
       model: this.model,
       max_tokens: this.maxTokens,
@@ -42,6 +52,12 @@ export class AnthropicLLMAdapter implements LLMPort {
         fullContent += chunk.delta.text;
       }
     }
+
+    logger.info("Anthropic LLM response", {
+      model: this.model,
+      durationMs: Date.now() - start,
+      responseLength: fullContent.length,
+    });
 
     return fullContent;
   }
