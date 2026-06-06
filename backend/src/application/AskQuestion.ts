@@ -3,6 +3,7 @@ import { Message, SourceCitation } from "../domain/entities/Message";
 import { ChunkSearchResult } from "../domain/ports/ChunkRepository";
 import { ConversationRepository } from "../domain/ports/ConversationRepository";
 import { LLMPort } from "../domain/ports/LLMPort";
+import { Logger } from "../infrastructure/logger/Logger";
 import { SearchKnowledge } from "./SearchKnowledge";
 
 const SLIDING_WINDOW_EXCHANGES = 4;
@@ -18,6 +19,7 @@ interface AskQuestionConfig {
 export class AskQuestion {
   private readonly retrievalLimit: number;
   private readonly retrievalMinScore: number;
+  private readonly logger = new Logger("AskQuestion");
 
   constructor(
     private readonly searchKnowledge: SearchKnowledge,
@@ -48,13 +50,26 @@ export class AskQuestion {
     };
     await this.conversationRepo.addMessage(conversationId, userMessage);
 
+    this.logger.info("Question received", {
+      conversationId,
+      question: userContent,
+    });
+
     const searchResults = await this.searchKnowledge.execute(
       userContent,
       this.retrievalLimit,
       this.retrievalMinScore,
     );
 
+    this.logger.info("Retrieval complete", {
+      conversationId,
+      chunks: searchResults.length,
+    });
+
     if (searchResults.length === 0) {
+      this.logger.warn("No chunks found, returning no-info response", {
+        conversationId,
+      });
       const noInfoMessage: Message = {
         id: randomUUID(),
         conversationId,
@@ -72,7 +87,12 @@ export class AskQuestion {
     let assistantContent: string;
     try {
       assistantContent = await this.llmAdapter.stream(prompt, onToken, signal);
-    } catch {
+      this.logger.info("LLM response complete", { conversationId });
+    } catch (err) {
+      this.logger.error(
+        "LLM streaming failed",
+        err instanceof Error ? err : new Error(String(err)),
+      );
       const errorMessage: Message = {
         id: randomUUID(),
         conversationId,

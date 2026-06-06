@@ -1,3 +1,4 @@
 {
-  "vitest.rootConfig": "./backend/vitest.config.ts"
+  "vitest.rootConfig": "./backend/vitest.config.ts",
+  "terminal.integrated.scrollback": 10000
 }

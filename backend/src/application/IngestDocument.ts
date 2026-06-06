@@ -4,6 +4,7 @@ import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
 import { FileParserPort } from "../domain/ports/FileParserPort";
 import { ChunkingStrategy } from "../domain/services/ChunkingStrategy";
+import { Logger } from "../infrastructure/logger/Logger";
 
 const BATCH_SIZE = 20;
 
@@ -15,6 +16,7 @@ interface IngestConfig {
 export class IngestDocument {
   private readonly chunkSize: number;
   private readonly chunkOverlap: number;
+  private readonly logger = new Logger("IngestDocument");
 
   constructor(
     private readonly documentRepo: DocumentRepository,
@@ -32,6 +34,11 @@ export class IngestDocument {
     const document = await this.documentRepo.findById(documentId);
     if (!document) throw new Error(`Document ${documentId} not found`);
 
+    this.logger.info("Starting ingestion", {
+      documentId,
+      file: document.filePath,
+    });
+
     await this.chunkRepo.deleteByDocumentId(documentId);
     await this.documentRepo.updateStatus(documentId, "processing");
 
@@ -40,6 +47,11 @@ export class IngestDocument {
       const chunkResults = this.chunkingStrategy.chunk(text, {
         chunkSize: this.chunkSize,
         chunkOverlap: this.chunkOverlap,
+      });
+
+      this.logger.info("Chunking complete", {
+        documentId,
+        chunks: chunkResults.length,
       });
 
       const contents = chunkResults.map((r) => r.content);
@@ -61,7 +73,15 @@ export class IngestDocument {
 
       await this.chunkRepo.saveMany(chunks);
       await this.documentRepo.updateStatus(documentId, "ready");
-    } catch {
+      this.logger.info("Ingestion complete", {
+        documentId,
+        chunks: chunks.length,
+      });
+    } catch (err) {
+      this.logger.error(
+        "Ingestion failed",
+        err instanceof Error ? err : new Error(String(err)),
+      );
       await this.documentRepo.updateStatus(documentId, "error");
     }
   }

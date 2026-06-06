@@ -69,9 +69,10 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
 
   private async embedBatch(texts: string[]): Promise<number[][]> {
     return withRetry(async () => {
-      logger.debug("Voyage API request", {
+      logger.info("Voyage API request", {
         model: this.model,
         inputCount: texts.length,
+        texts: texts,
       });
       const start = Date.now();
 
@@ -92,9 +93,11 @@ export class VoyageEmbeddingAdapter implements EmbeddingPort {
       }
 
       const data = (await response.json()) as VoyageResponse;
-      logger.debug("Voyage API response", {
+      logger.info("Voyage API response", {
         model: this.model,
         inputCount: texts.length,
+        texts: texts,
+        response: data,
         durationMs: Date.now() - start,
       });
       return data.data
