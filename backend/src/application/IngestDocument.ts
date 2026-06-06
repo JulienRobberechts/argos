@@ -37,6 +37,8 @@ export class IngestDocument {
     this.logger.info("Starting ingestion", {
       documentId,
       file: document.filePath,
+      chunkSize: this.chunkSize,
+      chunkOverlap: this.chunkOverlap,
     });
 
     await this.chunkRepo.deleteByDocumentId(documentId);
@@ -54,12 +56,19 @@ export class IngestDocument {
         chunks: chunkResults.length,
       });
 
+      chunkResults.forEach((r, i) => {
+        this.logger.info(`Chunk ${i}`, { content: r.content });
+      });
+
       const contents = chunkResults.map((r) => r.content);
       const embeddings: number[][] = [];
 
       for (let i = 0; i < contents.length; i += BATCH_SIZE) {
         const batch = contents.slice(i, i + BATCH_SIZE);
-        const batchEmbeddings = await this.embeddingAdapter.embedMany(batch, "document");
+        const batchEmbeddings = await this.embeddingAdapter.embedMany(
+          batch,
+          "document",
+        );
         embeddings.push(...batchEmbeddings);
       }
 
@@ -77,6 +86,7 @@ export class IngestDocument {
         documentId,
         chunks: chunks.length,
       });
+      this.logger.info("Ending ingestion", { documentId });
     } catch (err) {
       this.logger.error(
         "Ingestion failed",

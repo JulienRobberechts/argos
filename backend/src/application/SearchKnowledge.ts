@@ -16,6 +16,15 @@ export class SearchKnowledge {
     minScore = 0.7,
   ): Promise<ChunkSearchResult[]> {
     const vector = await this.embeddingAdapter.embed(query, "query");
-    return this.chunkRepo.search(vector, limit, minScore);
+    const results = await this.chunkRepo.search(vector, limit, minScore);
+    if (results.length === 0) {
+      console.warn("[SearchKnowledge] No results found", {
+        query,
+        limit,
+        minScore,
+        vectorLength: vector.length,
+      });
+    }
+    return results;
   }
 }
