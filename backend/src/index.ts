@@ -34,7 +34,7 @@ import { PgConversationRepository } from "./infrastructure/db/PgConversationRepo
 import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
-import { ChunkingStrategy } from "./domain/services/ChunkingStrategy";
+import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
@@ -45,7 +45,7 @@ const conversationRepo = new PgConversationRepository();
 const embeddingAdapter = new VoyageEmbeddingAdapter();
 const llmAdapter = new AnthropicLLMAdapter();
 const fileParser = new MultiFileParser();
-const chunkingStrategy = new ChunkingStrategy();
+const chunkingStrategy = createChunkingStrategy(config.rag.chunkingStrategy);
 const ingestDocument = new IngestDocument(
   documentRepo,
   chunkRepo,

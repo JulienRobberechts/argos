@@ -25,6 +25,9 @@ const config = {
     key: process.env.API_KEY,
   },
   rag: {
+    chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as
+      | "recursive"
+      | "sentence",
     chunkSize: parseInt(process.env.CHUNK_SIZE_TOKENS ?? "400", 10),
     chunkOverlap: parseInt(process.env.CHUNK_OVERLAP_TOKENS ?? "50", 10),
     retrievalLimit: parseInt(process.env.RETRIEVAL_LIMIT ?? "8", 10),

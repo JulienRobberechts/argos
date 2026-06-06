@@ -3,7 +3,7 @@ import { ChunkRepository } from "../domain/ports/ChunkRepository";
 import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
 import { FileParserPort } from "../domain/ports/FileParserPort";
-import { ChunkingStrategy } from "../domain/services/ChunkingStrategy";
+import type { IChunkingStrategy } from "../domain/services/ChunkingTypes";
 import { Logger } from "../infrastructure/logger/Logger";
 
 const BATCH_SIZE = 20;
@@ -23,7 +23,7 @@ export class IngestDocument {
     private readonly chunkRepo: ChunkRepository,
     private readonly embeddingAdapter: EmbeddingPort,
     private readonly fileParser: FileParserPort,
-    private readonly chunkingStrategy: ChunkingStrategy,
+    private readonly chunkingStrategy: IChunkingStrategy,
     config: IngestConfig = {},
   ) {
     this.chunkSize = config.chunkSize ?? 400;

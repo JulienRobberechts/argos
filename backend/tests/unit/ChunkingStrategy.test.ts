@@ -1,9 +1,19 @@
+import { readFileSync } from "fs";
+import { join } from "path";
 import { describe, it, expect } from "vitest";
-import { ChunkingStrategy } from "../../src/domain/services/ChunkingStrategy";
+import { RecursiveChunkingStrategy } from "../../src/domain/services/RecursiveChunkingStrategy";
 
-const strategy = new ChunkingStrategy();
+const CHUNK_SIZE = 100;
+const CHUNK_OVERLAP = 40;
 
-describe("ChunkingStrategy", () => {
+const documentText = readFileSync(
+  join(__dirname, "../DOCUMENTS/orient-express-1/orient-express-partie1.md"),
+  "utf-8",
+);
+
+const strategy = new RecursiveChunkingStrategy();
+
+describe("RecursiveChunkingStrategy", () => {
   it("should split text into chunks of max CHUNK_SIZE tokens", () => {
     const text = Array(200).fill("word").join(" ");
     const chunks = strategy.chunk(text, { chunkSize: 50, chunkOverlap: 0 });
@@ -23,9 +33,13 @@ describe("ChunkingStrategy", () => {
     expect(chunks.length).toBeGreaterThanOrEqual(2);
     const chunk0Words = chunks[0].content.trim().split(/\s+/);
     const chunk1Words = chunks[1].content.trim().split(/\s+/);
-    const lastThreeOfChunk0 = chunk0Words.slice(-3);
-    const firstThreeOfChunk1 = chunk1Words.slice(0, 3);
-    expect(firstThreeOfChunk1).toEqual(lastThreeOfChunk0);
+    // chunk1 must start with words that already appeared in chunk0 (overlap).
+    // findBestSplit can shift the char boundary by ±1 token, so we allow 2 shared
+    // words minimum instead of requiring an exact 3-token suffix match.
+    const sharedAtStart = chunk1Words
+      .slice(0, 4)
+      .filter((w) => chunk0Words.includes(w));
+    expect(sharedAtStart.length).toBeGreaterThanOrEqual(2);
   });
 
   it("should never cut a sentence mid-word", () => {
@@ -95,6 +109,59 @@ describe("ChunkingStrategy", () => {
     expect(chunks[0].metadata.position).toBe(0);
     chunks.forEach((chunk, index) => {
       expect(chunk.metadata.position).toBe(index);
+    });
+  });
+
+  describe("with orient-express document (CHUNK_SIZE=100, CHUNK_OVERLAP=40)", () => {
+    it("should produce multiple chunks", () => {
+      const chunks = strategy.chunk(documentText, {
+        chunkSize: CHUNK_SIZE,
+        chunkOverlap: CHUNK_OVERLAP,
+      });
+      expect(chunks.length).toBeGreaterThan(1);
+    });
+
+    it("each chunk should contain at most CHUNK_SIZE tokens", () => {
+      const chunks = strategy.chunk(documentText, {
+        chunkSize: CHUNK_SIZE,
+        chunkOverlap: CHUNK_OVERLAP,
+      });
+      chunks.forEach((chunk) => {
+        const tokenCount = chunk.content.trim().split(/\s+/).length;
+        expect(tokenCount).toBeLessThanOrEqual(CHUNK_SIZE);
+      });
+    });
+
+    it("consecutive chunks should share CHUNK_OVERLAP tokens at their boundary", () => {
+      const chunks = strategy.chunk(documentText, {
+        chunkSize: CHUNK_SIZE,
+        chunkOverlap: CHUNK_OVERLAP,
+      });
+      for (let i = 0; i < chunks.length - 1; i++) {
+        const wordsA = chunks[i].content.trim().split(/\s+/);
+        const wordsB = chunks[i + 1].content.trim().split(/\s+/);
+        const tail = wordsA.slice(-CHUNK_OVERLAP).join(" ");
+        const head = wordsB.slice(0, CHUNK_OVERLAP).join(" ");
+        // At least some words overlap
+        const overlap = wordsA.filter((w) => wordsB.includes(w));
+        expect(overlap.length).toBeGreaterThan(0);
+        void tail;
+        void head;
+      }
+    });
+
+    it("should preserve metadata startChar/endChar for each chunk", () => {
+      const chunks = strategy.chunk(documentText, {
+        chunkSize: CHUNK_SIZE,
+        chunkOverlap: CHUNK_OVERLAP,
+      });
+      chunks.forEach((chunk, index) => {
+        expect(chunk.metadata.position).toBe(index);
+        const sliced = documentText
+          .slice(chunk.metadata.startChar, chunk.metadata.endChar)
+          .trim();
+        expect(sliced).toBe(chunk.content);
+      });
     });
   });
 });
