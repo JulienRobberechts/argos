@@ -73,6 +73,7 @@ export class ChunkingStrategy {
 
     const results: ChunkResult[] = [];
     let tokenStart = 0;
+    const step = chunkSize - chunkOverlap;
 
     while (tokenStart < tokens.length) {
       const tokenEnd = Math.min(tokenStart + chunkSize, tokens.length);
@@ -80,24 +81,13 @@ export class ChunkingStrategy {
       const maxCharEnd = tokens[tokenEnd - 1].end;
 
       let charEnd: number;
-      let lastTokenInChunk: number;
-
       if (tokenEnd >= tokens.length) {
         charEnd = text.length;
-        lastTokenInChunk = tokenEnd - 1;
       } else {
         const searchFrom = Math.floor(
           charStart + (maxCharEnd - charStart) * 0.5,
         );
         charEnd = findBestSplit(text, searchFrom, maxCharEnd);
-
-        lastTokenInChunk = tokenEnd - 1;
-        while (
-          lastTokenInChunk > tokenStart &&
-          tokens[lastTokenInChunk].start >= charEnd
-        ) {
-          lastTokenInChunk--;
-        }
       }
 
       const content = text.slice(charStart, charEnd).trim();
@@ -112,11 +102,7 @@ export class ChunkingStrategy {
         });
       }
 
-      const nextTokenStart = Math.max(
-        lastTokenInChunk - chunkOverlap + 1,
-        tokenStart + 1,
-      );
-      tokenStart = nextTokenStart;
+      tokenStart += step;
     }
 
     return results;
