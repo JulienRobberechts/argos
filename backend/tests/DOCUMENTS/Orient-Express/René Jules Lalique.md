@@ -1,0 +1,3 @@
+René Jules Lalique, né le 6 avril 1860 à Aÿ (Marne) et mort le 1er mai 1945 à Paris 8e, est un maître verrier, bijoutier, joaillier et médailleur[1],[2] français.
+
+Il s'est rendu célèbre par ses créations étonnantes de bijoux, puis de flacons de parfum, de vases, de chandeliers, d'horloges et, à la fin de sa vie, de bouchons de radiateur de voitures. L'entreprise qu'il a fondée fonctionne toujours. Son nom est resté attaché à la créativité et la qualité, car il a toujours su dessiner des objets fastueux mais restant discrets. 

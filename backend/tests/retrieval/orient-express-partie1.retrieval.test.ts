@@ -14,9 +14,9 @@ import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository"
 // const CHUNK_OVERLAP = 5;
 // const MIN_SCORE = 0.0;
 
-// const CHUNK_SIZE = 50; // 
+// const CHUNK_SIZE = 50; //
 // const CHUNK_OVERLAP = 20; // (40% de CHUNK_SIZE)
-// const MIN_SCORE = 0.3; // 
+// const MIN_SCORE = 0.3; //
 
 // OK
 const CHUNK_SIZE = 100;
@@ -28,11 +28,10 @@ const MIN_SCORE = 0.3;
 // const CHUNK_OVERLAP = 50;
 // const MIN_SCORE = 0.75;
 
-
 const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY;
 const DOCUMENT_PATH = path.resolve(
   __dirname,
-  "../../../../DOCUMENTS/orient-express-1/orient-express-partie1.md",
+  "../DOCUMENTS/orient-express-1/orient-express-partie1.md",
 );
 
 // Each case: the question, the keyword that must appear in the retrieved chunk,
@@ -153,7 +152,10 @@ describe.skipIf(!VOYAGE_API_KEY)(
         // display retrieved chunks for debugging
         console.log(
           `Question: ${question}\nRetrieved chunks:\n${results
-            .map((r, i) => `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`)
+            .map(
+              (r, i) =>
+                `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`,
+            )
             .join("\n")}\n`,
         );
         const combined = results

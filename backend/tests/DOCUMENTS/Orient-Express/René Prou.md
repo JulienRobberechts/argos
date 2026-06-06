@@ -1,0 +1,5 @@
+René Prou, né le 14 juillet 1887 à Nantes et mort à Paris 8e le 6 juin 1947[1], est un décorateur ensemblier français.
+
+Ses nombreuses réalisations conçues spécifiquement pour les plus beaux lieux mobiles comme immobiles en feront un des artistes principaux du mouvement Art Déco et de l'Art du Voyage. L'historienne et spécialiste Anne Bony[2] déclare à son sujet : « Je me suis attachée à ce personnage [...], à son élégance sobre, son goût pour la couleur et son indépendance d'esprit ... »[3].
+
+Toujours préoccupé par le confort de l'usager, il décore sans orner, et réfute les théories modernistes de son temps qu'il juge trop éloignées de son idée du confort. Attaché à cette valeur, il sera tout de même un visionnaire en utilisant et créant de nouveaux matériaux, tels que le métal et le Duralumin. 
