@@ -20,7 +20,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    env_file: .env.local
+    env_file: .env
     ports:
       - "3205:3205"
     volumes:

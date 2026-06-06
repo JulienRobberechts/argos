@@ -10,10 +10,10 @@
 
 ```bash
 cd devknowledge
-cp .env.example .env.local
+cp .env.example .env
 ```
 
-Renseigner dans `.env.local` :
+Renseigner dans `.env` :
 
 | Variable | Description |
 |---|---|
@@ -32,7 +32,7 @@ Démarrer PostgreSQL avec pgvector :
 
 ```bash
 cd devknowledge
-docker compose --env-file .env.local up -d postgres
+docker compose up -d postgres
 ```
 
 ### Backend
@@ -56,14 +56,14 @@ npm run dev       # écoute sur http://localhost:5173
 
 ```bash
 cd devknowledge
-docker compose --env-file .env.local up --build
+docker compose up --build
 ```
 
 L'API sera disponible sur `http://localhost:3205`, le frontend sur `http://localhost:5173`.
 
 ## Lecture des logs
 
-docker compose --env-file .env.local logs -f api > log.ans 2>&1
+docker compose logs -f api > log.ans 2>&1
 
 
 

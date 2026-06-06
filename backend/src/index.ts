@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { z } from "zod";
 
-dotenv.config({ path: path.join(__dirname, "../../.env.local") });
+dotenv.config({ path: path.join(__dirname, "../../.env") });
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
