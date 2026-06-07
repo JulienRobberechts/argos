@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { VoyageEmbeddingAdapter } from "../../src/infrastructure/embeddings/VoyageEmbeddingAdapter";
+import { VoyageEmbeddingAdapter } from "./VoyageEmbeddingAdapter";
 
 const mockFetch = vi.fn();
 vi.stubGlobal("fetch", mockFetch);

@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Request, Response, NextFunction } from "express";
 
-vi.mock("../../src/config", () => ({
+vi.mock("../../config", () => ({
   default: { api: { key: "secret-key" }, server: { nodeEnv: "test" } },
 }));
 
-import { apiKeyAuth } from "../../src/api/middleware/apiKeyAuth";
+import { apiKeyAuth } from "./apiKeyAuth";
 
 function makeRes() {
   const res = {
@@ -25,7 +25,7 @@ describe("apiKeyAuth", () => {
       headers: { "x-api-key": "secret-key" },
     } as unknown as Request;
     const res = makeRes();
-    const next = vi.fn() as NextFunction;
+    const next = vi.fn() as unknown as NextFunction;
     apiKeyAuth(req, res, next);
     expect(next).toHaveBeenCalledOnce();
     expect(res.status).not.toHaveBeenCalled();
@@ -34,7 +34,7 @@ describe("apiKeyAuth", () => {
   it("returns 401 when API key is missing", () => {
     const req = { headers: {} } as unknown as Request;
     const res = makeRes();
-    const next = vi.fn() as NextFunction;
+    const next = vi.fn() as unknown as NextFunction;
     apiKeyAuth(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.json).toHaveBeenCalledWith({ error: "Unauthorized" });
@@ -44,7 +44,7 @@ describe("apiKeyAuth", () => {
   it("returns 401 when API key is wrong", () => {
     const req = { headers: { "x-api-key": "wrong-key" } } as unknown as Request;
     const res = makeRes();
-    const next = vi.fn() as NextFunction;
+    const next = vi.fn() as unknown as NextFunction;
     apiKeyAuth(req, res, next);
     expect(res.status).toHaveBeenCalledWith(401);
     expect(next).not.toHaveBeenCalled();

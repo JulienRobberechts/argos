@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Request, Response, NextFunction } from "express";
 import { ZodError, ZodIssueCode } from "zod";
 
-vi.mock("../../src/config", () => ({
+vi.mock("../../config", () => ({
   default: { api: { key: "key" }, server: { nodeEnv: "development" } },
 }));
 
-import { errorHandler } from "../../src/api/middleware/errorHandler";
+import { errorHandler } from "./errorHandler";
 
 function makeRes() {
   const res = {
@@ -17,7 +17,7 @@ function makeRes() {
 }
 
 const fakeReq = {} as Request;
-const fakeNext = vi.fn() as NextFunction;
+const fakeNext = vi.fn() as unknown as NextFunction;
 
 beforeEach(() => {
   vi.clearAllMocks();

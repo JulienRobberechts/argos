@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 import { VoyageEmbeddingAdapter } from "../../src/infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { MarkdownParser } from "../../src/infrastructure/parsers/MarkdownParser";
-import { ChunkingStrategy } from "../../src/domain/services/ChunkingStrategy";
+import { createChunkingStrategy } from "../../src/domain/services/ChunkingStrategy";
 import { IngestDocument } from "../../src/application/IngestDocument";
 import { SearchKnowledge } from "../../src/application/SearchKnowledge";
 import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
@@ -104,7 +104,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
     beforeAll(async () => {
       const embeddingAdapter = new VoyageEmbeddingAdapter(VOYAGE_API_KEY!);
       const parser = new MarkdownParser();
-      const chunkingStrategy = new ChunkingStrategy();
+      const chunkingStrategy = createChunkingStrategy("recursive");
       const docRepo = new InMemoryDocumentRepository();
       const chunkRepo = new InMemoryChunkRepository();
 

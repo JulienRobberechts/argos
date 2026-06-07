@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { writeFile, mkdtemp } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
-import { PdfParser } from "../../src/infrastructure/parsers/PdfParser";
+import { PdfParser } from "./PdfParser";
 
 let tmpDir: string;
 

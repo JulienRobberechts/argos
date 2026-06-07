@@ -10,14 +10,14 @@ vi.mock("@anthropic-ai/sdk", () => {
   return { default: MockAnthropic };
 });
 
-vi.mock("../../src/config", () => ({
+vi.mock("../../config", () => ({
   default: {
     llm: { anthropic: { apiKey: "test-key", maxTokens: 512 } },
     server: { nodeEnv: "test" },
   },
 }));
 
-import { AnthropicLLMAdapter } from "../../src/infrastructure/llm/AnthropicLLMAdapter";
+import { AnthropicLLMAdapter } from "./AnthropicLLMAdapter";
 
 function makeTextChunk(text: string) {
   return {

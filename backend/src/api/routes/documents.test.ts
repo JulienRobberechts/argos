@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { randomUUID } from "crypto";
 import express from "express";
 import request from "supertest";
-import { documentsRouter } from "../../src/api/routes/documents";
-import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository";
-import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
-import { Document } from "../../src/domain/entities/Document";
+import { documentsRouter } from "./documents";
+import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
+import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
+import { Document } from "../../domain/entities/Document";
 
 function makeDoc(overrides?: Partial<Document>): Document {
   return {

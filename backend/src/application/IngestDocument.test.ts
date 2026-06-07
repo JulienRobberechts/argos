@@ -1,10 +1,13 @@
 import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Document } from "../../src/domain/entities/Document";
-import { IngestDocument } from "../../src/application/IngestDocument";
-import { ChunkingStrategy } from "../../src/domain/services/ChunkingStrategy";
-import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
-import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository";
+import { Document } from "../domain/entities/Document";
+import { IngestDocument } from "./IngestDocument";
+import {
+  createChunkingStrategy,
+  IChunkingStrategy,
+} from "../domain/services/ChunkingStrategy";
+import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
+import { InMemoryDocumentRepository } from "../../tests/fakes/InMemoryDocumentRepository";
 
 function makeDocument(overrides?: Partial<Document>): Document {
   return {
@@ -42,14 +45,14 @@ describe("IngestDocument", () => {
   let chunkRepo: InMemoryChunkRepository;
   let embeddingAdapter: ReturnType<typeof makeEmbeddingAdapter>;
   let fileParser: ReturnType<typeof makeFileParser>;
-  let chunkingStrategy: ChunkingStrategy;
+  let chunkingStrategy: IChunkingStrategy;
 
   beforeEach(() => {
     docRepo = new InMemoryDocumentRepository();
     chunkRepo = new InMemoryChunkRepository();
     embeddingAdapter = makeEmbeddingAdapter();
     fileParser = makeFileParser();
-    chunkingStrategy = new ChunkingStrategy();
+    chunkingStrategy = createChunkingStrategy("recursive");
   });
 
   it("should parse the file content using the correct parser by sourceType", async () => {

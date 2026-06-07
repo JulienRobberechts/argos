@@ -1,12 +1,12 @@
 import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Chunk } from "../../src/domain/entities/Chunk";
-import { Conversation } from "../../src/domain/entities/Conversation";
-import { Message } from "../../src/domain/entities/Message";
-import { AskQuestion } from "../../src/application/AskQuestion";
-import { SearchKnowledge } from "../../src/application/SearchKnowledge";
-import { ChunkSearchResult } from "../../src/domain/ports/ChunkRepository";
-import { InMemoryConversationRepository } from "../fakes/InMemoryConversationRepository";
+import { Chunk } from "../domain/entities/Chunk";
+import { Conversation } from "../domain/entities/Conversation";
+import { Message } from "../domain/entities/Message";
+import { AskQuestion } from "./AskQuestion";
+import { SearchKnowledge } from "./SearchKnowledge";
+import { ChunkSearchResult } from "../domain/ports/ChunkRepository";
+import { InMemoryConversationRepository } from "../../tests/fakes/InMemoryConversationRepository";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {

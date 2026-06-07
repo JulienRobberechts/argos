@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import express from "express";
 import request from "supertest";
-import { searchRouter } from "../../src/api/routes/search";
-import { errorHandler } from "../../src/api/middleware/errorHandler";
-import { SearchKnowledge } from "../../src/application/SearchKnowledge";
+import { searchRouter } from "./search";
+import { errorHandler } from "../middleware/errorHandler";
+import { SearchKnowledge } from "../../application/SearchKnowledge";
 
 function makeApp(searchKnowledge: Partial<SearchKnowledge>) {
   const app = express();
@@ -33,7 +33,9 @@ describe("searchRouter", () => {
         score: 0.9,
       },
     ]);
-    const res = await request(makeApp(mockSearch))
+    const res = await request(
+      makeApp(mockSearch as unknown as Partial<SearchKnowledge>),
+    )
       .post("/search")
       .send({ query: "test query" });
     expect(res.status).toBe(200);
@@ -42,12 +44,18 @@ describe("searchRouter", () => {
   });
 
   it("POST /search returns 400 for missing query", async () => {
-    const res = await request(makeApp(mockSearch)).post("/search").send({});
+    const res = await request(
+      makeApp(mockSearch as unknown as Partial<SearchKnowledge>),
+    )
+      .post("/search")
+      .send({});
     expect(res.status).toBe(400);
   });
 
   it("POST /search respects limit parameter", async () => {
-    const res = await request(makeApp(mockSearch))
+    const res = await request(
+      makeApp(mockSearch as unknown as Partial<SearchKnowledge>),
+    )
       .post("/search")
       .send({ query: "q", limit: 5 });
     expect(res.status).toBe(200);

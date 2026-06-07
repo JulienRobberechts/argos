@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Chunk } from "../../src/domain/entities/Chunk";
-import { SearchKnowledge } from "../../src/application/SearchKnowledge";
-import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
+import { Chunk } from "../domain/entities/Chunk";
+import { SearchKnowledge } from "./SearchKnowledge";
+import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
 
 function makeChunk(embedding: number[], overrides?: Partial<Chunk>): Chunk {
   return {
@@ -33,7 +33,7 @@ describe("SearchKnowledge", () => {
       embedMany: vi.fn(),
     });
     await search.execute("my query");
-    expect(embed).toHaveBeenCalledWith("my query");
+    expect(embed).toHaveBeenCalledWith("my query", "query");
   });
 
   it("should return chunks sorted by score descending", async () => {

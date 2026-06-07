@@ -2,10 +2,10 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { randomUUID } from "crypto";
 import express from "express";
 import request from "supertest";
-import { conversationsRouter } from "../../src/api/routes/conversations";
-import { InMemoryConversationRepository } from "../fakes/InMemoryConversationRepository";
-import { Conversation } from "../../src/domain/entities/Conversation";
-import { Message } from "../../src/domain/entities/Message";
+import { conversationsRouter } from "./conversations";
+import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
+import { Conversation } from "../../domain/entities/Conversation";
+import { Message } from "../../domain/entities/Message";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {

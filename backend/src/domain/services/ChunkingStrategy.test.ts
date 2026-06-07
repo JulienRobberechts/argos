@@ -1,13 +1,16 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 import { describe, it, expect } from "vitest";
-import { RecursiveChunkingStrategy } from "../../src/domain/services/RecursiveChunkingStrategy";
+import { RecursiveChunkingStrategy } from "./RecursiveChunkingStrategy";
 
 const CHUNK_SIZE = 100;
 const CHUNK_OVERLAP = 40;
 
 const documentText = readFileSync(
-  join(__dirname, "../DOCUMENTS/orient-express-1/orient-express-partie1.md"),
+  join(
+    __dirname,
+    "../../../tests/DOCUMENTS/orient-express-1/orient-express-partie1.md",
+  ),
   "utf-8",
 );
 
