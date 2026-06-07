@@ -6,6 +6,8 @@ import recursiveOrientExpressSize150 from "./ChunkingStrategies.snapshots/recurs
 import recursiveVsoeSize100 from "./ChunkingStrategies.snapshots/recursive-vsoe-size100";
 import sentenceOrientExpressSize100Overlap30 from "./ChunkingStrategies.snapshots/sentence-orient-express-size100-overlap30";
 import sentenceVsoeSize80Overlap20 from "./ChunkingStrategies.snapshots/sentence-vsoe-size80-overlap20";
+import sentenceVsoeSize100Overlap30 from "./ChunkingStrategies.snapshots/sentence-vsoe-size100-overlap30";
+import sentenceVsoeSize512Overlap128 from "./ChunkingStrategies.snapshots/sentence-vsoe-size512-overlap128";
 
 export type ChunkCase = {
   text: string;
@@ -108,5 +110,19 @@ export const sentenceDocumentCases: DocumentChunkCase[] = [
     size: 80,
     overlap: 20,
     expected: sentenceVsoeSize80Overlap20,
+  },
+  {
+    name: "vsoe size=100 overlap=30",
+    text: veniseSimplonOrientExpress,
+    size: 100,
+    overlap: 30,
+    expected: sentenceVsoeSize100Overlap30,
+  },
+  {
+    name: "vsoe size=512 overlap=128",
+    text: veniseSimplonOrientExpress,
+    size: 512,
+    overlap: 128,
+    expected: sentenceVsoeSize512Overlap128,
   },
 ];
