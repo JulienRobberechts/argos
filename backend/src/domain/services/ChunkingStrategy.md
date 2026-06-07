@@ -2,105 +2,119 @@
 
 ## Vue d'ensemble
 
-`ChunkingStrategy` découpe un texte long en **chunks** (morceaux) de taille contrôlée, avec chevauchement optionnel entre chunks consécutifs. C'est une étape clé dans un pipeline RAG : les chunks sont ensuite vectorisés et indexés pour la recherche sémantique.
+Le module expose une interface commune `IChunkingStrategy` et deux implémentations. La factory `createChunkingStrategy(name)` retourne la bonne stratégie selon le nom passé.
+
+```
+"recursive" (défaut) → RecursiveChunkingStrategy
+"sentence"           → SentenceChunkingStrategy
+```
 
 ---
 
-## Types publics
+## Types partagés (`ChunkingTypes.ts`)
+
+### `ChunkingStrategyName`
+```ts
+"recursive" | "sentence"
+```
 
 ### `ChunkConfig`
 ```ts
 { chunkSize: number; chunkOverlap: number }
 ```
-- **`chunkSize`** : nombre maximum de tokens (mots) par chunk
-- **`chunkOverlap`** : nombre de tokens répétés entre deux chunks consécutifs (pour éviter de couper un contexte au mauvais endroit)
+- **`chunkSize`** : taille maximale en tokens (mots)
+- **`chunkOverlap`** : tokens répétés entre deux chunks consécutifs
 
 ### `ChunkResult`
 ```ts
 { content: string; metadata: { position, startChar, endChar } }
 ```
 - **`content`** : texte du chunk (trimmed)
-- **`position`** : index du chunk dans la liste résultante
-- **`startChar` / `endChar`** : positions caractères dans le texte original (utile pour tracer la source)
+- **`position`** : index dans `results` (chunks vides ignorés)
+- **`startChar` / `endChar`** : positions caractères dans le texte original
 
----
-
-## Étapes internes
-
-### 1. Tokenisation — `tokenize(text)`
-
-```
-"Hello world foo" → [{ start:0, end:5 }, { start:6, end:11 }, { start:12, end:15 }]
+### `IChunkingStrategy`
+```ts
+interface IChunkingStrategy {
+  chunk(text: string, config: ChunkConfig): ChunkResult[];
+}
 ```
 
-Parcourt le texte avec la regex `/\S+/g` (séquences non-blanches). Chaque **token = un mot** (ou ponctuation collée). Stocke uniquement les indices de début/fin dans le texte original, pas le mot lui-même.
-
-> Le comptage de taille se fait en **nombre de tokens**, mais les chunks sont extraits par **positions caractères**.
-
 ---
 
-### 2. Cas trivial
+## Stratégie 1 : `RecursiveChunkingStrategy`
 
-Si le texte contient ≤ `chunkSize` tokens → un seul chunk couvrant tout le texte. Pas de split nécessaire.
+Découpe basée sur les **tokens** (mots), avec coupure naturelle en caractères.
 
----
+### Étapes
 
-### 3. Boucle de chunking
+**1. Tokenisation** — `/\S+/g` → tableau de `{ start, end }` dans le texte original.
 
+**2. Cas trivial** — si `tokens.length ≤ chunkSize` → un seul chunk.
+
+**3. Boucle**
 ```
 step = chunkSize - chunkOverlap
 tokenStart = 0
 
 while tokenStart < tokens.length:
-    tokenEnd   = min(tokenStart + chunkSize, tokens.length)
-    charStart  = tokens[tokenStart].start
+    tokenEnd  = min(tokenStart + chunkSize, tokens.length)
+    charStart = tokens[tokenStart].start
     maxCharEnd = tokens[tokenEnd-1].end
 
-    charEnd = findBestSplit(...)   # sauf si on est au dernier groupe
-    chunk   = text[charStart:charEnd].trim()
+    if dernier groupe:
+        charEnd = text.length
+    else:
+        searchFrom = charStart + 50% de la fenêtre
+        charEnd = findBestSplit(text, searchFrom, maxCharEnd)
+
     tokenStart += step
 ```
 
-- **`step`** : avancement réel entre deux chunks. Si `chunkSize=100` et `chunkOverlap=20`, on avance de 80 tokens à chaque itération → les 20 derniers tokens du chunk N deviennent les 20 premiers du chunk N+1.
-- **`charStart`** / **`maxCharEnd`** : bornes caractères correspondant aux tokens de la fenêtre courante.
+**4. `findBestSplit`** — cherche en arrière depuis `maxCharEnd` le meilleur point de coupure :
 
----
-
-### 4. Recherche du meilleur point de coupure — `findBestSplit(text, searchFrom, maxEnd)`
-
-Au lieu de couper brutalement au dernier caractère du token `tokenEnd-1`, la fonction cherche **en arrière** depuis `maxCharEnd` un point de coupure naturel. La priorité est :
-
-| Priorité | Condition | Coupure à |
-|----------|-----------|-----------|
-| 1 (meilleure) | `\n\n` (paragraphe) | juste après le `\n\n` |
-| 2 | `\n` (saut de ligne) | juste après le `\n` |
+| Priorité | Pattern | Coupure à |
+|----------|---------|-----------|
+| 1 | `\n\n` | juste après |
+| 2 | `\n` | juste après |
 | 3 | `. ` (fin de phrase) | juste après le `.` |
-| 4 | espace/whitespace | juste après l'espace |
-| 5 (fallback) | rien trouvé | `maxCharEnd` (coupure dure) |
+| 4 | whitespace | juste après |
+| 5 (fallback) | rien | `maxCharEnd` |
 
-La recherche commence à `searchFrom = charStart + 50% de la fenêtre` pour garantir que le chunk fait au moins la moitié de sa taille cible avant de chercher une coupure.
-
-> **Effet** : les chunks sont de taille variable en caractères, mais bornés en tokens. La coupure respecte la structure du document (paragraphes > lignes > phrases > mots).
-
----
-
-## Exemple visuel
-
-```
-chunkSize=5, chunkOverlap=1, step=4
-
-Tokens: [t0 t1 t2 t3 t4 t5 t6 t7 t8]
-
-Chunk 0: tokens 0-4  (t0..t4)
-Chunk 1: tokens 4-8  (t4..t8)  ← t4 répété
-Chunk 2: tokens 8-8  (t8)
-```
+### Points d'attention
+- Chevauchement calculé en **tokens**, frontière réelle en **caractères** (peut différer légèrement).
+- Dernier chunk : `charEnd = text.length`, pas de `findBestSplit`.
+- Chunks vides (après trim) ignorés.
 
 ---
 
-## Points d'attention
+## Stratégie 2 : `SentenceChunkingStrategy`
 
-- **Overlap en tokens, coupure en caractères** : le chevauchement est calculé sur les tokens, mais la frontière réelle du chunk peut être légèrement différente à cause de `findBestSplit`.
-- **Dernier chunk** : `charEnd = text.length` (pas de `findBestSplit`), donc il prend tout ce qui reste.
-- **Chunks vides ignorés** : si `content.trim()` est vide après le slice, le chunk n'est pas ajouté.
-- **`position`** dans les métadonnées = index dans `results`, pas `tokenStart` — il reflète l'ordre réel des chunks non-vides.
+Découpe basée sur les **phrases/paragraphes**, respect des frontières sémantiques.
+
+### Segmentation des phrases
+
+Regex `SENTENCE_BOUNDARY` coupe :
+- après `[.!?]` suivi de whitespace + majuscule (y compris lettres accentuées et guillemets)
+- sur `\n\n+` (rupture de paragraphe)
+
+### Boucle de chunking
+
+Accumule des phrases entières jusqu'à atteindre `chunkSize` tokens. Puis calcule l'overlap **en remontant** depuis la fin du chunk pour inclure les dernières phrases qui tiennent dans `chunkOverlap` tokens.
+
+```
+sentenceStart = 0
+while sentenceStart < sentences.length:
+    accumule phrases → sentenceEnd (jusqu'à dépasser chunkSize)
+    émet chunk [sentenceStart..sentenceEnd-1]
+
+    remonte depuis sentenceEnd-1 pour trouver overlapStart
+    (phrases dont la somme ≤ chunkOverlap)
+
+    sentenceStart = overlapStart (ou sentenceEnd si pas d'overlap)
+```
+
+### Points d'attention
+- Si le texte total ≤ `chunkSize` tokens → un seul chunk.
+- Une phrase trop longue seule (> `chunkSize`) est quand même émise en chunk unique.
+- L'overlap est en **phrases entières** (pas en tokens exacts).
