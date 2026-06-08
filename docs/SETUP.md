@@ -161,7 +161,7 @@ LLM_TEMPERATURE=0.1
 
 Dans le dashboard Railway → service **devknowledge-api** → **Settings** → **Networking** → **Generate Domain**.
 
-Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3205`.
+Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3001`.
 
 ### 5. Premier déploiement de l'API
 
