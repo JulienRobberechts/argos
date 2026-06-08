@@ -123,14 +123,14 @@ export DATABASE_PUBLIC_URL=$(railway run printenv DATABASE_PUBLIC_URL)
 psql "$DATABASE_PUBLIC_URL" -c "SELECT * FROM pg_available_extensions WHERE name = 'vector';"
 ```
 
-Si absent, activer depuis le dashboard Railway : **PostgreSQL → Variables → `PGVECTOR_ENABLED=true`**.
+Si absent, le service PostgreSQL Railway ne supporte pas pgvector — utiliser le template **pgvector** depuis le dashboard Railway : **New Service → Database → pgvector**.
 
 ### 3. Créer le service API
 
 `railway up` ne crée pas automatiquement un service — il faut d'abord le créer explicitement :
 
 ```bash
-railway add --service devknowledge-api
+railway add  # choisir "Empty Service", nommer "argos-api"
 ```
 
 La CLI demande de saisir les variables :
@@ -150,7 +150,6 @@ CHUNK_OVERLAP_TOKENS=128
 RETRIEVAL_LIMIT=8
 RETRIEVAL_MIN_SCORE=0.10
 LLM_MAX_TOKENS=1024
-LLM_TEMPERATURE=0.1
 ```
 
 > `${{Postgres.DATABASE_URL}}` est une variable de référence Railway — elle injecte automatiquement l'URL du service PostgreSQL créé à l'étape 2.
@@ -159,7 +158,7 @@ LLM_TEMPERATURE=0.1
 
 > **Sans domaine public configuré, Railway ne route pas le port et tue le container après ~18s (health check timeout). Le service redémarre en boucle.**
 
-Dans le dashboard Railway → service **devknowledge-api** → **Settings** → **Networking** → **Generate Domain**.
+Dans le dashboard Railway → service **argos-api** → **Settings** → **Networking** → **Generate Domain**.
 
 Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3001`.
 
@@ -167,7 +166,7 @@ Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3001`.
 
 ```bash
 cd devknowledge/backend
-railway up --service devknowledge-api
+railway up --service argos-api
 ```
 
 ### 6. Créer et déployer le frontend
@@ -175,24 +174,24 @@ railway up --service devknowledge-api
 `railway up` ne crée pas automatiquement un service — il faut d'abord le créer explicitement :
 
 ```bash
-railway add --service devknowledge-frontend
+railway add  # choisir "Empty Service", nommer "argos-frontend"
 ```
 
 Variables à saisir :
 
 ```env
-BACKEND_URL=http://${{devknowledge-api.RAILWAY_PRIVATE_DOMAIN}}:3001
+BACKEND_URL=http://${{argos-api.RAILWAY_PRIVATE_DOMAIN}}:3001
 VITE_API_KEY=<même valeur que API_KEY>
 ```
 
-> `${{devknowledge-api.RAILWAY_PRIVATE_DOMAIN}}` est une variable de référence Railway — elle injecte le domaine privé du service API (réseau interne Railway, pas de frais d'egress). Utiliser le domaine **privé** (HTTP, port 3001) et non le domaine public pour éviter les frais de transit.
+> `${{argos-api.RAILWAY_PRIVATE_DOMAIN}}` est une variable de référence Railway — elle injecte le domaine privé du service API (réseau interne Railway, pas de frais d'egress). Utiliser le domaine **privé** (HTTP, port 3001) et non le domaine public pour éviter les frais de transit.
 > `VITE_API_KEY` est une variable **build-time** (Docker `ARG`) : elle est intégrée dans le bundle JS à la compilation, pas à l'exécution.
 
 Puis déployer :
 
 ```bash
 cd devknowledge/frontend
-railway up --service devknowledge-frontend
+railway up --service argos-frontend
 ```
 
 ### 7. Lancer les migrations en production
@@ -202,13 +201,13 @@ railway up --service devknowledge-frontend
 ```bash
 cd devknowledge/backend
 npm run build
-railway run --service sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
+railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
 ```
 
 Vérifier :
 
 ```bash
-railway run --service devknowledge-api sh -c \
+railway run --service argos-api sh -c \
   'DATABASE_URL=$DATABASE_PUBLIC_URL node -e "const {Pool}=require(\"pg\");const p=new Pool({connectionString:process.env.DATABASE_URL});p.query(\"SELECT COUNT(*) FROM documents\").then(r=>console.log(r.rows[0])).finally(()=>p.end())"'
 ```
 
@@ -218,9 +217,9 @@ Doit retourner `{ count: '0' }` (table vide mais présente).
 
 1. Obtenir l'URL du frontend :
    ```bash
-   railway domain -s devknowledge-frontend --json
+   railway domain -s argos-frontend --json
    ```
-   Ouvrir l'URL retournée (ex: `https://devknowledge-frontend-production.up.railway.app`)
+   Ouvrir l'URL retournée (ex: `https://argos-frontend-production.up.railway.app`)
 2. Uploader un PDF
 3. Poser une question sur son contenu
 4. Vérifier la réponse streamée
