@@ -208,7 +208,11 @@ Doit retourner `{ count: '0' }` (table vide mais présente).
 
 ### 7. Test de fumée
 
-1. Ouvrir l'URL publique du frontend Railway
+1. Obtenir l'URL du frontend :
+   ```bash
+   railway domain -s devknowledge-frontend --json
+   ```
+   Ouvrir l'URL retournée (ex: `https://devknowledge-frontend-production.up.railway.app`)
 2. Uploader un PDF
 3. Poser une question sur son contenu
 4. Vérifier la réponse streamée
