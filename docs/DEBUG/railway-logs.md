@@ -2,10 +2,17 @@
 
 ## Via l'interface Railway
 
-1. Aller sur [railway.app](https://railway.app) → ouvrir le projet
-2. Cliquer sur le service **backend**
-3. Onglet **Deployments** → cliquer sur le déploiement actif
-4. Section **Logs** en bas de page
+### Logs runtime (stdout/stderr de l'application)
+
+**Option 1 — Log Explorer (recommandé)**
+1. Ouvrir le projet sur [railway.app](https://railway.app)
+2. Cliquer sur **Observability** dans la navigation supérieure
+3. Le Log Explorer affiche les logs runtime de tous les services, avec filtres
+
+**Option 2 — Par déploiement**
+1. Cliquer sur le service **backend**
+2. Onglet **Deployments** → cliquer sur le déploiement actif
+3. Sélectionner l'onglet **Deploy Logs** (≠ Build Logs qui ne montre que la compilation)
 
 ## Via CLI Railway
 

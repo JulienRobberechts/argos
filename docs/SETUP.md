@@ -155,14 +155,22 @@ LLM_TEMPERATURE=0.1
 
 > `${{Postgres.DATABASE_URL}}` est une variable de référence Railway — elle injecte automatiquement l'URL du service PostgreSQL créé à l'étape 2.
 
-### 4. Premier déploiement de l'API
+### 4. Exposer le port de l'API (obligatoire)
+
+> **Sans domaine public configuré, Railway ne route pas le port et tue le container après ~18s (health check timeout). Le service redémarre en boucle.**
+
+Dans le dashboard Railway → service **devknowledge-api** → **Settings** → **Networking** → **Generate Domain**.
+
+Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3205`.
+
+### 5. Premier déploiement de l'API
 
 ```bash
 cd devknowledge/backend
 railway up --service devknowledge-api
 ```
 
-### 5. Créer et déployer le frontend
+### 6. Créer et déployer le frontend
 
 `railway up` ne crée pas automatiquement un service — il faut d'abord le créer explicitement :
 
@@ -187,14 +195,14 @@ cd devknowledge/frontend
 railway up --service devknowledge-frontend
 ```
 
-### 6. Lancer les migrations en production
+### 7. Lancer les migrations en production
 
 `railway run` s'exécute en local : `DATABASE_URL` pointe vers le réseau privé Railway (`*.railway.internal`), inaccessible hors du réseau Railway. Il faut overrider avec `DATABASE_PUBLIC_URL` :
 
 ```bash
 cd devknowledge/backend
 npm run build
-railway run --service devknowledge-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
+railway run --service sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
 ```
 
 Vérifier :
@@ -206,7 +214,7 @@ railway run --service devknowledge-api sh -c \
 
 Doit retourner `{ count: '0' }` (table vide mais présente).
 
-### 7. Test de fumée
+### 8. Test de fumée
 
 1. Obtenir l'URL du frontend :
    ```bash
