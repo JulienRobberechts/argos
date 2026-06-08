@@ -107,6 +107,12 @@ railway link # Then Select the project
 railway add --database postgres
 ```
 
+Activer le réseau public PostgreSQL (nécessaire pour les migrations en local) :
+
+> **Dashboard Railway → PostgreSQL → Settings → Networking → Generate Domain**
+
+Cela crée la variable `DATABASE_PUBLIC_URL` accessible depuis l'extérieur du réseau Railway.
+
 Vérifier que pgvector est disponible :
 
 ```bash
@@ -131,6 +137,7 @@ La CLI demande de saisir les variables :
 
 ```env
 DATABASE_URL=${{Postgres.DATABASE_URL}}
+DATABASE_PUBLIC_URL=${{Postgres.DATABASE_PUBLIC_URL}}
 ANTHROPIC_API_KEY=<>
 VOYAGE_API_KEY=<>
 API_KEY=<>
