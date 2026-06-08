@@ -100,7 +100,7 @@ railway login
 ### 2. Créer le projet et la base PostgreSQL
 
 ```bash
-railway init # Then Type the name of your project
+railway init # Then Type the name of your project argos
 
 railway link # Then Select the project
 
@@ -164,6 +164,9 @@ Cela crée la variable `RAILWAY_PUBLIC_DOMAIN` et expose le port `3001`.
 
 ### 5. Premier déploiement de l'API
 
+Dans le dashboard Railway → service **argos-api** → **Settings** → **Source** → **Root Directory** :
+Mettre "/backend"
+
 ```bash
 cd devknowledge/backend
 railway up --service argos-api
@@ -189,10 +192,15 @@ VITE_API_KEY=<même valeur que API_KEY>
 
 Puis déployer :
 
+Dans le dashboard Railway → service **argos-frontend** → **Settings** → **Source** → **Root Directory** :
+Mettre "/frontend"
+
 ```bash
 cd devknowledge/frontend
 railway up --service argos-frontend
 ```
+
+Dans le dashboard Railway → service **argos-frontend** → **Settings** → **Networking** → **Generate Domain** port 80.
 
 ### 7. Lancer les migrations en production
 
