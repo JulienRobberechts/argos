@@ -8,6 +8,7 @@ import {
 import { useSSEStream } from "../../hooks/useSSEStream";
 import MessageList from "./MessageList";
 import { useState, useRef, useEffect } from "react";
+import { ArrowUp, Pencil } from "lucide-react";
 
 function EditableTitle({ id, title }: { id: string; title: string }) {
   const [editing, setEditing] = useState(false);
@@ -47,19 +48,76 @@ function EditableTitle({ id, title }: { id: string; title: string }) {
             setEditing(false);
           }
         }}
-        className="text-2xl font-bold text-gray-800 bg-transparent border-b-2 border-blue-500 outline-none w-full"
+        className="text-base font-semibold text-gray-800 bg-transparent border-b border-gray-400 outline-none w-full"
       />
     );
   }
 
   return (
-    <h1
-      className="text-2xl font-bold text-gray-800 cursor-pointer hover:text-blue-600 transition-colors"
+    <button
+      className="group flex items-center gap-1.5 text-base font-semibold text-gray-800 hover:text-gray-600 transition-colors"
       onClick={() => setEditing(true)}
-      title="Click to edit title"
+      title="Edit title"
     >
-      {title}
-    </h1>
+      <span>{title}</span>
+      <Pencil className="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-opacity" />
+    </button>
+  );
+}
+
+function InputForm({
+  input,
+  setInput,
+  onSubmit,
+  disabled,
+}: {
+  input: string;
+  setInput: (v: string) => void;
+  onSubmit: () => void;
+  disabled: boolean;
+}) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSubmit();
+    }
+  }
+
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+  }, [input]);
+
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      className="relative flex items-end gap-2 rounded-2xl border border-gray-200 bg-white shadow-sm px-4 py-3 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all"
+    >
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        placeholder="Ask a question…"
+        rows={1}
+        className="flex-1 resize-none bg-transparent text-sm text-gray-800 placeholder:text-gray-400 outline-none min-h-[24px] max-h-[200px] leading-relaxed disabled:opacity-50"
+      />
+      <button
+        type="submit"
+        disabled={disabled || !input.trim()}
+        className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+      >
+        <ArrowUp className="w-4 h-4" />
+      </button>
+    </form>
   );
 }
 
@@ -107,13 +165,6 @@ export default function ChatInterface() {
     });
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      submit();
-    }
-  }
-
   const isEmpty =
     !id ||
     (!!conversation &&
@@ -122,32 +173,21 @@ export default function ChatInterface() {
 
   if (!id) {
     return (
-      <div className="flex flex-col h-screen">
-        <div className="flex-1 flex items-center justify-center p-4">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              submit();
-            }}
-            className="flex gap-2 w-full max-w-2xl"
-          >
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
+      <div className="flex flex-col h-screen bg-gray-50">
+        <div className="flex-1 flex flex-col items-center justify-center px-4 gap-6">
+          <div className="text-center">
+            <p className="text-gray-400 text-sm">
+              Ask anything about your knowledge base
+            </p>
+          </div>
+          <div className="w-full max-w-2xl">
+            <InputForm
+              input={input}
+              setInput={setInput}
+              onSubmit={submit}
               disabled={createConversation.isPending}
-              placeholder="Ask your question…"
-              rows={1}
-              className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             />
-            <button
-              type="submit"
-              disabled={createConversation.isPending || !input.trim()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-            >
-              Send
-            </button>
-          </form>
+          </div>
         </div>
       </div>
     );
@@ -155,7 +195,7 @@ export default function ChatInterface() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
         Loading…
       </div>
     );
@@ -163,47 +203,30 @@ export default function ChatInterface() {
 
   if (!conversation) {
     return (
-      <div className="flex items-center justify-center h-full text-gray-500">
+      <div className="flex items-center justify-center h-full text-gray-400 text-sm">
         Conversation not found
       </div>
     );
   }
 
-  const inputForm = (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        submit();
-      }}
-      className={`flex gap-2${isEmpty ? " w-full max-w-2xl" : ""}`}
-    >
-      <textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={stream.isStreaming}
-        placeholder="Ask your question…"
-        rows={1}
-        className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-      />
-      <button
-        type="submit"
-        disabled={stream.isStreaming || !input.trim()}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
-      >
-        Send
-      </button>
-    </form>
-  );
-
   return (
-    <div className="flex flex-col h-screen">
-      <div className="border-b border-gray-200 px-8 pt-8 pb-4 shrink-0">
+    <div className="flex flex-col h-screen bg-gray-50">
+      <div className="border-b border-gray-200 bg-white px-6 py-3 shrink-0 flex items-center">
         <EditableTitle id={conversation.id} title={conversation.title} />
       </div>
       {isEmpty ? (
-        <div className="flex-1 flex items-center justify-center p-4">
-          {inputForm}
+        <div className="flex-1 flex flex-col items-center justify-center px-4 gap-6">
+          <p className="text-gray-400 text-sm">
+            Ask anything about your knowledge base
+          </p>
+          <div className="w-full max-w-2xl">
+            <InputForm
+              input={input}
+              setInput={setInput}
+              onSubmit={submit}
+              disabled={stream.isStreaming}
+            />
+          </div>
         </div>
       ) : (
         <>
@@ -215,7 +238,16 @@ export default function ChatInterface() {
               isStreaming={stream.isStreaming}
             />
           </div>
-          <div className="border-t border-gray-200 p-4">{inputForm}</div>
+          <div className="border-t border-gray-200 bg-white px-4 py-3">
+            <div className="max-w-3xl mx-auto">
+              <InputForm
+                input={input}
+                setInput={setInput}
+                onSubmit={submit}
+                disabled={stream.isStreaming}
+              />
+            </div>
+          </div>
         </>
       )}
     </div>
