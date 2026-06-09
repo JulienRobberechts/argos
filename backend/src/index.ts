@@ -75,6 +75,7 @@ const askQuestion = new AskQuestion(
   searchKnowledge,
   llmAdapter,
   conversationRepo,
+  documentRepo,
   {
     retrievalLimit: config.rag.retrievalLimit,
     retrievalMinScore: config.rag.retrievalMinScore,

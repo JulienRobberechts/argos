@@ -1,10 +1,10 @@
-import { FileText } from "lucide-react";
 import type { SourceCitation } from "../../types/domain";
+import DocumentTypeIcon from "../documents/DocumentTypeIcon";
 
 export default function SourceCard({ source }: { source: SourceCitation }) {
   return (
     <div className="flex gap-2.5 p-3 bg-gray-50 rounded-lg border border-gray-200 text-sm">
-      <FileText className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
+      <DocumentTypeIcon sourceType={source.sourceType} size={14} />
       <div className="min-w-0">
         <div className="flex items-baseline gap-2 mb-1">
           <span className="font-medium text-gray-700 truncate">

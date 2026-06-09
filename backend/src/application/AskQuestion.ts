@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { Message, SourceCitation } from "../domain/entities/Message";
 import { ChunkSearchResult } from "../domain/ports/ChunkRepository";
 import { ConversationRepository } from "../domain/ports/ConversationRepository";
+import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { LLMPort } from "../domain/ports/LLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 import { SearchKnowledge } from "./SearchKnowledge";
@@ -25,6 +26,7 @@ export class AskQuestion {
     private readonly searchKnowledge: SearchKnowledge,
     private readonly llmAdapter: LLMPort,
     private readonly conversationRepo: ConversationRepository,
+    private readonly documentRepo: DocumentRepository,
     config: AskQuestionConfig = {},
   ) {
     this.retrievalLimit = config.retrievalLimit ?? 8;
@@ -105,10 +107,25 @@ export class AskQuestion {
       return errorMessage;
     }
 
+    const uniqueDocIds = [
+      ...new Set(searchResults.map((r) => r.chunk.documentId)),
+    ];
+    const docs = await Promise.all(
+      uniqueDocIds.map((id) => this.documentRepo.findById(id)),
+    );
+    const titleById = new Map(
+      uniqueDocIds.map((id, i) => [id, docs[i]?.title ?? id]),
+    );
+    const sourceTypeById = new Map(
+      uniqueDocIds.map((id, i) => [id, docs[i]?.sourceType ?? "text"]),
+    );
+
     const sources: SourceCitation[] = searchResults.map((result) => ({
       chunkId: result.chunk.id,
       documentId: result.chunk.documentId,
-      documentTitle: result.chunk.documentId,
+      documentTitle:
+        titleById.get(result.chunk.documentId) ?? result.chunk.documentId,
+      sourceType: sourceTypeById.get(result.chunk.documentId) ?? "text",
       excerpt: result.chunk.content.slice(0, 200),
       score: result.score,
     }));

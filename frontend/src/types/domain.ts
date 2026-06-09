@@ -15,6 +15,7 @@ export interface SourceCitation {
   chunkId: string;
   documentId: string;
   documentTitle: string;
+  sourceType: SourceType;
   excerpt: string;
   score: number;
 }

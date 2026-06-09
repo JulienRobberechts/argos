@@ -2,6 +2,7 @@ export interface SourceCitation {
   chunkId: string;
   documentId: string;
   documentTitle: string;
+  sourceType: "pdf" | "markdown" | "text";
   excerpt: string;
   score: number;
 }
