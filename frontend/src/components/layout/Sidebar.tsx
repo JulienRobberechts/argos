@@ -25,7 +25,14 @@ export default function Sidebar() {
     e.preventDefault();
     e.stopPropagation();
     await deleteConversation.mutateAsync(id);
-    if (activeId === id) navigate("/conversations");
+    if (activeId === id) {
+      const remaining = conversations?.filter((c) => c.id !== id);
+      if (remaining && remaining.length > 0) {
+        navigate(`/conversations/${remaining[0].id}`);
+      } else {
+        navigate("/conversations");
+      }
+    }
   }
 
   return (

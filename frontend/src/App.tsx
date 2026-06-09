@@ -6,7 +6,7 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import ChatInterface from "./components/chat/ChatInterface";
 import DocumentList from "./components/documents/DocumentList";
@@ -15,7 +15,10 @@ import DashboardPage from "./components/pages/DashboardPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import PageHeader from "./components/ui/PageHeader";
-import { useCreateConversation } from "./hooks/useConversation";
+import {
+  useConversations,
+  useCreateConversation,
+} from "./hooks/useConversation";
 import { FileText, MessageSquare } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -39,12 +42,20 @@ function DocumentsPage() {
 function ConversationsPage() {
   const navigate = useNavigate();
   const createConversation = useCreateConversation();
+  const { data: conversations, isLoading } = useConversations();
+  const hasActed = useRef(false);
 
   useEffect(() => {
-    createConversation.mutateAsync().then((conv) => {
-      navigate(`/conversations/${conv.id}`, { replace: true });
-    });
-  }, []);
+    if (isLoading || hasActed.current) return;
+    hasActed.current = true;
+    if (!conversations || conversations.length === 0) {
+      void createConversation.mutateAsync().then((conv) => {
+        navigate(`/conversations/${conv.id}`, { replace: true });
+      });
+    } else {
+      navigate(`/conversations/${conversations[0].id}`, { replace: true });
+    }
+  }, [isLoading]);
 
   return (
     <div className="p-8">
