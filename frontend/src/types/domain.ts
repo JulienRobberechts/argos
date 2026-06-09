@@ -45,7 +45,11 @@ export interface AppConfig {
     retrievalMinScore: number;
   };
   llm: {
+    provider: string;
     maxTokens: number;
     temperature: number;
+  };
+  embeddings: {
+    provider: string;
   };
 }

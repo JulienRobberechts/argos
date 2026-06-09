@@ -118,6 +118,11 @@ export default function SettingsPage() {
 
           <Section title="LLM">
             <Row
+              label="Fournisseur"
+              value={config.llm.provider}
+              info="API utilisée pour la génération de réponses. Configurable via les variables d'environnement."
+            />
+            <Row
               label="Max tokens"
               value={config.llm.maxTokens}
               info="Nombre maximum de tokens que le LLM peut générer en réponse. Augmenter cette valeur permet des réponses plus longues."
@@ -126,6 +131,14 @@ export default function SettingsPage() {
               label="Température"
               value={config.llm.temperature}
               info="Contrôle la créativité des réponses (0 = déterministe, 1 = très créatif). Une valeur basse est recommandée pour des réponses factuelles."
+            />
+          </Section>
+
+          <Section title="Embeddings">
+            <Row
+              label="Fournisseur"
+              value={config.embeddings.provider}
+              info="API utilisée pour la vectorisation des documents et des requêtes."
             />
           </Section>
         </>

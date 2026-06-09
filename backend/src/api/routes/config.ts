@@ -15,8 +15,12 @@ export function configRouter(): Router {
         retrievalMinScore: config.rag.retrievalMinScore,
       },
       llm: {
+        provider: "anthropic",
         maxTokens: config.llm.anthropic.maxTokens,
         temperature: config.llm.anthropic.temperature,
+      },
+      embeddings: {
+        provider: "voyage",
       },
     });
   });
