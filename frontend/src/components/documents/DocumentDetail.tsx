@@ -8,6 +8,7 @@ import "react-pdf/dist/Page/TextLayer.css";
 import { api } from "../../services/api";
 import { useDeleteDocument, useDocumentChunks } from "../../hooks/useDocuments";
 import DocumentStatusBadge from "./DocumentStatusBadge";
+import DocumentTypeIcon from "./DocumentTypeIcon";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -63,6 +64,24 @@ function PdfViewer({ id }: { id: string }) {
   );
 }
 
+function TextViewer({ id }: { id: string }) {
+  const { data, isLoading } = useQuery({
+    queryKey: ["documents", id, "content"],
+    queryFn: () => api.getDocumentContent(id),
+  });
+
+  return (
+    <div className="h-full overflow-y-auto p-8">
+      {isLoading && <p className="text-sm text-gray-400">Chargement…</p>}
+      {data && (
+        <pre className="max-w-3xl mx-auto text-sm text-gray-800 font-mono whitespace-pre-wrap break-words leading-relaxed">
+          {data.content}
+        </pre>
+      )}
+    </div>
+  );
+}
+
 function MarkdownViewer({ id }: { id: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["documents", id, "content"],
@@ -108,7 +127,9 @@ export default function DocumentDetail() {
 
   const canPreview =
     doc.status === "ready" &&
-    (doc.sourceType === "pdf" || doc.sourceType === "markdown");
+    (doc.sourceType === "pdf" ||
+      doc.sourceType === "markdown" ||
+      doc.sourceType === "text");
 
   async function handleDelete() {
     await deleteDocument.mutateAsync(doc!.id);
@@ -118,7 +139,8 @@ export default function DocumentDetail() {
   return (
     <div className="h-full flex flex-col">
       <div className="shrink-0 border-b border-gray-200 bg-white px-6 pt-5 pb-0">
-        <h2 className="text-base font-semibold text-gray-900 mb-3">
+        <h2 className="text-base font-semibold text-gray-900 mb-3 flex items-center gap-2">
+          <DocumentTypeIcon sourceType={doc.sourceType} size={18} />
           {doc.title}
         </h2>
         <div className="flex">
@@ -152,6 +174,7 @@ export default function DocumentDetail() {
           <>
             {doc.sourceType === "pdf" && <PdfViewer id={id!} />}
             {doc.sourceType === "markdown" && <MarkdownViewer id={id!} />}
+            {doc.sourceType === "text" && <TextViewer id={id!} />}
           </>
         )}
         {tab === "details" && (
