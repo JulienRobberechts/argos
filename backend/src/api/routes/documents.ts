@@ -37,11 +37,12 @@ export function documentsRouter(
         }
 
         const body = createDocumentSchema.parse(req.body);
-        const title = body.title ?? path.basename(req.file.originalname);
-        const sourceType = sourceTypeFromMime(
-          req.file.mimetype,
+        const originalName = Buffer.from(
           req.file.originalname,
-        );
+          "latin1",
+        ).toString("utf8");
+        const title = body.title ?? path.basename(originalName);
+        const sourceType = sourceTypeFromMime(req.file.mimetype, originalName);
 
         const document = {
           id: randomUUID(),
