@@ -3,54 +3,91 @@ import { ChevronDown } from "lucide-react";
 import type { SourceCitation } from "../../types/domain";
 import DocumentTypeIcon from "../documents/DocumentTypeIcon";
 
-function ScoreBar({ score }: { score: number }) {
-  const pct = Math.round(score * 100);
-  const color =
-    pct >= 85 ? "bg-emerald-400" : pct >= 70 ? "bg-amber-400" : "bg-red-400";
+const SCORE_THRESHOLDS = [
+  { min: 85, bar: "bg-emerald-500", text: "text-emerald-600" },
+  { min: 70, bar: "bg-amber-400", text: "text-amber-600" },
+  { min: 0, bar: "bg-red-400", text: "text-red-600" },
+] as const;
+
+function scoreStyle(pct: number) {
+  return SCORE_THRESHOLDS.find((t) => pct >= t.min)!;
+}
+
+function ScoreRow({ score }: { score: number }) {
+  const pct = score * 100;
+  const { bar, text } = scoreStyle(Math.round(pct));
   return (
-    <div className="flex items-center gap-2">
-      <div className="flex-1 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+    <div className="flex items-center gap-3">
+      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
         <div
-          className={`h-full rounded-full ${color}`}
+          className={`h-full rounded-full ${bar} transition-all`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="w-16 text-right tabular-nums text-green-400">
-        {score.toFixed(6)}
+      <span
+        className={`font-mono text-[11px] tabular-nums w-14 text-right ${text}`}
+      >
+        {score.toFixed(5)}
       </span>
     </div>
   );
 }
 
-function TruncatedId({ value }: { value: string }) {
+function IdCell({ value }: { value: string }) {
   return (
-    <span className="text-green-400 font-mono cursor-default" title={value}>
-      {value.slice(0, 8)}…{value.slice(-4)}
+    <span
+      className="font-mono text-[11px] text-slate-500 tracking-tight cursor-default select-all"
+      title={value}
+    >
+      {value.slice(0, 8)}
+      <span className="text-slate-300">…</span>
+      {value.slice(-6)}
     </span>
+  );
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid grid-cols-[88px_1fr] items-center py-1.5 border-b border-slate-100 last:border-0">
+      <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
+        {label}
+      </span>
+      <div>{children}</div>
+    </div>
   );
 }
 
 function DebugPanel({ source }: { source: SourceCitation }) {
   return (
-    <div className="mt-2 pt-2 border-t border-gray-200 font-mono text-[11px] bg-gray-900 -mx-3 -mb-3 px-3 py-2.5 rounded-b-lg">
-      <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5 items-center">
-        <span className="text-gray-400">score</span>
-        <ScoreBar score={source.score} />
-
-        <span className="text-gray-400">chunkId</span>
-        <TruncatedId value={source.chunkId} />
-
-        <span className="text-gray-400">docId</span>
-        <TruncatedId value={source.documentId} />
-
-        <span className="text-gray-400">type</span>
-        <span className="text-green-400">{source.sourceType}</span>
-
-        <span className="text-gray-400">excerptLen</span>
-        <span className="text-green-400 tabular-nums">
-          {source.excerpt.length}
+    <div className="border-t border-slate-200 bg-white px-4 py-3">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-300 mb-2">
+        Technical details
+      </p>
+      <Row label="Score">
+        <ScoreRow score={source.score} />
+      </Row>
+      <Row label="Type">
+        <span className="text-[11px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
+          {source.sourceType}
         </span>
-      </div>
+      </Row>
+      <Row label="Chunk ID">
+        <IdCell value={source.chunkId} />
+      </Row>
+      <Row label="Document ID">
+        <IdCell value={source.documentId} />
+      </Row>
+      <Row label="Excerpt">
+        <span className="text-[11px] font-mono text-slate-500 tabular-nums">
+          {source.excerpt.length} chars
+        </span>
+      </Row>
     </div>
   );
 }
@@ -59,7 +96,7 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="bg-gray-50 rounded-lg border border-gray-200 text-sm overflow-hidden">
+    <div className="rounded-lg border border-gray-200 text-sm overflow-hidden bg-gray-50">
       <div className="flex gap-2.5 p-3">
         <DocumentTypeIcon sourceType={source.sourceType} size={14} />
         <div className="min-w-0 flex-1">
