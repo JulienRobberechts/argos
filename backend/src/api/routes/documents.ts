@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import fs from "fs";
 import { Router, Request, Response, NextFunction } from "express";
 import multer from "multer";
 import path from "path";
@@ -48,12 +49,16 @@ export function documentsRouter(
         const title = body.title ?? path.basename(originalName);
         const sourceType = sourceTypeFromMime(req.file.mimetype, originalName);
 
+        const ext = path.extname(originalName).toLowerCase();
+        const filePath = req.file.path + ext;
+        await fs.promises.rename(req.file.path, filePath);
+
         const document = {
           id: randomUUID(),
           title,
           sourceType,
           status: "pending" as const,
-          filePath: req.file.path,
+          filePath,
           createdAt: new Date(),
         };
 
