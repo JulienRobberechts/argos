@@ -37,6 +37,8 @@ services:
     environment:
       VITE_API_URL: http://localhost:3205
       API_URL: http://api:3205
+    volumes:
+      - ./frontend/src:/app/src
 
 volumes:
   pgdata:
