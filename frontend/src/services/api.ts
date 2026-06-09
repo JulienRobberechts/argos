@@ -2,6 +2,7 @@ import type {
   AppConfig,
   Conversation,
   Document,
+  QuizQuestion,
   SourceCitation,
 } from "../types/domain";
 
@@ -69,4 +70,11 @@ export const api = {
     }),
 
   getConfig: () => request<AppConfig>("/config"),
+
+  generateQuiz: (documentId: string, questionCount: number) =>
+    request<{ questions: QuizQuestion[] }>("/quizzes/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ documentId, questionCount }),
+    }),
 };

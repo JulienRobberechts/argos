@@ -52,6 +52,8 @@ import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
+import { GenerateQuiz } from "./application/GenerateQuiz";
+import { quizzesRouter } from "./api/routes/quizzes";
 
 const documentRepo = new PgDocumentRepository();
 const chunkRepo = new PgVectorChunkRepository();
@@ -78,6 +80,7 @@ const askQuestion = new AskQuestion(
     retrievalMinScore: config.rag.retrievalMinScore,
   },
 );
+const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
 
 const app = express();
 const PORT = config.server.port;
@@ -101,6 +104,7 @@ app.use(
   conversationsRouter(conversationRepo, askQuestion),
 );
 app.use("/api/search", searchRouter(searchKnowledge));
+app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
 app.use(errorHandler);
 

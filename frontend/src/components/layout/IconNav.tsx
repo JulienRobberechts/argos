@@ -1,10 +1,17 @@
 import { NavLink } from "react-router-dom";
-import { FileText, MessageSquare, Settings, FlaskConical } from "lucide-react";
+import {
+  FileText,
+  MessageSquare,
+  Settings,
+  FlaskConical,
+  BrainCircuit,
+} from "lucide-react";
 
 const navItems = [
   { to: "/", icon: null, label: "Argos" },
   { to: "/documents", icon: FileText, label: "Documents" },
   { to: "/conversations", icon: MessageSquare, label: "Conversations" },
+  { to: "/quiz", icon: BrainCircuit, label: "Quiz" },
   { to: "/technical", icon: FlaskConical, label: "Technical" },
   { to: "/settings", icon: Settings, label: "Settings" },
 ];

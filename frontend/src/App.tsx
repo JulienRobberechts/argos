@@ -12,6 +12,7 @@ import ChatInterface from "./components/chat/ChatInterface";
 import DocumentDetail from "./components/documents/DocumentDetail";
 import DocumentUpload from "./components/documents/DocumentUpload";
 import DashboardPage from "./components/pages/DashboardPage";
+import QuizPage from "./components/pages/QuizPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import { useConversations } from "./hooks/useConversation";
@@ -66,6 +67,7 @@ export default function App() {
             <Route path="conversations" element={<ConversationsPage />} />
             <Route path="conversations/new" element={<ChatInterface />} />
             <Route path="conversations/:id" element={<ChatInterface />} />
+            <Route path="quiz" element={<QuizPage />} />
             <Route path="technical" element={<TechnicalPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

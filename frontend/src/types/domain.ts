@@ -35,6 +35,12 @@ export interface Conversation {
   createdAt: string;
 }
 
+export interface QuizQuestion {
+  text: string;
+  options: string[];
+  correctIndex: number;
+}
+
 export interface AppConfig {
   logLevel: string;
   rag: {
