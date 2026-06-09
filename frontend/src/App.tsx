@@ -8,7 +8,7 @@ import DashboardPage from "./components/pages/DashboardPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import PageHeader from "./components/ui/PageHeader";
-import { FileText } from "lucide-react";
+import { FileText, MessageSquare } from "lucide-react";
 
 const queryClient = new QueryClient();
 
@@ -30,8 +30,13 @@ function DocumentsPage() {
 
 function ConversationsPage() {
   return (
-    <div className="p-8 text-gray-500">
-      Sélectionnez ou créez une conversation.
+    <div className="p-8">
+      <PageHeader
+        icon={<MessageSquare className="text-blue-500" size={28} />}
+        title="Conversations"
+        info="Posez des questions sur vos documents. Le système recherche les passages pertinents et génère une réponse contextuelle."
+      />
+      <p className="text-gray-500">Sélectionnez ou créez une conversation.</p>
     </div>
   );
 }

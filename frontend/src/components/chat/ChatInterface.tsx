@@ -46,8 +46,10 @@ export default function ChatInterface() {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="border-b border-gray-200 px-4 py-3">
-        <h2 className="font-medium text-gray-800">{conversation.title}</h2>
+      <div className="border-b border-gray-200 px-8 pt-8 pb-4 shrink-0">
+        <h1 className="text-2xl font-bold text-gray-800">
+          {conversation.title}
+        </h1>
       </div>
       <div className="flex-1 overflow-y-auto">
         <MessageList
