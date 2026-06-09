@@ -21,19 +21,30 @@ const QUESTION_COUNTS = [5, 10, 15];
 function SetupScreen({
   onStart,
 }: {
-  onStart: (documentId: string, count: number) => void;
+  onStart: (documentIds: string[], count: number) => void;
 }) {
   const { data: documents = [], isLoading } = useDocuments();
-  const [documentId, setDocumentId] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [count, setCount] = useState(5);
 
   const ready = documents.filter((d) => d.status === "ready");
+
+  function toggleDoc(id: string) {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
+  }
 
   return (
     <div className="max-w-lg space-y-6">
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-5">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">Document</label>
+          <label className="text-sm font-medium text-gray-700">
+            Documents{" "}
+            <span className="text-gray-400 font-normal">
+              (select one or more)
+            </span>
+          </label>
           {isLoading ? (
             <p className="text-sm text-gray-400">Loading documents…</p>
           ) : ready.length === 0 ? (
@@ -41,18 +52,29 @@ function SetupScreen({
               No indexed documents. Import documents first.
             </p>
           ) : (
-            <select
-              value={documentId}
-              onChange={(e) => setDocumentId(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select a document…</option>
-              {ready.map((doc) => (
-                <option key={doc.id} value={doc.id}>
-                  {doc.title}
-                </option>
-              ))}
-            </select>
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {ready.map((doc) => {
+                const checked = selectedIds.includes(doc.id);
+                return (
+                  <label
+                    key={doc.id}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg border cursor-pointer text-sm transition-colors ${
+                      checked
+                        ? "border-blue-400 bg-blue-50 text-blue-800"
+                        : "border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-gray-50"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() => toggleDoc(doc.id)}
+                      className="accent-blue-600"
+                    />
+                    {doc.title}
+                  </label>
+                );
+              })}
+            </div>
           )}
         </div>
 
@@ -78,8 +100,8 @@ function SetupScreen({
         </div>
 
         <button
-          onClick={() => onStart(documentId, count)}
-          disabled={!documentId}
+          onClick={() => onStart(selectedIds, count)}
+          disabled={selectedIds.length === 0}
           className="w-full py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
         >
           <BrainCircuit size={16} />
@@ -288,20 +310,20 @@ export default function QuizPage() {
     error,
   } = useMutation({
     mutationFn: ({
-      documentId,
+      documentIds,
       count,
     }: {
-      documentId: string;
+      documentIds: string[];
       count: number;
-    }) => api.generateQuiz(documentId, count),
+    }) => api.generateQuiz(documentIds, count),
     onSuccess: (data) => {
       setQuestions(data.questions);
       setPhase("quiz");
     },
   });
 
-  function handleStart(documentId: string, count: number) {
-    generate({ documentId, count });
+  function handleStart(documentIds: string[], count: number) {
+    generate({ documentIds, count });
   }
 
   function handleFinish(userAnswers: number[]) {

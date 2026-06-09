@@ -27,13 +27,16 @@ export class GenerateQuiz {
   ) {}
 
   async execute(
-    documentId: string,
+    documentIds: string[],
     questionCount: number,
   ): Promise<QuizQuestion[]> {
-    const chunks = await this.chunkRepo.findByDocumentId(documentId);
+    const chunkArrays = await Promise.all(
+      documentIds.map((id) => this.chunkRepo.findByDocumentId(id)),
+    );
+    const chunks = chunkArrays.flat();
 
     if (chunks.length === 0) {
-      throw new Error("No content found for this document");
+      throw new Error("No content found for the selected documents");
     }
 
     const selected = chunks.slice(0, MAX_CHUNKS);
@@ -44,7 +47,7 @@ export class GenerateQuiz {
     const prompt = this.buildPrompt(context, questionCount);
 
     this.logger.info("Generating quiz", {
-      documentId,
+      documentIds,
       questionCount,
       chunks: selected.length,
     });

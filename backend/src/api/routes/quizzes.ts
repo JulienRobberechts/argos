@@ -3,7 +3,7 @@ import { z } from "zod";
 import { GenerateQuiz } from "../../application/GenerateQuiz";
 
 const generateQuizSchema = z.object({
-  documentId: z.string().uuid(),
+  documentIds: z.array(z.string().uuid()).min(1),
   questionCount: z.number().int().min(3).max(20).default(5),
 });
 
@@ -16,7 +16,7 @@ export function quizzesRouter(generateQuiz: GenerateQuiz): Router {
       try {
         const body = generateQuizSchema.parse(req.body);
         const questions = await generateQuiz.execute(
-          body.documentId,
+          body.documentIds,
           body.questionCount,
         );
         res.json({ questions });
