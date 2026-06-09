@@ -51,8 +51,12 @@ export default function Sidebar() {
                 : "text-gray-700 hover:bg-gray-100"
             }`}
           >
-            <Link to={`/conversations/${conv.id}`} className="flex-1 truncate">
-              {conv.title}
+            <Link
+              to={`/conversations/${conv.id}`}
+              className="flex-1 flex items-center gap-2 truncate"
+            >
+              <MessageSquare size={14} className="shrink-0 opacity-50" />
+              <span className="truncate">{conv.title}</span>
             </Link>
             <button
               onClick={(e) => void handleDelete(e, conv.id)}
