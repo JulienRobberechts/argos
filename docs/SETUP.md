@@ -64,6 +64,14 @@ docker compose up --build
 
 API disponible sur `http://localhost:3205`, frontend sur `http://localhost:5173`.
 
+**Migrations**
+
+Le host `postgres` dans `DATABASE_URL` n'est résolvable qu'à l'intérieur du réseau Docker. Lancer les migrations depuis le conteneur `api` :
+
+```bash
+docker compose exec api npm run migrate
+```
+
 **Vérification**
 
 ```bash

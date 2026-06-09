@@ -6,7 +6,12 @@ import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { api } from "../../services/api";
-import { useDeleteDocument, useDocumentChunks } from "../../hooks/useDocuments";
+import {
+  useDeleteDocument,
+  useDocumentChunks,
+  useDocumentSummary,
+  useGenerateDocumentSummary,
+} from "../../hooks/useDocuments";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 import DocumentTypeIcon from "./DocumentTypeIcon";
 
@@ -124,7 +129,9 @@ export default function DocumentDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const deleteDocument = useDeleteDocument();
-  const [tab, setTab] = useState<"document" | "details">("document");
+  const [tab, setTab] = useState<"document" | "details" | "summary">(
+    "document",
+  );
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { data: doc, isLoading } = useQuery({
@@ -138,6 +145,11 @@ export default function DocumentDetail() {
   );
   const charCount = chunks?.reduce((sum, c) => sum + c.contentLength, 0);
   const chunkCount = chunks?.length;
+
+  const { data: summary, isLoading: summaryLoading } = useDocumentSummary(
+    tab === "summary" && doc?.status === "ready" ? id : undefined,
+  );
+  const generateSummary = useGenerateDocumentSummary();
 
   if (isLoading) {
     return (
@@ -241,6 +253,18 @@ export default function DocumentDetail() {
           >
             Details
           </button>
+          {doc.status === "ready" && (
+            <button
+              onClick={() => setTab("summary")}
+              className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
+                tab === "summary"
+                  ? "border-gray-900 text-gray-900"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Summary
+            </button>
+          )}
         </div>
       </div>
 
@@ -252,6 +276,49 @@ export default function DocumentDetail() {
             {doc.sourceType === "markdown" && <MarkdownViewer id={id!} />}
             {doc.sourceType === "text" && <TextViewer id={id!} />}
           </>
+        )}
+
+        {tab === "summary" && (
+          <div className="h-full flex flex-col overflow-hidden">
+            {summary && (
+              <div className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+                <p className="text-xs text-gray-400">
+                  {summary.content.length.toLocaleString()} characters
+                </p>
+                <button
+                  onClick={() => generateSummary.mutate(id!)}
+                  disabled={generateSummary.isPending}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 transition-colors"
+                >
+                  {generateSummary.isPending ? "Refreshing…" : "Refresh"}
+                </button>
+              </div>
+            )}
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-8">
+              {summaryLoading && (
+                <p className="text-sm text-gray-400">Loading…</p>
+              )}
+              {!summaryLoading && !summary && (
+                <div className="flex flex-col items-center justify-center h-full gap-3">
+                  <p className="text-sm text-gray-500">No summary yet.</p>
+                  <button
+                    onClick={() => generateSummary.mutate(id!)}
+                    disabled={generateSummary.isPending}
+                    className="px-4 py-2 text-xs font-medium text-white bg-gray-900 rounded-md hover:bg-gray-700 disabled:opacity-50 transition-colors"
+                  >
+                    {generateSummary.isPending
+                      ? "Generating…"
+                      : "Generate summary"}
+                  </button>
+                </div>
+              )}
+              {summary && (
+                <div className="prose prose-sm max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                  <ReactMarkdown>{summary.content}</ReactMarkdown>
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
         {tab === "details" && (

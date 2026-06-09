@@ -45,6 +45,7 @@ import { searchRouter } from "./api/routes/search";
 import { PgDocumentRepository } from "./infrastructure/db/PgDocumentRepository";
 import { PgVectorChunkRepository } from "./infrastructure/db/PgVectorChunkRepository";
 import { PgConversationRepository } from "./infrastructure/db/PgConversationRepository";
+import { PgDocumentSummaryRepository } from "./infrastructure/db/PgDocumentSummaryRepository";
 import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
@@ -53,6 +54,7 @@ import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
 import { GenerateQuiz } from "./application/GenerateQuiz";
+import { SummarizeDocument } from "./application/SummarizeDocument";
 import { quizzesRouter } from "./api/routes/quizzes";
 
 const documentRepo = new PgDocumentRepository();
@@ -82,6 +84,13 @@ const askQuestion = new AskQuestion(
   },
 );
 const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
+const summaryRepo = new PgDocumentSummaryRepository();
+const summarizeDocument = new SummarizeDocument(
+  documentRepo,
+  chunkRepo,
+  summaryRepo,
+  llmAdapter,
+);
 
 const app = express();
 const PORT = config.server.port;
@@ -98,7 +107,13 @@ app.use("/api/config", configRouter());
 app.use("/api", apiKeyAuth);
 app.use(
   "/api/documents",
-  documentsRouter(documentRepo, chunkRepo, ingestDocument),
+  documentsRouter(
+    documentRepo,
+    chunkRepo,
+    ingestDocument,
+    summaryRepo,
+    summarizeDocument,
+  ),
 );
 app.use(
   "/api/conversations",

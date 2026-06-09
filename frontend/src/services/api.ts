@@ -2,6 +2,7 @@ import type {
   AppConfig,
   Conversation,
   Document,
+  DocumentSummary,
   QuizQuestion,
   SourceCitation,
 } from "../types/domain";
@@ -53,6 +54,12 @@ export const api = {
     ),
   deleteDocument: (id: string) =>
     request<void>(`/documents/${id}`, { method: "DELETE" }),
+  getDocumentSummary: (id: string) =>
+    request<DocumentSummary>(`/documents/${id}/summary`),
+  generateDocumentSummary: (id: string) =>
+    request<{ content: string }>(`/documents/${id}/summary`, {
+      method: "POST",
+    }),
 
   getConversations: () => request<Conversation[]>("/conversations"),
   getConversation: (id: string) =>

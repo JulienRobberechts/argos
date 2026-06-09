@@ -7,9 +7,18 @@ dotenv.config({ path: path.join(__dirname, "../../../../.env") });
 import pool from "./pool";
 
 async function migrate(): Promise<void> {
-  const sqlPath = path.join(__dirname, "migrations", "001_init.sql");
-  const sql = fs.readFileSync(sqlPath, "utf8");
-  await pool.query(sql);
+  const migrationsDir = path.join(__dirname, "migrations");
+  const files = fs
+    .readdirSync(migrationsDir)
+    .filter((f) => f.endsWith(".sql"))
+    .sort();
+
+  for (const file of files) {
+    const sql = fs.readFileSync(path.join(migrationsDir, file), "utf8");
+    await pool.query(sql);
+    console.log(`Applied: ${file}`);
+  }
+
   console.log("Migration complete");
   await pool.end();
 }

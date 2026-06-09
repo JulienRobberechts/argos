@@ -45,3 +45,23 @@ export function useDeleteDocument() {
     },
   });
 }
+
+export function useDocumentSummary(id: string | undefined) {
+  return useQuery({
+    queryKey: ["documents", id, "summary"],
+    queryFn: () => api.getDocumentSummary(id!),
+    enabled: !!id,
+    retry: false,
+  });
+}
+
+export function useGenerateDocumentSummary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => api.generateDocumentSummary(id),
+    onSuccess: (_data, id) => {
+      queryClient.invalidateQueries({ queryKey: ["documents", id, "summary"] });
+    },
+  });
+}

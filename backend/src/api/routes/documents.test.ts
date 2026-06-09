@@ -24,9 +24,23 @@ function makeApp(
   chunkRepo: InMemoryChunkRepository,
   ingest = { execute: vi.fn().mockResolvedValue(undefined) },
 ) {
+  const fakeSummaryRepo = {
+    findByDocumentId: vi.fn().mockResolvedValue(null),
+    upsert: vi.fn().mockResolvedValue(undefined),
+  };
+  const fakeSummarize = { execute: vi.fn().mockResolvedValue("summary") };
   const app = express();
   app.use(express.json());
-  app.use("/documents", documentsRouter(docRepo, chunkRepo, ingest as never));
+  app.use(
+    "/documents",
+    documentsRouter(
+      docRepo,
+      chunkRepo,
+      ingest as never,
+      fakeSummaryRepo as never,
+      fakeSummarize as never,
+    ),
+  );
   return app;
 }
 

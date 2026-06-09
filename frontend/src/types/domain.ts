@@ -42,6 +42,14 @@ export interface QuizQuestion {
   correctIndex: number;
 }
 
+export interface DocumentSummary {
+  id: string;
+  documentId: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AppConfig {
   logLevel: string;
   rag: {

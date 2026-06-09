@@ -5,7 +5,9 @@ import path from "path";
 import { createDocumentSchema } from "../dto/document.dto";
 import { DocumentRepository } from "../../domain/ports/DocumentRepository";
 import { ChunkRepository } from "../../domain/ports/ChunkRepository";
+import { DocumentSummaryRepository } from "../../domain/ports/DocumentSummaryRepository";
 import { IngestDocument } from "../../application/IngestDocument";
+import { SummarizeDocument } from "../../application/SummarizeDocument";
 
 const upload = multer({ dest: "/tmp/devknowledge-uploads/" });
 
@@ -23,6 +25,8 @@ export function documentsRouter(
   documentRepo: DocumentRepository,
   chunkRepo: ChunkRepository,
   ingestDocument: IngestDocument,
+  summaryRepo: DocumentSummaryRepository,
+  summarizeDocument: SummarizeDocument,
 ): Router {
   const router = Router();
 
@@ -154,6 +158,48 @@ export function documentsRouter(
         }
         res.setHeader("Content-Type", "application/pdf");
         res.sendFile(doc.filePath, { root: "/" });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.get(
+    "/:id/summary",
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const doc = await documentRepo.findById(req.params.id);
+        if (!doc) {
+          res.status(404).json({ error: "Document not found" });
+          return;
+        }
+        const summary = await summaryRepo.findByDocumentId(req.params.id);
+        if (!summary) {
+          res.status(404).json({ error: "Summary not found" });
+          return;
+        }
+        res.json(summary);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.post(
+    "/:id/summary",
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const doc = await documentRepo.findById(req.params.id);
+        if (!doc) {
+          res.status(404).json({ error: "Document not found" });
+          return;
+        }
+        if (doc.status !== "ready") {
+          res.status(409).json({ error: "Document is not ready" });
+          return;
+        }
+        const content = await summarizeDocument.execute(req.params.id);
+        res.json({ content });
       } catch (err) {
         next(err);
       }
