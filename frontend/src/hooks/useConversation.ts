@@ -37,3 +37,16 @@ export function useDeleteConversation() {
     },
   });
 }
+
+export function useUpdateConversationTitle() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      api.updateConversationTitle(id, title),
+    onSuccess: (_data, { id }) => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["conversations", id] });
+    },
+  });
+}

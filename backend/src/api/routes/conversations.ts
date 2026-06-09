@@ -8,6 +8,10 @@ const createConversationSchema = z.object({
   title: z.string().min(1).default("New conversation"),
 });
 
+const updateTitleSchema = z.object({
+  title: z.string().min(1).max(80),
+});
+
 const sendMessageSchema = z.object({
   content: z.string().min(1),
 });
@@ -61,6 +65,28 @@ export function conversationsRouter(
           return;
         }
         res.json(conversation);
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
+  router.patch(
+    "/:id",
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const body = updateTitleSchema.safeParse(req.body);
+        if (!body.success) {
+          res.status(400).json({ error: "Validation error" });
+          return;
+        }
+        const conversation = await conversationRepo.findById(req.params.id);
+        if (!conversation) {
+          res.status(404).json({ error: "Conversation not found" });
+          return;
+        }
+        await conversationRepo.updateTitle(req.params.id, body.data.title);
+        res.json({ ...conversation, title: body.data.title });
       } catch (err) {
         next(err);
       }

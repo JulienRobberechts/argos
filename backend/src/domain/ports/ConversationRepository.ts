@@ -6,5 +6,6 @@ export interface ConversationRepository {
   findById(id: string): Promise<Conversation | null>;
   findAll(): Promise<Conversation[]>;
   addMessage(conversationId: string, message: Message): Promise<void>;
+  updateTitle(id: string, title: string): Promise<void>;
   delete(id: string): Promise<void>;
 }

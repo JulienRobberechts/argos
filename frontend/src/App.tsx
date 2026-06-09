@@ -1,5 +1,12 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import { useEffect } from "react";
 import AppLayout from "./components/layout/AppLayout";
 import ChatInterface from "./components/chat/ChatInterface";
 import DocumentList from "./components/documents/DocumentList";
@@ -8,6 +15,7 @@ import DashboardPage from "./components/pages/DashboardPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import PageHeader from "./components/ui/PageHeader";
+import { useCreateConversation } from "./hooks/useConversation";
 import { FileText, MessageSquare } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -29,6 +37,15 @@ function DocumentsPage() {
 }
 
 function ConversationsPage() {
+  const navigate = useNavigate();
+  const createConversation = useCreateConversation();
+
+  useEffect(() => {
+    createConversation.mutateAsync().then((conv) => {
+      navigate(`/conversations/${conv.id}`, { replace: true });
+    });
+  }, []);
+
   return (
     <div className="p-8">
       <PageHeader
@@ -36,7 +53,6 @@ function ConversationsPage() {
         title="Conversations"
         info="Posez des questions sur vos documents. Le système recherche les passages pertinents et génère une réponse contextuelle."
       />
-      <p className="text-gray-500">Sélectionnez ou créez une conversation.</p>
     </div>
   );
 }

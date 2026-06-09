@@ -30,6 +30,11 @@ export class InMemoryConversationRepository implements ConversationRepository {
     }
   }
 
+  async updateTitle(id: string, title: string): Promise<void> {
+    const conv = this.conversations.get(id);
+    if (conv) this.conversations.set(id, { ...conv, title });
+  }
+
   async delete(id: string): Promise<void> {
     this.conversations.delete(id);
   }

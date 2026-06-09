@@ -122,7 +122,32 @@ export class AskQuestion {
       createdAt: new Date(),
     };
     await this.conversationRepo.addMessage(conversationId, assistantMessage);
+
+    if (history.length === 0) {
+      const title = await this.generateTitle(userContent, assistantContent);
+      await this.conversationRepo.updateTitle(conversationId, title);
+    }
+
     return assistantMessage;
+  }
+
+  private async generateTitle(
+    userContent: string,
+    assistantContent: string,
+  ): Promise<string> {
+    const prompt = [
+      "Generate a short title (5 words maximum) summarizing this exchange. Reply with only the title, no quotes, no punctuation at the end.",
+      "",
+      `User: ${userContent.slice(0, 300)}`,
+      `Assistant: ${assistantContent.slice(0, 300)}`,
+    ].join("\n");
+
+    try {
+      const title = await this.llmAdapter.stream(prompt, () => {});
+      return title.trim().slice(0, 80);
+    } catch {
+      return userContent.slice(0, 60);
+    }
   }
 
   private buildPrompt(

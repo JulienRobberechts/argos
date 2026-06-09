@@ -92,6 +92,13 @@ export class PgConversationRepository implements ConversationRepository {
     );
   }
 
+  async updateTitle(id: string, title: string): Promise<void> {
+    await pool.query("UPDATE conversations SET title = $1 WHERE id = $2", [
+      title,
+      id,
+    ]);
+  }
+
   async delete(id: string): Promise<void> {
     await pool.query("DELETE FROM conversations WHERE id = $1", [id]);
   }

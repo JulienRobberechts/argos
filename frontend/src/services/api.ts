@@ -57,5 +57,12 @@ export const api = {
       body: JSON.stringify({ query, limit }),
     }),
 
+  updateConversationTitle: (id: string, title: string) =>
+    request<Conversation>(`/conversations/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title }),
+    }),
+
   getConfig: () => request<AppConfig>("/config"),
 };
