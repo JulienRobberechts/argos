@@ -23,7 +23,7 @@ const queryClient = new QueryClient();
 
 function DocumentsEmptyPage() {
   return (
-    <div className="p-8 max-w-lg">
+    <div className="flex items-center justify-center h-full w-full">
       <DocumentUpload />
     </div>
   );
