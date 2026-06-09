@@ -2,7 +2,6 @@ import { Link, useMatch, useNavigate } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 import {
   useConversations,
-  useCreateConversation,
   useDeleteConversation,
 } from "../../hooks/useConversation";
 import PageHeader from "../ui/PageHeader";
@@ -13,13 +12,7 @@ export default function Sidebar() {
   const activeId = match?.params.id;
 
   const { data: conversations } = useConversations();
-  const createConversation = useCreateConversation();
   const deleteConversation = useDeleteConversation();
-
-  async function handleNew() {
-    const conv = await createConversation.mutateAsync();
-    navigate(`/conversations/${conv.id}`);
-  }
 
   async function handleDelete(e: React.MouseEvent, id: string) {
     e.preventDefault();
@@ -43,9 +36,8 @@ export default function Sidebar() {
         info="Posez des questions sur vos documents. Le système recherche les passages pertinents et génère une réponse contextuelle."
       />
       <button
-        onClick={() => void handleNew()}
-        disabled={createConversation.isPending}
-        className="w-full mb-4 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+        onClick={() => navigate("/conversations/new")}
+        className="w-full mb-4 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
       >
         + Nouvelle conversation
       </button>

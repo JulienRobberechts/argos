@@ -15,10 +15,7 @@ import DashboardPage from "./components/pages/DashboardPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import PageHeader from "./components/ui/PageHeader";
-import {
-  useConversations,
-  useCreateConversation,
-} from "./hooks/useConversation";
+import { useConversations } from "./hooks/useConversation";
 import { FileText, MessageSquare } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -41,19 +38,16 @@ function DocumentsPage() {
 
 function ConversationsPage() {
   const navigate = useNavigate();
-  const createConversation = useCreateConversation();
   const { data: conversations, isLoading } = useConversations();
   const hasActed = useRef(false);
 
   useEffect(() => {
     if (isLoading || hasActed.current) return;
     hasActed.current = true;
-    if (!conversations || conversations.length === 0) {
-      void createConversation.mutateAsync().then((conv) => {
-        navigate(`/conversations/${conv.id}`, { replace: true });
-      });
-    } else {
+    if (conversations && conversations.length > 0) {
       navigate(`/conversations/${conversations[0].id}`, { replace: true });
+    } else if (conversations) {
+      navigate("/conversations/new", { replace: true });
     }
   }, [isLoading]);
 
@@ -77,6 +71,7 @@ export default function App() {
             <Route index element={<DashboardPage />} />
             <Route path="documents" element={<DocumentsPage />} />
             <Route path="conversations" element={<ConversationsPage />} />
+            <Route path="conversations/new" element={<ChatInterface />} />
             <Route path="conversations/:id" element={<ChatInterface />} />
             <Route path="technical" element={<TechnicalPage />} />
             <Route path="settings" element={<SettingsPage />} />

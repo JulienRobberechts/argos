@@ -1,7 +1,8 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import {
   useConversation,
+  useCreateConversation,
   useUpdateConversationTitle,
 } from "../../hooks/useConversation";
 import { useSSEStream } from "../../hooks/useSSEStream";
@@ -64,15 +65,42 @@ function EditableTitle({ id, title }: { id: string; title: string }) {
 
 export default function ChatInterface() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const location = useLocation();
   const queryClient = useQueryClient();
+  const createConversation = useCreateConversation();
   const { data: conversation, isLoading } = useConversation(id ?? null);
   const [input, setInput] = useState("");
   const stream = useSSEStream(id ?? "");
+  const pendingSentRef = useRef(false);
+
+  useEffect(() => {
+    const pending = (location.state as { pendingMessage?: string } | null)
+      ?.pendingMessage;
+    if (!pending || !id || pendingSentRef.current) return;
+    pendingSentRef.current = true;
+    stream.send(pending, () => {
+      queryClient.invalidateQueries({ queryKey: ["conversations", id] });
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+    });
+  }, [id]);
+
+  async function submitNew(content: string) {
+    const conv = await createConversation.mutateAsync();
+    navigate(`/conversations/${conv.id}`, {
+      replace: true,
+      state: { pendingMessage: content },
+    });
+  }
 
   function submit() {
     const content = input.trim();
-    if (!content || stream.isStreaming || !id) return;
+    if (!content || stream.isStreaming) return;
     setInput("");
+    if (!id) {
+      void submitNew(content);
+      return;
+    }
     stream.send(content, () => {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
@@ -84,6 +112,45 @@ export default function ChatInterface() {
       e.preventDefault();
       submit();
     }
+  }
+
+  const isEmpty =
+    !id ||
+    (!!conversation &&
+      conversation.messages.length === 0 &&
+      !stream.isStreaming);
+
+  if (!id) {
+    return (
+      <div className="flex flex-col h-screen">
+        <div className="flex-1 flex items-center justify-center p-4">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              submit();
+            }}
+            className="flex gap-2 w-full max-w-2xl"
+          >
+            <textarea
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={createConversation.isPending}
+              placeholder="Posez votre question…"
+              rows={1}
+              className="flex-1 resize-none rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={createConversation.isPending || !input.trim()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+            >
+              Envoyer
+            </button>
+          </form>
+        </div>
+      </div>
+    );
   }
 
   if (isLoading) {
@@ -101,8 +168,6 @@ export default function ChatInterface() {
       </div>
     );
   }
-
-  const isEmpty = conversation.messages.length === 0 && !stream.isStreaming;
 
   const inputForm = (
     <form
