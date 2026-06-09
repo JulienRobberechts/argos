@@ -35,6 +35,7 @@ export class AnthropicLLMAdapter implements LLMPort {
     const stream = this.client.messages.stream({
       model: this.model,
       max_tokens: this.maxTokens,
+      system: "Always respond in the same language as the user's question.",
       messages: [{ role: "user", content: prompt }],
     });
 
