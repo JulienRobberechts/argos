@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.40.0",
+    "lucide-react": "^1.17.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-dropzone": "^14.2.0",

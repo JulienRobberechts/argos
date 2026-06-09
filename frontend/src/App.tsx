@@ -4,6 +4,9 @@ import AppLayout from "./components/layout/AppLayout";
 import ChatInterface from "./components/chat/ChatInterface";
 import DocumentList from "./components/documents/DocumentList";
 import DocumentUpload from "./components/documents/DocumentUpload";
+import DashboardPage from "./components/pages/DashboardPage";
+import SettingsPage from "./components/pages/SettingsPage";
+import TechnicalPage from "./components/pages/TechnicalPage";
 
 const queryClient = new QueryClient();
 
@@ -17,15 +20,27 @@ function DocumentsPage() {
   );
 }
 
+function ConversationsPage() {
+  return (
+    <div className="p-8 text-gray-500">
+      Sélectionnez ou créez une conversation.
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<AppLayout />}>
-            <Route index element={<Navigate to="/documents" replace />} />
+            <Route index element={<DashboardPage />} />
             <Route path="documents" element={<DocumentsPage />} />
+            <Route path="conversations" element={<ConversationsPage />} />
             <Route path="conversations/:id" element={<ChatInterface />} />
+            <Route path="technical" element={<TechnicalPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
       </BrowserRouter>
