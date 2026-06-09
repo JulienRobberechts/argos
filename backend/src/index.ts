@@ -38,6 +38,7 @@ if (!envResult.success) {
 import config from "./config";
 import { apiKeyAuth } from "./api/middleware/apiKeyAuth";
 import { errorHandler } from "./api/middleware/errorHandler";
+import { configRouter } from "./api/routes/config";
 import { documentsRouter } from "./api/routes/documents";
 import { conversationsRouter } from "./api/routes/conversations";
 import { searchRouter } from "./api/routes/search";
@@ -87,6 +88,8 @@ app.use(express.json());
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
+
+app.use("/api/config", configRouter());
 
 app.use("/api", apiKeyAuth);
 app.use(

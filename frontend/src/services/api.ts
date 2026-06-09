@@ -1,4 +1,9 @@
-import type { Conversation, Document, SourceCitation } from "../types/domain";
+import type {
+  AppConfig,
+  Conversation,
+  Document,
+  SourceCitation,
+} from "../types/domain";
 
 const API_KEY = import.meta.env.VITE_API_KEY as string;
 
@@ -51,4 +56,6 @@ export const api = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query, limit }),
     }),
+
+  getConfig: () => request<AppConfig>("/config"),
 };

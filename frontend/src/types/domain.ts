@@ -34,3 +34,18 @@ export interface Conversation {
   messages: Message[];
   createdAt: string;
 }
+
+export interface AppConfig {
+  logLevel: string;
+  rag: {
+    chunkingStrategy: string;
+    chunkSize: number;
+    chunkOverlap: number;
+    retrievalLimit: number;
+    retrievalMinScore: number;
+  };
+  llm: {
+    maxTokens: number;
+    temperature: number;
+  };
+}

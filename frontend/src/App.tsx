@@ -7,15 +7,23 @@ import DocumentUpload from "./components/documents/DocumentUpload";
 import DashboardPage from "./components/pages/DashboardPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
+import PageHeader from "./components/ui/PageHeader";
+import { FileText } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 function DocumentsPage() {
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-xl font-semibold text-gray-800">Documents</h1>
-      <DocumentUpload />
-      <DocumentList />
+    <div className="p-8">
+      <PageHeader
+        icon={<FileText className="text-green-600" size={28} />}
+        title="Documents"
+        info="Gérez les documents indexés dans la base de connaissance. Chaque document est découpé en chunks, vectorisé et stocké pour la recherche sémantique."
+      />
+      <div className="space-y-6">
+        <DocumentUpload />
+        <DocumentList />
+      </div>
     </div>
   );
 }
