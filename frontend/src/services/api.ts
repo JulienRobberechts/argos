@@ -40,6 +40,13 @@ export const api = {
     request<{ content: string; sourceType: string }>(
       `/documents/${id}/content`,
     ),
+  getDocumentRaw: async (id: string): Promise<ArrayBuffer> => {
+    const res = await fetch(`/api/documents/${id}/raw`, {
+      headers: { "x-api-key": API_KEY },
+    });
+    if (!res.ok) throw new Error("Raw file not available");
+    return res.arrayBuffer();
+  },
   getDocumentChunks: (id: string) =>
     request<{ position: number; contentLength: number; preview: string }[]>(
       `/documents/${id}/chunks`,

@@ -143,6 +143,27 @@ export function documentsRouter(
     },
   );
 
+  router.get(
+    "/:id/raw",
+    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const doc = await documentRepo.findById(req.params.id);
+        if (!doc) {
+          res.status(404).json({ error: "Document not found" });
+          return;
+        }
+        if (doc.sourceType !== "pdf" || !doc.filePath) {
+          res.status(404).json({ error: "Raw file not available" });
+          return;
+        }
+        res.setHeader("Content-Type", "application/pdf");
+        res.sendFile(doc.filePath, { root: "/" });
+      } catch (err) {
+        next(err);
+      }
+    },
+  );
+
   router.delete(
     "/:id",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
