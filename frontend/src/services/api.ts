@@ -35,6 +35,10 @@ export const api = {
       body: fd,
     });
   },
+  getDocumentChunks: (id: string) =>
+    request<{ position: number; contentLength: number; preview: string }[]>(
+      `/documents/${id}/chunks`,
+    ),
   deleteDocument: (id: string) =>
     request<void>(`/documents/${id}`, { method: "DELETE" }),
 

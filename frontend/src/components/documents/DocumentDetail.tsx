@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "../../services/api";
-import { useDeleteDocument } from "../../hooks/useDocuments";
+import { useDeleteDocument, useDocumentChunks } from "../../hooks/useDocuments";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 
 const sourceTypeLabel: Record<string, string> = {
@@ -21,6 +21,12 @@ export default function DocumentDetail() {
     enabled: !!id,
   });
 
+  const { data: chunks } = useDocumentChunks(
+    doc?.status === "ready" ? id : undefined,
+  );
+  const charCount = chunks?.reduce((sum, c) => sum + c.contentLength, 0);
+  const chunkCount = chunks?.length;
+
   if (isLoading) {
     return <div className="p-8 text-sm text-gray-500">Loading document...</div>;
   }
@@ -37,16 +43,7 @@ export default function DocumentDetail() {
   return (
     <div className="p-8 max-w-2xl">
       <div className="flex items-start justify-between mb-6">
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900">{doc.title}</h2>
-          <p className="text-sm text-gray-500 mt-1">
-            {new Date(doc.createdAt).toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </p>
-        </div>
+        <h2 className="text-xl font-semibold text-gray-900">{doc.title}</h2>
         <DocumentStatusBadge status={doc.status} />
       </div>
 
@@ -67,16 +64,42 @@ export default function DocumentDetail() {
             <DocumentStatusBadge status={doc.status} />
           </dd>
         </div>
-        {doc.filePath && (
-          <div className="flex gap-4 py-3 border-t border-gray-100">
-            <dt className="w-32 text-sm font-medium text-gray-500 shrink-0">
-              File path
-            </dt>
-            <dd className="text-sm text-gray-800 font-mono break-all">
-              {doc.filePath}
-            </dd>
-          </div>
-        )}
+        <div className="flex gap-4 py-3 border-t border-gray-100">
+          <dt className="w-32 text-sm font-medium text-gray-500 shrink-0">
+            ID
+          </dt>
+          <dd className="text-sm text-gray-800 font-mono break-all">
+            {doc.id}
+          </dd>
+        </div>
+        <div className="flex gap-4 py-3 border-t border-gray-100">
+          <dt className="w-32 text-sm font-medium text-gray-500 shrink-0">
+            Added
+          </dt>
+          <dd className="text-sm text-gray-800">
+            {new Date(doc.createdAt).toLocaleDateString(undefined, {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </dd>
+        </div>
+        <div className="flex gap-4 py-3 border-t border-gray-100">
+          <dt className="w-32 text-sm font-medium text-gray-500 shrink-0">
+            Characters
+          </dt>
+          <dd className="text-sm text-gray-800">
+            {charCount !== undefined ? charCount.toLocaleString() : "—"}
+          </dd>
+        </div>
+        <div className="flex gap-4 py-3 border-t border-gray-100">
+          <dt className="w-32 text-sm font-medium text-gray-500 shrink-0">
+            Chunks
+          </dt>
+          <dd className="text-sm text-gray-800">
+            {chunkCount !== undefined ? chunkCount : "—"}
+          </dd>
+        </div>
       </dl>
 
       <div className="mt-8 pt-6 border-t border-gray-100">

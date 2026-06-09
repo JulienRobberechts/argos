@@ -27,6 +27,14 @@ export function useUploadDocument() {
   });
 }
 
+export function useDocumentChunks(id: string | undefined) {
+  return useQuery({
+    queryKey: ["documents", id, "chunks"],
+    queryFn: () => api.getDocumentChunks(id!),
+    enabled: !!id,
+  });
+}
+
 export function useDeleteDocument() {
   const queryClient = useQueryClient();
 
