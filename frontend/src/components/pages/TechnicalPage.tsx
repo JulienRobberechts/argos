@@ -13,6 +13,8 @@ import {
   Hash,
   ChevronRight,
   ArrowUpDown,
+  Brain,
+  ShieldCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageHeader from "../ui/PageHeader";
@@ -693,6 +695,50 @@ User: <current question>`}
           <ArrowRight
             size={16}
             className="text-purple-400 group-hover:translate-x-1 transition-transform"
+          />
+        </div>
+      </Link>
+
+      {/* ── LLM MODELS ───────────────────────────────────────────────────────── */}
+      <Link to="/technical/llm-models" className="block mb-6 group">
+        <div className="bg-white border border-blue-200 rounded-xl p-5 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 flex-shrink-0 group-hover:bg-blue-200 transition-colors">
+            <Brain size={20} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">
+              Modèles LLM — Comparaison
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5 : caractéristiques, prix
+              et quand les utiliser
+            </p>
+          </div>
+          <ArrowRight
+            size={16}
+            className="text-blue-400 group-hover:translate-x-1 transition-transform"
+          />
+        </div>
+      </Link>
+
+      {/* ── KNOWLEDGE CHECK ──────────────────────────────────────────────────── */}
+      <Link to="/technical/knowledge-check" className="block mb-6 group">
+        <div className="bg-white border border-teal-200 rounded-xl p-5 shadow-sm hover:border-teal-400 hover:shadow-md transition-all flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-700 flex-shrink-0 group-hover:bg-teal-200 transition-colors">
+            <ShieldCheck size={20} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">
+              Knowledge Check — Technical Deep Dive
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Faithfulness, Counterfactual, Citation Forcing : détecter si la
+              réponse vient des documents ou de l'entraînement
+            </p>
+          </div>
+          <ArrowRight
+            size={16}
+            className="text-teal-400 group-hover:translate-x-1 transition-transform"
           />
         </div>
       </Link>

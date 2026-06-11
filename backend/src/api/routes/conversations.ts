@@ -5,14 +5,22 @@ import { ConversationRepository } from "../../domain/ports/ConversationRepositor
 import { AskQuestion } from "../../application/AskQuestion";
 import config from "../../config";
 
+const knowledgeCheckStrategySchema = z.enum([
+  "faithfulness",
+  "counterfactual",
+  "citation_forcing",
+]);
+
 const conversationParamsSchema = z.object({
   retrievalLimit: z.number().int().min(1).max(20).optional(),
   retrievalMinScore: z.number().min(0).max(1).optional(),
   rerankEnabled: z.boolean().optional(),
+  rerankModel: z.string().min(1).optional(),
   rerankCandidateMultiplier: z.number().int().min(1).max(10).optional(),
   llmModel: z.string().min(1).optional(),
   llmTemperature: z.number().min(0).max(1).optional(),
   llmMaxTokens: z.number().int().min(64).max(8192).optional(),
+  knowledgeCheckStrategies: z.array(knowledgeCheckStrategySchema).optional(),
 });
 
 const createConversationSchema = z.object({
@@ -50,12 +58,15 @@ export function conversationsRouter(
             retrievalMinScore:
               p.retrievalMinScore ?? config.rag.retrievalMinScore,
             rerankEnabled: p.rerankEnabled ?? config.rerank.enabled,
+            rerankModel: p.rerankModel ?? config.rerank.model,
             rerankCandidateMultiplier:
               p.rerankCandidateMultiplier ?? config.rerank.candidateMultiplier,
             llmModel: p.llmModel ?? config.llm.anthropic.model,
             llmTemperature:
               p.llmTemperature ?? config.llm.anthropic.temperature,
             llmMaxTokens: p.llmMaxTokens ?? config.llm.anthropic.maxTokens,
+            knowledgeCheckStrategies:
+              p.knowledgeCheckStrategies ?? config.rag.knowledgeCheckStrategies,
           },
           messages: [],
           createdAt: new Date(),
@@ -187,6 +198,11 @@ export function conversationsRouter(
         res.write(
           `event: sources\ndata: ${JSON.stringify({ sources: assistantMessage.sources })}\n\n`,
         );
+        if (assistantMessage.knowledgeCheck?.length) {
+          res.write(
+            `event: knowledge_check\ndata: ${JSON.stringify({ results: assistantMessage.knowledgeCheck })}\n\n`,
+          );
+        }
         res.write(
           `event: done\ndata: ${JSON.stringify({ messageId: assistantMessage.id, totalTokens: assistantMessage.content.length })}\n\n`,
         );

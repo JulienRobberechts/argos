@@ -16,6 +16,8 @@ import QuizPage from "./components/pages/QuizPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
 import RerankingPage from "./components/pages/RerankingPage";
+import LLMModelsPage from "./components/pages/LLMModelsPage";
+import KnowledgeCheckPage from "./components/pages/KnowledgeCheckPage";
 import { useConversations } from "./hooks/useConversation";
 import { MessageSquare } from "lucide-react";
 import PageHeader from "./components/ui/PageHeader";
@@ -71,6 +73,11 @@ export default function App() {
             <Route path="quiz" element={<QuizPage />} />
             <Route path="technical" element={<TechnicalPage />} />
             <Route path="technical/reranking" element={<RerankingPage />} />
+            <Route path="technical/llm-models" element={<LLMModelsPage />} />
+            <Route
+              path="technical/knowledge-check"
+              element={<KnowledgeCheckPage />}
+            />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>

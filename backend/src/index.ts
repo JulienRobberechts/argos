@@ -53,6 +53,7 @@ import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
+import { CheckContextualKnowledge } from "./application/CheckContextualKnowledge";
 import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { SummarizeDocument } from "./application/SummarizeDocument";
@@ -80,11 +81,13 @@ const searchKnowledge = new SearchKnowledge(
   reranker,
   config.rerank.candidateMultiplier,
 );
+const knowledgeChecker = new CheckContextualKnowledge(llmAdapter);
 const askQuestion = new AskQuestion(
   searchKnowledge,
   llmAdapter,
   conversationRepo,
   documentRepo,
+  knowledgeChecker,
 );
 const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
 const summaryRepo = new PgDocumentSummaryRepository();

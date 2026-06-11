@@ -21,9 +21,14 @@ export class VoyageRerankAdapter implements RerankPort {
     private readonly model: string = config.rerank.model,
   ) {}
 
-  async rerank(query: string, documents: string[]): Promise<number[]> {
+  async rerank(
+    query: string,
+    documents: string[],
+    model?: string,
+  ): Promise<number[]> {
+    const effectiveModel = model ?? this.model;
     logger.info("Voyage rerank request", {
-      model: this.model,
+      model: effectiveModel,
       documentCount: documents.length,
     });
     const start = Date.now();
@@ -35,7 +40,7 @@ export class VoyageRerankAdapter implements RerankPort {
         Authorization: `Bearer ${this.apiKey}`,
       },
       body: JSON.stringify({
-        model: this.model,
+        model: effectiveModel,
         query,
         documents,
       }),
@@ -52,7 +57,7 @@ export class VoyageRerankAdapter implements RerankPort {
 
     const data = (await response.json()) as VoyageRerankResponse;
     logger.info("Voyage rerank response", {
-      model: this.model,
+      model: effectiveModel,
       resultCount: data.data.length,
       durationMs: Date.now() - start,
     });

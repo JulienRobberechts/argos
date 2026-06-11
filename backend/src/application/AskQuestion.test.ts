@@ -18,10 +18,12 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
       retrievalLimit: 8,
       retrievalMinScore: 0.75,
       rerankEnabled: false,
+      rerankModel: "rerank-2.5",
       rerankCandidateMultiplier: 3,
       llmModel: "claude-haiku-4-5-20251001",
       llmTemperature: 0.1,
       llmMaxTokens: 1024,
+      knowledgeCheckStrategies: [],
     },
     ...overrides,
   };

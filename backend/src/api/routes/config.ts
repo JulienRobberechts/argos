@@ -13,7 +13,10 @@ export function configRouter(): Router {
         chunkOverlap: config.rag.chunkOverlap,
         retrievalLimit: config.rag.retrievalLimit,
         retrievalMinScore: config.rag.retrievalMinScore,
-        reranking: config.rerank.enabled,
+        reranking: {
+          enabled: config.rerank.enabled,
+          model: config.rerank.model,
+        },
       },
       llm: {
         provider: "anthropic",

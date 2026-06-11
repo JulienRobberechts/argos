@@ -1,0 +1,1 @@
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS knowledge_check JSONB;

@@ -1,13 +1,15 @@
-import { Message } from "./Message";
+import { Message, KnowledgeCheckStrategy } from "./Message";
 
 export interface ConversationParams {
   retrievalLimit: number;
   retrievalMinScore: number;
   rerankEnabled: boolean;
+  rerankModel: string;
   rerankCandidateMultiplier: number;
   llmModel: string;
   llmTemperature: number;
   llmMaxTokens: number;
+  knowledgeCheckStrategies: KnowledgeCheckStrategy[];
 }
 
 export interface Conversation {

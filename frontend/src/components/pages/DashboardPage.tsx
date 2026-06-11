@@ -197,7 +197,10 @@ function RagConfigCard({
     chunkOverlap: number;
     retrievalLimit: number;
     retrievalMinScore: number;
-    reranking: boolean;
+    reranking: {
+      enabled: boolean;
+      model: string;
+    };
   };
 }) {
   const items = [
@@ -219,11 +222,11 @@ function RagConfigCard({
       </div>
       <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
         <span
-          className={`inline-block w-2 h-2 rounded-full ${config.reranking ? "bg-green-400" : "bg-gray-300"}`}
+          className={`inline-block w-2 h-2 rounded-full ${config.reranking.enabled ? "bg-green-400" : "bg-gray-300"}`}
         />
         <span className="text-xs text-gray-400">Reranking</span>
         <span className="text-sm font-semibold text-gray-700 ml-auto">
-          {config.reranking ? "active" : "disabled"}
+          {config.reranking.enabled ? "active" : "disabled"}
         </span>
       </div>
     </div>

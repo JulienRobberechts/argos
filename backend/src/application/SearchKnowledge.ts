@@ -17,7 +17,11 @@ export class SearchKnowledge {
     query: string,
     limit = 5,
     minScore = 0.7,
-    rerankOptions?: { enabled?: boolean; candidateMultiplier?: number },
+    rerankOptions?: {
+      enabled?: boolean;
+      candidateMultiplier?: number;
+      model?: string;
+    },
   ): Promise<ChunkSearchResult[]> {
     const vector = await this.embeddingAdapter.embed(query, "query");
 
@@ -33,6 +37,7 @@ export class SearchKnowledge {
         limit,
         minScore,
         rerankOptions?.candidateMultiplier,
+        rerankOptions?.model,
       );
     }
 
@@ -54,6 +59,7 @@ export class SearchKnowledge {
     limit: number,
     minScore: number,
     candidateMultiplier?: number,
+    model?: string,
   ): Promise<ChunkSearchResult[]> {
     const candidateLimit =
       limit * (candidateMultiplier ?? this.candidateMultiplier);
@@ -74,6 +80,7 @@ export class SearchKnowledge {
     const rankedIndices = await this.reranker!.rerank(
       query,
       candidates.map((c) => c.chunk.content),
+      model,
     );
 
     return rankedIndices.slice(0, limit).map((i) => candidates[i]);

@@ -5,6 +5,7 @@ import { ConversationRepository } from "../domain/ports/ConversationRepository";
 import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { LLMPort } from "../domain/ports/LLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
+import { CheckContextualKnowledge } from "./CheckContextualKnowledge";
 import { SearchKnowledge } from "./SearchKnowledge";
 
 const SLIDING_WINDOW_EXCHANGES = 4;
@@ -20,6 +21,7 @@ export class AskQuestion {
     private readonly llmAdapter: LLMPort,
     private readonly conversationRepo: ConversationRepository,
     private readonly documentRepo: DocumentRepository,
+    private readonly knowledgeChecker?: CheckContextualKnowledge,
   ) {}
 
   async execute(
@@ -54,6 +56,7 @@ export class AskQuestion {
       params
         ? {
             enabled: params.rerankEnabled,
+            model: params.rerankModel,
             candidateMultiplier: params.rerankCandidateMultiplier,
           }
         : undefined,
@@ -130,12 +133,30 @@ export class AskQuestion {
       score: result.score,
     }));
 
+    const strategies = params?.knowledgeCheckStrategies ?? [];
+    const knowledgeCheck =
+      this.knowledgeChecker && strategies.length > 0
+        ? await this.knowledgeChecker.run(
+            userContent,
+            assistantContent,
+            searchResults,
+            strategies,
+          )
+        : undefined;
+
+    this.logger.info("Knowledge check complete", {
+      conversationId,
+      strategies,
+      results: knowledgeCheck?.length ?? 0,
+    });
+
     const assistantMessage: Message = {
       id: randomUUID(),
       conversationId,
       role: "assistant",
       content: assistantContent,
       sources,
+      knowledgeCheck,
       createdAt: new Date(),
     };
     await this.conversationRepo.addMessage(conversationId, assistantMessage);

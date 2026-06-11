@@ -26,17 +26,38 @@ export interface Message {
   role: MessageRole;
   content: string;
   sources: SourceCitation[];
+  knowledgeCheck?: KnowledgeCheckResult[];
   createdAt: string;
+}
+
+export type KnowledgeCheckStrategy =
+  | "faithfulness"
+  | "counterfactual"
+  | "citation_forcing";
+
+export interface KnowledgeClaim {
+  claim: string;
+  status: "SUPPORTED" | "UNSUPPORTED";
+  sourceExcerpt?: string;
+}
+
+export interface KnowledgeCheckResult {
+  strategy: KnowledgeCheckStrategy;
+  score: number;
+  claims: KnowledgeClaim[];
+  warning?: string;
 }
 
 export interface ConversationParams {
   retrievalLimit: number;
   retrievalMinScore: number;
   rerankEnabled: boolean;
+  rerankModel: string;
   rerankCandidateMultiplier: number;
   llmModel: string;
   llmTemperature: number;
   llmMaxTokens: number;
+  knowledgeCheckStrategies: KnowledgeCheckStrategy[];
 }
 
 export interface Conversation {
@@ -69,7 +90,10 @@ export interface AppConfig {
     chunkOverlap: number;
     retrievalLimit: number;
     retrievalMinScore: number;
-    reranking: boolean;
+    reranking: {
+      enabled: boolean;
+      model: string;
+    };
   };
   llm: {
     provider: string;

@@ -1,8 +1,9 @@
-import type { SourceCitation } from "../types/domain";
+import type { KnowledgeCheckResult, SourceCitation } from "../types/domain";
 
 interface SSEHandlers {
   onDelta: (token: string) => void;
   onSources: (sources: SourceCitation[]) => void;
+  onKnowledgeCheck: (results: KnowledgeCheckResult[]) => void;
   onDone: (messageId: string) => void;
   onError: (error: string) => void;
 }
@@ -51,6 +52,8 @@ export function streamMessage(
           if (currentEvent === "delta") handlers.onDelta(data.token as string);
           else if (currentEvent === "sources")
             handlers.onSources(data.sources as SourceCitation[]);
+          else if (currentEvent === "knowledge_check")
+            handlers.onKnowledgeCheck(data.results as KnowledgeCheckResult[]);
           else if (currentEvent === "done")
             handlers.onDone(data.messageId as string);
           else if (currentEvent === "error")

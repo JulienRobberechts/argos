@@ -3,6 +3,7 @@ import {
   ConversationParams,
 } from "../../domain/entities/Conversation";
 import {
+  KnowledgeCheckResult,
   Message,
   MessageRole,
   SourceCitation,
@@ -17,11 +18,15 @@ function toParams(raw: unknown): ConversationParams {
     retrievalLimit: p.retrievalLimit ?? config.rag.retrievalLimit,
     retrievalMinScore: p.retrievalMinScore ?? config.rag.retrievalMinScore,
     rerankEnabled: p.rerankEnabled ?? config.rerank.enabled,
+    rerankModel: p.rerankModel ?? config.rerank.model,
     rerankCandidateMultiplier:
       p.rerankCandidateMultiplier ?? config.rerank.candidateMultiplier,
     llmModel: p.llmModel ?? config.llm.anthropic.model,
     llmTemperature: p.llmTemperature ?? config.llm.anthropic.temperature,
     llmMaxTokens: p.llmMaxTokens ?? config.llm.anthropic.maxTokens,
+    knowledgeCheckStrategies: Array.isArray(p.knowledgeCheckStrategies)
+      ? p.knowledgeCheckStrategies
+      : config.rag.knowledgeCheckStrategies,
   };
 }
 
@@ -32,6 +37,7 @@ function toMessage(row: Record<string, unknown>): Message {
     role: row.role as MessageRole,
     content: row.content as string,
     sources: row.sources as SourceCitation[],
+    knowledgeCheck: row.knowledge_check as KnowledgeCheckResult[] | undefined,
     createdAt: new Date(row.created_at as string),
   };
 }
@@ -104,14 +110,15 @@ export class PgConversationRepository implements ConversationRepository {
 
   async addMessage(conversationId: string, message: Message): Promise<void> {
     await pool.query(
-      `INSERT INTO messages (id, conversation_id, role, content, sources, created_at)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+      `INSERT INTO messages (id, conversation_id, role, content, sources, knowledge_check, created_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         message.id,
         conversationId,
         message.role,
         message.content,
         JSON.stringify(message.sources),
+        message.knowledgeCheck ? JSON.stringify(message.knowledgeCheck) : null,
         message.createdAt,
       ],
     );

@@ -18,11 +18,11 @@ Les deux types de connaissance coexistent dans les mêmes couches du réseau, en
 
 ---
 
-## Les 3 familles d'approches
+## Technical
 
-### 1. Boîte noire — applicable à Claude/GPT-4 via API
+Trois approches applicables via API (Claude, GPT-4) sans accès aux poids du modèle.
 
-#### a) Faithfulness scoring — RAGAS
+### 1. RAGAS faithfulness
 
 Après génération, un LLM-juge décompose la réponse en claims atomiques, puis vérifie pour chaque claim s'il est supporté par les chunks récupérés.
 
@@ -45,7 +45,11 @@ result = evaluate(
 # faithfulness score entre 0 et 1
 ```
 
-#### b) Test contrefactuel (comparaison avec/sans contexte)
+| Certitude | Coût |
+|---|---|
+| Moyenne | 1 appel LLM |
+
+### 2. Comparaison avec/sans contexte
 
 Générer la réponse deux fois :
 - **Avec** les chunks récupérés → réponse A
@@ -58,7 +62,11 @@ Si A ≠ B  → le LLM a utilisé le contexte fourni
 
 C'est une formalisation du test Jensen-Shannon Divergence sur les distributions de tokens (papier 2025 : *"Attributing Response to Context: A JSD-Driven Mechanistic Study"*). Applicable avec `logprobs` (disponible chez OpenAI, partiel chez Anthropic).
 
-#### c) Forçage de citation
+| Certitude | Coût |
+|---|---|
+| Bonne | 2× latence |
+
+### 3. Forçage de citation
 
 Prompter le LLM à citer le chunk exact pour chaque claim factuel :
 
@@ -71,78 +79,9 @@ Si le LLM produit `[CONNAISSANCE PROPRE]` → signal explicite.
 
 **Limite** : les LLMs hallucinent des citations. Il faut vérifier que la citation existe réellement dans les chunks.
 
-#### d) Injection de conflit (test de sensibilité)
-
-Insérer délibérément une version légèrement modifiée dans les documents :
-
-```
-Document injecté : "L'Orient-Express a commencé à circuler en 1887..."
-```
-
-- Si le LLM suit le document → il a utilisé le contexte
-- Si le LLM répond 1883 → il a utilisé l'entraînement
-
-Utile en mode test/évaluation pour mesurer le degré de dépendance paramétrique.
-
----
-
-### 2. Boîte blanche — modèles open-source uniquement (Llama, Mistral, etc.)
-
-#### a) Analyse d'attention + MLP
-
-La connaissance contextuelle circule via les **têtes d'attention** sur les tokens du contexte.
-La connaissance paramétrique est stockée dans les **couches MLP** (feed-forward).
-
-On peut mesurer :
-- Attention scores sur les tokens des chunks vs les tokens de la question
-- Attribution par gradient (Integrated Gradients) pour tracer quelle partie du contexte a influencé chaque token généré
-
-Papier 2025 : *"Probing for Knowledge Attribution in Large Language Models"* — entraîne un classifieur sur les états cachés pour prédire "vient du contexte" vs "vient de l'entraînement".
-
-#### b) Self-RAG — tokens de réflexion intégrés
-
-Un modèle fine-tuné (Self-RAG) génère des tokens spéciaux pendant l'inférence :
-
-```
-[Retrieve]   → décide si récupérer
-[IsRel]      → le chunk est-il pertinent ?
-[IsSup]      → le chunk supporte-t-il la réponse ?
-[IsUse]      → la réponse est-elle utile ?
-```
-
-Signal **inline et explicite** sur l'utilisation du contexte.
-
-**Limite** : nécessite un modèle spécifiquement entraîné — pas applicable à Claude via API.
-
----
-
-### 3. Approches hybrides
-
-#### Décodage contrastif
-
-Comparer les logits avec et sans contexte pour amplifier ou détecter la contribution du contexte. Partiellement possible via `logprobs` avec l'API OpenAI.
-
-Papier 2025 : *"From Context-Aware to Conflict-Aware: Generalizing Contrastive Decoding for Knowledge Conflict in LLMs"*
-
-#### Two-stage conflict detection (FaithfulRAG, 2025)
-
-1. Extraire la connaissance paramétrique via **self-consistency** (poser la question sans contexte plusieurs fois, consensus = connaissance d'entraînement)
-2. Comparer ce consensus avec la réponse générée avec les chunks
-3. Divergence → conflit → signaler la source
-
----
-
-## Synthèse comparative
-
-| Méthode | API closed-source | Certitude | Coût |
-|---|---|---|---|
-| RAGAS faithfulness | ✅ | Moyenne | 1 appel LLM |
-| Comparaison avec/sans contexte | ✅ | Bonne | 2× latence |
-| Forçage de citation | ✅ | Moyenne | Prompt engineering |
-| Injection de conflit | ✅ (test uniquement) | Bonne | Infra test |
-| Attention/MLP analysis | ❌ open-source only | Très bonne | Compute GPU |
-| Self-RAG tokens | ❌ modèle dédié | Excellente | Fine-tuning |
-| Probing classifiers | ❌ open-source only | Bonne | Labeling + entraînement |
+| Certitude | Coût |
+|---|---|
+| Moyenne | Prompt engineering |
 
 ---
 

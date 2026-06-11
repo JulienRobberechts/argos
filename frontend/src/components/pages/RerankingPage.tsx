@@ -146,7 +146,7 @@ export default function RerankingPage() {
       <PageHeader
         icon={<ArrowUpDown className="text-purple-600" size={28} />}
         title="Re-ranking — Technical Deep Dive"
-        info="Why vector search alone isn't enough, how a cross-encoder fixes it, and how Voyage rerank-2 is wired into this project."
+        info="Why vector search alone isn't enough, how a cross-encoder fixes it, and how Voyage rerank-2.5 is wired into this project."
       />
 
       {/* ── PROBLEM ──────────────────────────────────────────────────────────── */}
@@ -281,7 +281,7 @@ score = cosine(q_vec, c_vec)
           <Arrow />
           <FlowBox
             label="Stage 2 — Cross-encoder re-ranking"
-            sub="Voyage rerank-2: score each (question, chunk) pair together"
+            sub="Voyage rerank-2.5: score each (question, chunk) pair together"
             color="purple"
           />
           <Arrow />
@@ -323,13 +323,13 @@ score = cosine(q_vec, c_vec)
       <Card className="mb-6">
         <SectionTitle
           icon={<Zap size={20} />}
-          title="Voyage rerank-2 API"
+          title="Voyage rerank-2.5 API"
           subtitle="The cross-encoder used in this project"
         />
         <p className="text-sm text-gray-700 leading-relaxed mb-4">
           This project uses Voyage AI's{" "}
           <code className="bg-gray-100 px-1 rounded text-purple-700">
-            rerank-2
+            rerank-2.5
           </code>{" "}
           model — the same provider as the embeddings, which ensures the
           representations are coherent. The API takes a query and a list of
@@ -342,7 +342,7 @@ score = cosine(q_vec, c_vec)
 Authorization: Bearer <VOYAGE_API_KEY>
 
 {
-  "model":     "rerank-2",
+  "model":     "rerank-2.5",
   "query":     "Quand a commencé l'Orient-Express ?",
   "documents": [
     "Sherwood S., 1984, Venise Simplon Orient-Express...",
@@ -475,8 +475,8 @@ async execute(query, limit, minScore) {
               />
               <ParamRow
                 name="RERANK_MODEL"
-                value="rerank-2"
-                description="Voyage AI reranker model to use. rerank-2 is the current production model. rerank-lite-1 is faster and cheaper but less accurate."
+                value="rerank-2.5"
+                description="Voyage AI reranker model to use. rerank-2.5 is the current production model. rerank-lite-1 is faster and cheaper but less accurate."
               />
               <ParamRow
                 name="RERANK_CANDIDATE_MULTIPLIER"

@@ -37,13 +37,15 @@ const config = {
     chunkOverlap: parseInt(process.env.CHUNK_OVERLAP_TOKENS ?? "128", 10),
     retrievalLimit: parseInt(process.env.RETRIEVAL_LIMIT ?? "8", 10),
     retrievalMinScore: parseFloat(process.env.RETRIEVAL_MIN_SCORE ?? "0.75"),
+    knowledgeCheckStrategies: [] as (
+      | "faithfulness"
+      | "counterfactual"
+      | "citation_forcing"
+    )[],
   },
   rerank: {
-    enabled:
-      process.env.RERANK_ENABLED !== undefined
-        ? process.env.RERANK_ENABLED === "true"
-        : !!process.env.VOYAGE_API_KEY,
-    model: process.env.RERANK_MODEL ?? "rerank-2",
+    enabled: process.env.RERANK_ENABLED !== "false",
+    model: process.env.RERANK_MODEL ?? "rerank-2.5",
     candidateMultiplier: parseInt(
       process.env.RERANK_CANDIDATE_MULTIPLIER ?? "3",
       10,

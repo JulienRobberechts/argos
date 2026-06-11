@@ -149,6 +149,19 @@ export default function SettingsPage() {
               info="Embedding model used for vectorizing documents and queries. Overridable via EMBEDDING_MODEL environment variable."
             />
           </Section>
+
+          <Section title="Reranking">
+            <Row
+              label="Enabled"
+              value={config.rag.reranking.enabled ? "true" : "false"}
+              info="Whether cross-encoder re-ranking is active. Enabled automatically when VOYAGE_API_KEY is set, or forced via RERANK_ENABLED."
+            />
+            <Row
+              label="Model"
+              value={config.rag.reranking.model}
+              info="Reranker model used for the second retrieval stage. Overridable via RERANK_MODEL environment variable."
+            />
+          </Section>
         </>
       )}
     </div>
