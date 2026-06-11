@@ -126,7 +126,7 @@ export class AskQuestion {
       documentTitle:
         titleById.get(result.chunk.documentId) ?? result.chunk.documentId,
       sourceType: sourceTypeById.get(result.chunk.documentId) ?? "text",
-      excerpt: result.chunk.content.slice(0, 200),
+      excerpt: result.chunk.content,
       score: result.score,
     }));
 

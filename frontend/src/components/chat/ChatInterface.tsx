@@ -123,6 +123,83 @@ function InputForm({
   );
 }
 
+const LLM_MODELS = [
+  { value: "claude-haiku-4-5-20251001", label: "Claude Haiku 4.5" },
+];
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1 mb-0.5">
+      {children}
+    </p>
+  );
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-xs text-gray-500 shrink-0">{label}</span>
+      {children}
+    </div>
+  );
+}
+
+function NumericField({
+  value,
+  onChange,
+  min,
+  max,
+  step,
+}: {
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+}) {
+  return (
+    <input
+      type="number"
+      value={value}
+      min={min}
+      max={max}
+      step={step ?? 1}
+      onChange={(e) => onChange(parseFloat(e.target.value))}
+      className="w-20 text-xs text-right border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 bg-gray-50"
+    />
+  );
+}
+
+function Toggle({
+  checked,
+  onChange,
+}: {
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
+        checked ? "bg-indigo-500" : "bg-gray-200"
+      }`}
+    >
+      <span
+        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+          checked ? "translate-x-4" : "translate-x-1"
+        }`}
+      />
+    </button>
+  );
+}
+
 function ParamsPanel({
   params,
   onChange,
@@ -130,81 +207,80 @@ function ParamsPanel({
   params: Partial<ConversationParams>;
   onChange: (p: Partial<ConversationParams>) => void;
 }) {
-  function field(
-    label: string,
-    key: keyof ConversationParams,
-    type: "number" | "boolean",
-    opts?: { min?: number; max?: number; step?: number },
-  ) {
-    const value = params[key];
-    if (type === "boolean") {
-      return (
-        <label key={key} className="flex items-center justify-between">
-          <span className="text-xs text-gray-500">{label}</span>
-          <input
-            type="checkbox"
-            checked={value as boolean}
-            onChange={(e) => onChange({ ...params, [key]: e.target.checked })}
-            className="accent-indigo-600"
-          />
-        </label>
-      );
-    }
-    return (
-      <label key={key} className="flex items-center justify-between gap-4">
-        <span className="text-xs text-gray-500 shrink-0">{label}</span>
-        <input
-          type="number"
-          value={value as number}
-          min={opts?.min}
-          max={opts?.max}
-          step={opts?.step ?? 1}
-          onChange={(e) =>
-            onChange({ ...params, [key]: parseFloat(e.target.value) })
-          }
-          className="w-24 text-xs text-right border border-gray-200 rounded px-2 py-0.5 outline-none focus:border-indigo-400"
-        />
-      </label>
-    );
-  }
-
   return (
-    <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 flex flex-col gap-2 w-full max-w-2xl">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">
-        Conversation parameters
-      </p>
-      {field("Retrieval limit", "retrievalLimit", "number", {
-        min: 1,
-        max: 20,
-      })}
-      {field("Min similarity score", "retrievalMinScore", "number", {
-        min: 0,
-        max: 1,
-        step: 0.05,
-      })}
-      {field("Reranking", "rerankEnabled", "boolean")}
-      {params.rerankEnabled &&
-        field(
-          "Rerank candidate multiplier",
-          "rerankCandidateMultiplier",
-          "number",
-          { min: 1, max: 10 },
-        )}
-      <label className="flex items-center justify-between gap-4">
-        <span className="text-xs text-gray-500 shrink-0">LLM model</span>
-        <input
-          type="text"
-          value={(params.llmModel as string) ?? ""}
-          onChange={(e) => onChange({ ...params, llmModel: e.target.value })}
-          className="w-48 text-xs text-right border border-gray-200 rounded px-2 py-0.5 outline-none focus:border-indigo-400"
+    <div className="bg-white border border-gray-200 rounded-xl px-5 py-4 flex flex-col gap-2.5 w-full max-w-2xl shadow-sm">
+      <p className="text-xs font-semibold text-gray-700">Parameters</p>
+      <div className="h-px bg-gray-100" />
+
+      <SectionLabel>Retrieval</SectionLabel>
+      <Row label="Results limit">
+        <NumericField
+          value={params.retrievalLimit ?? 5}
+          onChange={(v) => onChange({ ...params, retrievalLimit: v })}
+          min={1}
+          max={20}
         />
-      </label>
-      {field("Temperature", "llmTemperature", "number", {
-        min: 0,
-        max: 1,
-        step: 0.05,
-      })}
-      {field("Max tokens", "llmMaxTokens", "number", { min: 64, max: 8192 })}
+      </Row>
+      <Row label="Min similarity score">
+        <NumericField
+          value={params.retrievalMinScore ?? 0.5}
+          onChange={(v) => onChange({ ...params, retrievalMinScore: v })}
+          min={0}
+          max={1}
+          step={0.05}
+        />
+      </Row>
+      <Row label="Reranking">
+        <Toggle
+          checked={params.rerankEnabled ?? false}
+          onChange={(v) => onChange({ ...params, rerankEnabled: v })}
+        />
+      </Row>
+      {params.rerankEnabled && (
+        <Row label="Rerank candidate multiplier">
+          <NumericField
+            value={params.rerankCandidateMultiplier ?? 3}
+            onChange={(v) =>
+              onChange({ ...params, rerankCandidateMultiplier: v })
+            }
+            min={1}
+            max={10}
+          />
+        </Row>
+      )}
+
+      <div className="h-px bg-gray-100" />
+      <SectionLabel>Generation</SectionLabel>
+      <Row label="Model">
+        <select
+          value={params.llmModel ?? LLM_MODELS[0].value}
+          onChange={(e) => onChange({ ...params, llmModel: e.target.value })}
+          className="text-xs border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 bg-gray-50 text-gray-700"
+        >
+          {LLM_MODELS.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.label}
+            </option>
+          ))}
+        </select>
+      </Row>
+      <Row label="Temperature">
+        <NumericField
+          value={params.llmTemperature ?? 0.2}
+          onChange={(v) => onChange({ ...params, llmTemperature: v })}
+          min={0}
+          max={1}
+          step={0.05}
+        />
+      </Row>
+      <Row label="Max tokens">
+        <NumericField
+          value={params.llmMaxTokens ?? 1024}
+          onChange={(v) => onChange({ ...params, llmMaxTokens: v })}
+          min={64}
+          max={8192}
+        />
+      </Row>
     </div>
   );
 }

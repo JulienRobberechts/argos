@@ -23,7 +23,7 @@ export default function Sidebar() {
       if (remaining && remaining.length > 0) {
         navigate(`/conversations/${remaining[0].id}`);
       } else {
-        navigate("/conversations");
+        navigate("/conversations/new");
       }
     }
   }
