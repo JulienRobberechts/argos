@@ -12,7 +12,9 @@ import {
   Layers,
   Hash,
   ChevronRight,
+  ArrowUpDown,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import PageHeader from "../ui/PageHeader";
 
 function SectionTitle({
@@ -672,6 +674,28 @@ User: <current question>`}
           )}
         </div>
       </Card>
+
+      {/* ── RERANKING ────────────────────────────────────────────────────────── */}
+      <Link to="/technical/reranking" className="block mb-6 group">
+        <div className="bg-white border border-purple-200 rounded-xl p-5 shadow-sm hover:border-purple-400 hover:shadow-md transition-all flex items-center gap-4">
+          <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 flex-shrink-0 group-hover:bg-purple-200 transition-colors">
+            <ArrowUpDown size={20} />
+          </div>
+          <div className="flex-1">
+            <p className="font-semibold text-gray-900 text-sm">
+              Re-ranking — Technical Deep Dive
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Why vector search alone isn't enough, and how a cross-encoder
+              fixes it
+            </p>
+          </div>
+          <ArrowRight
+            size={16}
+            className="text-purple-400 group-hover:translate-x-1 transition-transform"
+          />
+        </div>
+      </Link>
 
       {/* ── WHY EACH CHOICE ──────────────────────────────────────────────────── */}
       <Card>

@@ -15,6 +15,7 @@ import DashboardPage from "./components/pages/DashboardPage";
 import QuizPage from "./components/pages/QuizPage";
 import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./components/pages/TechnicalPage";
+import RerankingPage from "./components/pages/RerankingPage";
 import { useConversations } from "./hooks/useConversation";
 import { MessageSquare } from "lucide-react";
 import PageHeader from "./components/ui/PageHeader";
@@ -69,6 +70,7 @@ export default function App() {
             <Route path="conversations/:id" element={<ChatInterface />} />
             <Route path="quiz" element={<QuizPage />} />
             <Route path="technical" element={<TechnicalPage />} />
+            <Route path="technical/reranking" element={<RerankingPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
