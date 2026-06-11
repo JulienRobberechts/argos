@@ -1,5 +1,5 @@
-import { Outlet, useMatch } from "react-router-dom";
-import { useState, useCallback, useRef } from "react";
+import { Outlet, useMatch, useLocation } from "react-router-dom";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import IconNav from "./IconNav";
 import Sidebar from "./Sidebar";
@@ -17,6 +17,13 @@ export default function AppLayout() {
   const matchDocuments = useMatch("/documents");
   const matchDocumentId = useMatch("/documents/:id");
   const onDocuments = matchDocuments ?? matchDocumentId;
+
+  const { pathname } = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+  }, [pathname]);
 
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
   const [collapsed, setCollapsed] = useState(false);
@@ -96,7 +103,7 @@ export default function AppLayout() {
           </div>
         </>
       )}
-      <main className="flex-1 overflow-y-auto">
+      <main ref={mainRef} className="flex-1 overflow-y-auto">
         <Outlet />
       </main>
     </div>
