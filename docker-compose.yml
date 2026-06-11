@@ -23,10 +23,13 @@ services:
       postgres:
         condition: service_healthy
     env_file: .env
+    environment:
+      UPLOAD_DIR: /app/uploads
     ports:
       - "3205:3205"
     volumes:
       - ./backend/src:/app/src
+      - uploads:/app/uploads
 
   frontend:
     build:
@@ -42,3 +45,4 @@ services:
 
 volumes:
   pgdata:
+  uploads:

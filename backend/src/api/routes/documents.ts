@@ -3,6 +3,7 @@ import fs from "fs";
 import { Router, Request, Response, NextFunction } from "express";
 import multer from "multer";
 import path from "path";
+import config from "../../config";
 import { createDocumentSchema } from "../dto/document.dto";
 import { DocumentRepository } from "../../domain/ports/DocumentRepository";
 import { ChunkRepository } from "../../domain/ports/ChunkRepository";
@@ -10,7 +11,7 @@ import { DocumentSummaryRepository } from "../../domain/ports/DocumentSummaryRep
 import { IngestDocument } from "../../application/IngestDocument";
 import { SummarizeDocument } from "../../application/SummarizeDocument";
 
-const upload = multer({ dest: "/tmp/devknowledge-uploads/" });
+const upload = multer({ dest: config.api.uploadDir });
 
 function sourceTypeFromMime(
   mimetype: string,
@@ -159,6 +160,12 @@ export function documentsRouter(
         }
         if (doc.sourceType !== "pdf" || !doc.filePath) {
           res.status(404).json({ error: "Raw file not available" });
+          return;
+        }
+        try {
+          await fs.promises.access(doc.filePath);
+        } catch {
+          res.status(404).json({ error: "File no longer available" });
           return;
         }
         res.setHeader("Content-Type", "application/pdf");

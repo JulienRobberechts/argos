@@ -41,10 +41,15 @@ function PdfViewer({ id }: { id: string }) {
     return () => observer.disconnect();
   }, []);
 
-  const { data: pdfData, isLoading } = useQuery({
+  const {
+    data: pdfData,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["documents", id, "raw"],
     queryFn: () => api.getDocumentRaw(id),
     gcTime: 0,
+    retry: false,
   });
 
   return (
@@ -53,6 +58,11 @@ function PdfViewer({ id }: { id: string }) {
       className="h-full overflow-y-auto bg-gray-50 p-6 flex flex-col items-center"
     >
       {isLoading && <p className="text-sm text-gray-400 mt-8">Loading…</p>}
+      {isError && (
+        <p className="text-sm text-gray-500 mt-8">
+          The original file is no longer available.
+        </p>
+      )}
       {pdfData && (
         <Document
           file={pdfData}

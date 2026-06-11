@@ -27,6 +27,7 @@ const config = {
   },
   api: {
     key: process.env.API_KEY,
+    uploadDir: process.env.UPLOAD_DIR ?? "/app/uploads",
   },
   rag: {
     chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as
