@@ -58,6 +58,7 @@ export interface AppConfig {
     chunkOverlap: number;
     retrievalLimit: number;
     retrievalMinScore: number;
+    reranking: boolean;
   };
   llm: {
     provider: string;

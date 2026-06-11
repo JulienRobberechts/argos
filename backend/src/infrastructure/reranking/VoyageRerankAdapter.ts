@@ -1,0 +1,64 @@
+import { RerankPort } from "../../domain/ports/RerankPort";
+import config from "../../config";
+import { Logger } from "../logger/Logger";
+
+const logger = new Logger("VoyageRerankAdapter");
+
+interface VoyageRerankItem {
+  index: number;
+  relevance_score: number;
+}
+
+interface VoyageRerankResponse {
+  data: VoyageRerankItem[];
+}
+
+export class VoyageRerankAdapter implements RerankPort {
+  private readonly apiUrl = "https://api.voyageai.com/v1/rerank";
+
+  constructor(
+    private readonly apiKey: string = config.embeddings.voyage.apiKey,
+    private readonly model: string = config.rerank.model,
+  ) {}
+
+  async rerank(query: string, documents: string[]): Promise<number[]> {
+    logger.info("Voyage rerank request", {
+      model: this.model,
+      documentCount: documents.length,
+    });
+    const start = Date.now();
+
+    const response = await fetch(this.apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: this.model,
+        query,
+        documents,
+      }),
+    });
+
+    if (!response.ok) {
+      const body = await response.text();
+      logger.error("Voyage rerank API error", {
+        status: response.status,
+        body,
+      });
+      throw new Error(`Voyage rerank API error: ${response.status} ${body}`);
+    }
+
+    const data = (await response.json()) as VoyageRerankResponse;
+    logger.info("Voyage rerank response", {
+      model: this.model,
+      resultCount: data.data.length,
+      durationMs: Date.now() - start,
+    });
+
+    return data.data
+      .sort((a, b) => b.relevance_score - a.relevance_score)
+      .map((item) => item.index);
+  }
+}

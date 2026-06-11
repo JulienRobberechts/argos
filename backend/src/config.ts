@@ -38,6 +38,17 @@ const config = {
     retrievalLimit: parseInt(process.env.RETRIEVAL_LIMIT ?? "8", 10),
     retrievalMinScore: parseFloat(process.env.RETRIEVAL_MIN_SCORE ?? "0.75"),
   },
+  rerank: {
+    enabled:
+      process.env.RERANK_ENABLED !== undefined
+        ? process.env.RERANK_ENABLED === "true"
+        : !!process.env.VOYAGE_API_KEY,
+    model: process.env.RERANK_MODEL ?? "rerank-2",
+    candidateMultiplier: parseInt(
+      process.env.RERANK_CANDIDATE_MULTIPLIER ?? "3",
+      10,
+    ),
+  },
 };
 
 export default config;

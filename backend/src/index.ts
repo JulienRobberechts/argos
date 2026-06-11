@@ -53,6 +53,7 @@ import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
+import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { SummarizeDocument } from "./application/SummarizeDocument";
 import { quizzesRouter } from "./api/routes/quizzes";
@@ -72,7 +73,13 @@ const ingestDocument = new IngestDocument(
   chunkingStrategy,
   { chunkSize: config.rag.chunkSize, chunkOverlap: config.rag.chunkOverlap },
 );
-const searchKnowledge = new SearchKnowledge(chunkRepo, embeddingAdapter);
+const reranker = config.rerank.enabled ? new VoyageRerankAdapter() : null;
+const searchKnowledge = new SearchKnowledge(
+  chunkRepo,
+  embeddingAdapter,
+  reranker,
+  config.rerank.candidateMultiplier,
+);
 const askQuestion = new AskQuestion(
   searchKnowledge,
   llmAdapter,

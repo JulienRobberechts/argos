@@ -63,6 +63,7 @@ describe("AskQuestion", () => {
   let mockSearchKnowledge: Pick<SearchKnowledge, "execute"> & {
     execute: ReturnType<typeof vi.fn>;
   };
+  let mockDocumentRepo: { findById: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     convRepo = new InMemoryConversationRepository();
@@ -70,6 +71,7 @@ describe("AskQuestion", () => {
     mockSearchKnowledge = {
       execute: vi.fn().mockResolvedValue([makeChunkResult()]),
     };
+    mockDocumentRepo = { findById: vi.fn().mockResolvedValue(null) };
   });
 
   it("should call SearchKnowledge to retrieve relevant chunks", async () => {
@@ -79,6 +81,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "What is RAG?", vi.fn());
     expect(mockSearchKnowledge.execute).toHaveBeenCalledWith(
@@ -99,6 +103,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "Question?", vi.fn());
     const prompt: string = llmAdapter.stream.mock.calls[0][0];
@@ -125,6 +131,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "Current question", vi.fn());
     const prompt: string = llmAdapter.stream.mock.calls[0][0];
@@ -150,6 +158,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "Question?", onToken);
     expect(onToken).toHaveBeenCalledWith("token1");
@@ -163,6 +173,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "My question", vi.fn());
     const updated = await convRepo.findById(conv.id);
@@ -181,6 +193,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await ask.execute(conv.id, "Question?", vi.fn());
     const updated = await convRepo.findById(conv.id);
@@ -198,6 +212,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     await expect(
       ask.execute(conv.id, "Question?", vi.fn()),
@@ -216,6 +232,8 @@ describe("AskQuestion", () => {
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
       convRepo,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      mockDocumentRepo as any,
     );
     const result = await ask.execute(conv.id, "Unknown topic", vi.fn());
     expect(llmAdapter.stream).not.toHaveBeenCalled();

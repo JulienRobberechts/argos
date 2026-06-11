@@ -1,9 +1,34 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import { Bot } from "lucide-react";
 import type { Message, SourceCitation } from "../../types/domain";
 import SourceCard from "./SourceCard";
 import StreamingMessage from "./StreamingMessage";
+
+const VISIBLE_SOURCES = 3;
+
+function SourcesList({ sources }: { sources: SourceCitation[] }) {
+  const [expanded, setExpanded] = useState(false);
+  const hidden = sources.length - VISIBLE_SOURCES;
+  const visible = expanded ? sources : sources.slice(0, VISIBLE_SOURCES);
+
+  return (
+    <div className="mt-3 flex flex-col gap-2">
+      {visible.map((source) => (
+        <SourceCard key={source.chunkId} source={source} />
+      ))}
+      {hidden > 0 && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="text-xs text-indigo-500 hover:text-indigo-700 text-left"
+        >
+          + {hidden} autre{hidden > 1 ? "s" : ""} référence
+          {hidden > 1 ? "s" : ""}
+        </button>
+      )}
+    </div>
+  );
+}
 
 interface Props {
   messages: Message[];
@@ -49,13 +74,7 @@ export default function MessageList({
             <div className="prose prose-sm prose-gray max-w-none">
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
-            {msg.sources.length > 0 && (
-              <div className="mt-3 flex flex-col gap-2">
-                {msg.sources.map((source) => (
-                  <SourceCard key={source.chunkId} source={source} />
-                ))}
-              </div>
-            )}
+            {msg.sources.length > 0 && <SourcesList sources={msg.sources} />}
           </AssistantBubble>
         ),
       )}
@@ -63,11 +82,7 @@ export default function MessageList({
         <AssistantBubble>
           <StreamingMessage text={streamingText} />
           {streamingSources && streamingSources.length > 0 && (
-            <div className="mt-3 flex flex-col gap-2">
-              {streamingSources.map((source) => (
-                <SourceCard key={source.chunkId} source={source} />
-              ))}
-            </div>
+            <SourcesList sources={streamingSources} />
           )}
         </AssistantBubble>
       )}
