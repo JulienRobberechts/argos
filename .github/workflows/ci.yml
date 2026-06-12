@@ -72,11 +72,9 @@ jobs:
       - run: npm install -g @railway/cli
       - name: Deploy API
         run: railway up --service argos-api --detach
-        working-directory: backend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       - name: Deploy Frontend
         run: railway up --service argos-frontend --detach
-        working-directory: frontend
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
