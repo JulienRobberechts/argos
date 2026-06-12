@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   FlaskConical,
   FileText,
@@ -12,12 +13,9 @@ import {
   Layers,
   Hash,
   ChevronRight,
-  ArrowUpDown,
-  Brain,
-  ShieldCheck,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import PageHeader from "../ui/PageHeader";
+import TechnicalNav from "./TechnicalNav";
 
 function SectionTitle({
   icon,
@@ -142,16 +140,38 @@ function ParamRow({
   );
 }
 
-export default function TechnicalPage() {
-  return (
-    <div className="p-8 max-w-4xl">
-      <PageHeader
-        icon={<FlaskConical className="text-purple-600" size={28} />}
-        title="How RAG Works — Technical Deep Dive"
-        info="Everything you need to understand Retrieval-Augmented Generation and how this project implements it, from document ingestion to streaming answers."
-      />
+const TABS = ["Overview", "Ingestion", "Query", "Config"] as const;
+type Tab = (typeof TABS)[number];
 
-      {/* ── OVERVIEW ─────────────────────────────────────────────────────────── */}
+function TabBar({
+  active,
+  onChange,
+}: {
+  active: Tab;
+  onChange: (t: Tab) => void;
+}) {
+  return (
+    <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      {TABS.map((t) => (
+        <button
+          key={t}
+          onClick={() => onChange(t)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            active === t
+              ? "bg-white text-purple-700 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-white/60"
+          }`}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function OverviewTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<Layers size={20} />}
@@ -194,7 +214,130 @@ export default function TechnicalPage() {
         </Callout>
       </Card>
 
-      {/* ── INGESTION PIPELINE ───────────────────────────────────────────────── */}
+      <Card className="mb-6">
+        <SectionTitle
+          icon={<ArrowRight size={20} />}
+          title="End-to-End Flow Summary"
+          subtitle="The complete lifecycle of a question"
+        />
+        <div className="flex flex-col gap-1 text-sm text-gray-700">
+          {[
+            ["User uploads a PDF", "file_path stored, status = pending"],
+            ["POST /documents/:id/ingest", "IngestDocument use case triggered"],
+            ["FileParser extracts text", "raw string from PDF/MD/TXT"],
+            [
+              "ChunkingStrategy splits text",
+              "N overlapping ChunkResult objects",
+            ],
+            [
+              "VoyageEmbeddingAdapter (×N/20)",
+              "1024-dim vectors via voyage-4-lite",
+            ],
+            [
+              "PgVectorChunkRepository.saveMany()",
+              "rows inserted in chunks table",
+            ],
+            ["Status → ready", "document is searchable"],
+            ["", ""],
+            ["User types a question", "POST /conversations/:id/messages (SSE)"],
+            ["AskQuestion.execute()", "orchestrates the whole query"],
+            [
+              "VoyageEmbeddingAdapter.embed(q, 'query')",
+              "1024-dim query vector",
+            ],
+            [
+              "PgVectorChunkRepository.search()",
+              "cosine similarity, top 8 ≥ 0.75",
+            ],
+            ["buildPrompt()", "sources + history + question string"],
+            ["AnthropicLLMAdapter.stream()", "Claude Haiku streams tokens"],
+            ["SSE → browser", "user sees answer token by token"],
+            [
+              "Sources stored with message",
+              "shown as citations below the answer",
+            ],
+          ].map(([left, right], i) =>
+            left === "" ? (
+              <div
+                key={i}
+                className="border-t border-dashed border-gray-200 my-2"
+              />
+            ) : (
+              <div key={i} className="flex items-start gap-2">
+                <code className="bg-purple-50 text-purple-800 px-2 py-0.5 rounded text-xs flex-shrink-0 font-mono">
+                  {left}
+                </code>
+                <span className="text-gray-500 text-xs mt-0.5">→ {right}</span>
+              </div>
+            ),
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <SectionTitle
+          icon={<Info size={20} />}
+          title="Why These Technology Choices?"
+          subtitle="The reasoning behind the stack"
+        />
+        <div className="space-y-4 text-sm text-gray-700">
+          <div>
+            <p className="font-semibold text-gray-900 mb-1">
+              PostgreSQL + pgvector instead of a dedicated vector DB
+            </p>
+            <p className="leading-relaxed text-gray-600">
+              Dedicated vector databases (Pinecone, Qdrant, Weaviate) add
+              operational complexity. pgvector keeps everything in a single
+              Postgres instance that you already need for documents and
+              conversations, with ACID guarantees and SQL joins. For projects
+              under ~10M chunks, the HNSW index is fast enough.
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-1">
+              Voyage AI instead of OpenAI embeddings
+            </p>
+            <p className="leading-relaxed text-gray-600">
+              Voyage's models are purpose-built for retrieval. The{" "}
+              <code className="bg-gray-100 px-1 rounded">input_type</code>{" "}
+              distinction between "document" and "query" (asymmetric embeddings)
+              measurably improves retrieval quality compared to symmetric
+              embedding models.
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-1">
+              Claude Haiku for generation
+            </p>
+            <p className="leading-relaxed text-gray-600">
+              Haiku is fast and cheap while still being highly capable at
+              reading comprehension and synthesis from a given context. Since
+              the LLM is only asked to <em>summarise retrieved sources</em> (not
+              to recall facts from training), a smaller model is perfectly
+              adequate.
+            </p>
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 mb-1">
+              Sliding window conversation history (last 4 exchanges)
+            </p>
+            <p className="leading-relaxed text-gray-600">
+              Appending the full conversation history would grow the prompt
+              unbounded, inflating cost and pushing retrieved sources out of the
+              context window. Keeping only the last 8 messages (4 user + 4
+              assistant) provides enough continuity for follow-up questions
+              while keeping prompt size predictable.
+            </p>
+          </div>
+        </div>
+      </Card>
+    </>
+  );
+}
+
+function IngestionTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<FileText size={20} />}
@@ -233,7 +376,6 @@ export default function TechnicalPage() {
         </Callout>
       </Card>
 
-      {/* ── CHUNKING ─────────────────────────────────────────────────────────── */}
       <Card className="mb-6">
         <SectionTitle
           icon={<Scissors size={20} />}
@@ -248,7 +390,6 @@ export default function TechnicalPage() {
         </p>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Recursive */}
           <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <ChevronRight size={16} className="text-purple-600" />
@@ -280,7 +421,6 @@ export default function TechnicalPage() {
             </div>
           </div>
 
-          {/* Sentence */}
           <div className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <ChevronRight size={16} className="text-blue-600" />
@@ -331,7 +471,6 @@ Chunk 2:           [sentence B] [sentence C] [sentence D]
         </div>
       </Card>
 
-      {/* ── EMBEDDINGS ───────────────────────────────────────────────────────── */}
       <Card className="mb-6">
         <SectionTitle
           icon={<Hash size={20} />}
@@ -373,8 +512,7 @@ Chunk 2:           [sentence B] [sentence C] [sentence D]
         </Callout>
       </Card>
 
-      {/* ── VECTOR SEARCH ────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<Database size={20} />}
           title="Vector Storage & Similarity Search"
@@ -441,8 +579,13 @@ LIMIT $3;                                   -- top-K results`}
           </Callout>
         </div>
       </Card>
+    </>
+  );
+}
 
-      {/* ── QUERY PIPELINE ───────────────────────────────────────────────────── */}
+function QueryTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<Search size={20} />}
@@ -507,8 +650,7 @@ User: <current question>`}
         </div>
       </Card>
 
-      {/* ── LLM ──────────────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<MessageSquare size={20} />}
           title="The Language Model — Claude Haiku"
@@ -557,250 +699,89 @@ User: <current question>`}
           table and shown in the sidebar.
         </p>
       </Card>
+    </>
+  );
+}
 
-      {/* ── CONFIG ───────────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
-        <SectionTitle
-          icon={<Code2 size={20} />}
-          title="Configuration Parameters"
-          subtitle="All the knobs and what they do"
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Env var
-                </th>
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Default
-                </th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Effect
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <ParamRow
-                name="CHUNKING_STRATEGY"
-                value="recursive"
-                description="Switch between 'recursive' (token window) and 'sentence' (sentence-aware grouping). Sentence strategy preserves meaning boundaries better for prose; recursive is more predictable for technical docs."
-              />
-              <ParamRow
-                name="CHUNK_SIZE_TOKENS"
-                value="512"
-                description="Maximum number of tokens (words) per chunk. Smaller = more precise retrieval but less context per chunk. Larger = richer context but noisier similarity scores."
-              />
-              <ParamRow
-                name="CHUNK_OVERLAP_TOKENS"
-                value="128"
-                description="How many tokens from the end of chunk N are repeated at the start of chunk N+1. Prevents ideas from being split across a boundary. Rule of thumb: ~20-25% of chunk size."
-              />
-              <ParamRow
-                name="RETRIEVAL_LIMIT"
-                value="8"
-                description="Maximum number of chunks returned by vector search. More chunks = richer context for the LLM but longer prompts and higher cost."
-              />
-              <ParamRow
-                name="RETRIEVAL_MIN_SCORE"
-                value="0.75"
-                description="Cosine similarity threshold (0–1). Chunks below this score are discarded even if they are within the top-K. Raise this to reduce noise; lower it if you get 'no information' responses too often."
-              />
-              <ParamRow
-                name="LLM_MAX_TOKENS"
-                value="1024"
-                description="Maximum tokens in the LLM response. Increase for detailed answers; decrease to save cost."
-              />
-            </tbody>
-          </table>
-        </div>
-      </Card>
+function ConfigTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<Code2 size={20} />}
+        title="Configuration Parameters"
+        subtitle="All the knobs and what they do"
+      />
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Env var
+              </th>
+              <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Default
+              </th>
+              <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Effect
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <ParamRow
+              name="CHUNKING_STRATEGY"
+              value="recursive"
+              description="Switch between 'recursive' (token window) and 'sentence' (sentence-aware grouping). Sentence strategy preserves meaning boundaries better for prose; recursive is more predictable for technical docs."
+            />
+            <ParamRow
+              name="CHUNK_SIZE_TOKENS"
+              value="512"
+              description="Maximum number of tokens (words) per chunk. Smaller = more precise retrieval but less context per chunk. Larger = richer context but noisier similarity scores."
+            />
+            <ParamRow
+              name="CHUNK_OVERLAP_TOKENS"
+              value="128"
+              description="How many tokens from the end of chunk N are repeated at the start of chunk N+1. Prevents ideas from being split across a boundary. Rule of thumb: ~20-25% of chunk size."
+            />
+            <ParamRow
+              name="RETRIEVAL_LIMIT"
+              value="8"
+              description="Maximum number of chunks returned by vector search. More chunks = richer context for the LLM but longer prompts and higher cost."
+            />
+            <ParamRow
+              name="RETRIEVAL_MIN_SCORE"
+              value="0.75"
+              description="Cosine similarity threshold (0–1). Chunks below this score are discarded even if they are within the top-K. Raise this to reduce noise; lower it if you get 'no information' responses too often."
+            />
+            <ParamRow
+              name="LLM_MAX_TOKENS"
+              value="1024"
+              description="Maximum tokens in the LLM response. Increase for detailed answers; decrease to save cost."
+            />
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
 
-      {/* ── FULL FLOW SUMMARY ────────────────────────────────────────────────── */}
-      <Card className="mb-6">
-        <SectionTitle
-          icon={<ArrowRight size={20} />}
-          title="End-to-End Flow Summary"
-          subtitle="The complete lifecycle of a question"
-        />
-        <div className="flex flex-col gap-1 text-sm text-gray-700">
-          {[
-            ["User uploads a PDF", "file_path stored, status = pending"],
-            ["POST /documents/:id/ingest", "IngestDocument use case triggered"],
-            ["FileParser extracts text", "raw string from PDF/MD/TXT"],
-            [
-              "ChunkingStrategy splits text",
-              "N overlapping ChunkResult objects",
-            ],
-            [
-              "VoyageEmbeddingAdapter (×N/20)",
-              "1024-dim vectors via voyage-4-lite",
-            ],
-            [
-              "PgVectorChunkRepository.saveMany()",
-              "rows inserted in chunks table",
-            ],
-            ["Status → ready", "document is searchable"],
-            ["", ""],
-            ["User types a question", "POST /conversations/:id/messages (SSE)"],
-            ["AskQuestion.execute()", "orchestrates the whole query"],
-            [
-              "VoyageEmbeddingAdapter.embed(q, 'query')",
-              "1024-dim query vector",
-            ],
-            [
-              "PgVectorChunkRepository.search()",
-              "cosine similarity, top 8 ≥ 0.75",
-            ],
-            ["buildPrompt()", "sources + history + question string"],
-            ["AnthropicLLMAdapter.stream()", "Claude Haiku streams tokens"],
-            ["SSE → browser", "user sees answer token by token"],
-            [
-              "Sources stored with message",
-              "shown as citations below the answer",
-            ],
-          ].map(([left, right], i) =>
-            left === "" ? (
-              <div
-                key={i}
-                className="border-t border-dashed border-gray-200 my-2"
-              />
-            ) : (
-              <div key={i} className="flex items-start gap-2">
-                <code className="bg-purple-50 text-purple-800 px-2 py-0.5 rounded text-xs flex-shrink-0 font-mono">
-                  {left}
-                </code>
-                <span className="text-gray-500 text-xs mt-0.5">→ {right}</span>
-              </div>
-            ),
-          )}
-        </div>
-      </Card>
+export default function TechnicalPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("Overview");
 
-      {/* ── RERANKING ────────────────────────────────────────────────────────── */}
-      <Link to="/technical/reranking" className="block mb-6 group">
-        <div className="bg-white border border-purple-200 rounded-xl p-5 shadow-sm hover:border-purple-400 hover:shadow-md transition-all flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-700 flex-shrink-0 group-hover:bg-purple-200 transition-colors">
-            <ArrowUpDown size={20} />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900 text-sm">
-              Re-ranking — Technical Deep Dive
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Why vector search alone isn't enough, and how a cross-encoder
-              fixes it
-            </p>
-          </div>
-          <ArrowRight
-            size={16}
-            className="text-purple-400 group-hover:translate-x-1 transition-transform"
-          />
-        </div>
-      </Link>
+  return (
+    <div className="p-8 max-w-4xl">
+      <PageHeader
+        icon={<FlaskConical className="text-purple-600" size={28} />}
+        title="How RAG Works — Technical Deep Dive"
+        info="Everything you need to understand Retrieval-Augmented Generation and how this project implements it, from document ingestion to streaming answers."
+      />
 
-      {/* ── LLM MODELS ───────────────────────────────────────────────────────── */}
-      <Link to="/technical/llm-models" className="block mb-6 group">
-        <div className="bg-white border border-blue-200 rounded-xl p-5 shadow-sm hover:border-blue-400 hover:shadow-md transition-all flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 flex-shrink-0 group-hover:bg-blue-200 transition-colors">
-            <Brain size={20} />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900 text-sm">
-              Modèles LLM — Comparaison
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Fable 5, Opus 4.8, Sonnet 4.6, Haiku 4.5 : caractéristiques, prix
-              et quand les utiliser
-            </p>
-          </div>
-          <ArrowRight
-            size={16}
-            className="text-blue-400 group-hover:translate-x-1 transition-transform"
-          />
-        </div>
-      </Link>
+      <TechnicalNav />
+      <TabBar active={activeTab} onChange={setActiveTab} />
 
-      {/* ── KNOWLEDGE CHECK ──────────────────────────────────────────────────── */}
-      <Link to="/technical/knowledge-check" className="block mb-6 group">
-        <div className="bg-white border border-teal-200 rounded-xl p-5 shadow-sm hover:border-teal-400 hover:shadow-md transition-all flex items-center gap-4">
-          <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center text-teal-700 flex-shrink-0 group-hover:bg-teal-200 transition-colors">
-            <ShieldCheck size={20} />
-          </div>
-          <div className="flex-1">
-            <p className="font-semibold text-gray-900 text-sm">
-              Knowledge Check — Technical Deep Dive
-            </p>
-            <p className="text-xs text-gray-500 mt-0.5">
-              Faithfulness, Counterfactual, Citation Forcing : détecter si la
-              réponse vient des documents ou de l'entraînement
-            </p>
-          </div>
-          <ArrowRight
-            size={16}
-            className="text-teal-400 group-hover:translate-x-1 transition-transform"
-          />
-        </div>
-      </Link>
-
-      {/* ── WHY EACH CHOICE ──────────────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle
-          icon={<Info size={20} />}
-          title="Why These Technology Choices?"
-          subtitle="The reasoning behind the stack"
-        />
-        <div className="space-y-4 text-sm text-gray-700">
-          <div>
-            <p className="font-semibold text-gray-900 mb-1">
-              PostgreSQL + pgvector instead of a dedicated vector DB
-            </p>
-            <p className="leading-relaxed text-gray-600">
-              Dedicated vector databases (Pinecone, Qdrant, Weaviate) add
-              operational complexity. pgvector keeps everything in a single
-              Postgres instance that you already need for documents and
-              conversations, with ACID guarantees and SQL joins. For projects
-              under ~10M chunks, the HNSW index is fast enough.
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 mb-1">
-              Voyage AI instead of OpenAI embeddings
-            </p>
-            <p className="leading-relaxed text-gray-600">
-              Voyage's models are purpose-built for retrieval. The{" "}
-              <code className="bg-gray-100 px-1 rounded">input_type</code>{" "}
-              distinction between "document" and "query" (asymmetric embeddings)
-              measurably improves retrieval quality compared to symmetric
-              embedding models.
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 mb-1">
-              Claude Haiku for generation
-            </p>
-            <p className="leading-relaxed text-gray-600">
-              Haiku is fast and cheap while still being highly capable at
-              reading comprehension and synthesis from a given context. Since
-              the LLM is only asked to <em>summarise retrieved sources</em> (not
-              to recall facts from training), a smaller model is perfectly
-              adequate.
-            </p>
-          </div>
-          <div>
-            <p className="font-semibold text-gray-900 mb-1">
-              Sliding window conversation history (last 4 exchanges)
-            </p>
-            <p className="leading-relaxed text-gray-600">
-              Appending the full conversation history would grow the prompt
-              unbounded, inflating cost and pushing retrieved sources out of the
-              context window. Keeping only the last 8 messages (4 user + 4
-              assistant) provides enough continuity for follow-up questions
-              while keeping prompt size predictable.
-            </p>
-          </div>
-        </div>
-      </Card>
+      {activeTab === "Overview" && <OverviewTab />}
+      {activeTab === "Ingestion" && <IngestionTab />}
+      {activeTab === "Query" && <QueryTab />}
+      {activeTab === "Config" && <ConfigTab />}
     </div>
   );
 }

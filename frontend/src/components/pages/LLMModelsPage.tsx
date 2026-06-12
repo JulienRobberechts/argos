@@ -9,8 +9,8 @@ import {
   Code2,
   Layers,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import PageHeader from "../ui/PageHeader";
+import TechnicalNav from "./TechnicalNav";
 
 function Card({
   children,
@@ -324,14 +324,7 @@ function ModelCard({ model }: { model: ModelSpec }) {
 export default function LLMModelsPage() {
   return (
     <div className="p-8 max-w-5xl">
-      <div className="mb-4">
-        <Link
-          to="/technical"
-          className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
-        >
-          ← How RAG Works
-        </Link>
-      </div>
+      <TechnicalNav />
 
       <PageHeader
         icon={<Brain className="text-blue-600" size={28} />}

@@ -10,8 +10,8 @@ import {
   Layers,
   Info,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import PageHeader from "../ui/PageHeader";
+import TechnicalNav from "./TechnicalNav";
 
 function Card({
   children,
@@ -113,14 +113,7 @@ function StrategyBadge({
 export default function KnowledgeCheckPage() {
   return (
     <div className="p-8 max-w-4xl">
-      <div className="mb-4">
-        <Link
-          to="/technical"
-          className="text-xs text-blue-500 hover:text-blue-700 flex items-center gap-1"
-        >
-          ← How RAG Works
-        </Link>
-      </div>
+      <TechnicalNav />
 
       <PageHeader
         icon={<ShieldCheck className="text-teal-600" size={28} />}
