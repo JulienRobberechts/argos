@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   Brain,
   Zap,
@@ -321,191 +323,241 @@ function ModelCard({ model }: { model: ModelSpec }) {
   );
 }
 
+const TABS = ["Models", "Comparison", "RAG Usage", "Config"] as const;
+type Tab = (typeof TABS)[number];
+
+function TabBar({
+  active,
+  onChange,
+}: {
+  active: Tab;
+  onChange: (t: Tab) => void;
+}) {
+  return (
+    <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      {TABS.map((t) => (
+        <button
+          key={t}
+          onClick={() => onChange(t)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            active === t
+              ? "bg-white text-blue-700 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-white/60"
+          }`}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function isTab(value: string | null): value is Tab {
+  return TABS.includes(value as Tab);
+}
+
+function ModelsTab() {
+  return (
+    <div className="grid grid-cols-2 gap-4">
+      {MODELS.map((m) => (
+        <ModelCard key={m.id} model={m} />
+      ))}
+    </div>
+  );
+}
+
+function ComparisonTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<Layers size={20} />}
+        title="Tableau comparatif"
+        subtitle="Tous les modèles courants côte à côte"
+      />
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="text-left py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Modèle
+              </th>
+              <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Contexte
+              </th>
+              <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Max output
+              </th>
+              <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Input/MTok
+              </th>
+              <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Output/MTok
+              </th>
+              <th className="text-center py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
+                Adaptive
+              </th>
+              <th className="text-center py-2 font-semibold text-gray-500 uppercase tracking-wide">
+                Extended
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {MODELS.map((m) => (
+              <tr key={m.id} className="border-b border-gray-100 last:border-0">
+                <td className="py-2.5 pr-4">
+                  <div className="flex items-center gap-2">
+                    <TierBadge tier={m.tier} />
+                    <span className="font-medium text-gray-800">{m.name}</span>
+                  </div>
+                  <code className="text-[10px] text-gray-400">{m.id}</code>
+                </td>
+                <td className="py-2.5 pr-4 text-right text-gray-700">
+                  {m.contextWindow}
+                </td>
+                <td className="py-2.5 pr-4 text-right text-gray-700">
+                  {m.maxOutput}
+                </td>
+                <td className="py-2.5 pr-4 text-right font-medium text-gray-800">
+                  {m.inputPrice}
+                </td>
+                <td className="py-2.5 pr-4 text-right font-medium text-gray-800">
+                  {m.outputPrice}
+                </td>
+                <td className="py-2.5 pr-4 text-center">
+                  {m.adaptiveThinking ? (
+                    <CheckCircle size={13} className="text-green-500 mx-auto" />
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </td>
+                <td className="py-2.5 text-center">
+                  {m.extendedThinking ? (
+                    <CheckCircle size={13} className="text-green-500 mx-auto" />
+                  ) : (
+                    <span className="text-gray-300">—</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Card>
+  );
+}
+
+function RagUsageTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<Zap size={20} />}
+        title="Recommandation pour ce projet RAG"
+        subtitle="Quel modèle choisir selon le cas d'usage"
+      />
+      <div className="space-y-3 text-sm text-gray-700">
+        <div className="flex gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <CheckCircle size={16} className="text-green-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold text-gray-900">
+              Production —{" "}
+              <code className="text-blue-700">claude-sonnet-4-6</code>
+            </p>
+            <p className="text-xs text-gray-600 mt-0.5">
+              Meilleur équilibre pour un pipeline RAG : contexte 1M tokens,
+              sortie 64k, vitesse rapide et coût raisonnable ($3/$15).
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <CheckCircle size={16} className="text-blue-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold text-gray-900">
+              Expérimentation / haute qualité —{" "}
+              <code className="text-blue-700">claude-opus-4-8</code> ou{" "}
+              <code className="text-blue-700">claude-fable-5</code>
+            </p>
+            <p className="text-xs text-gray-600 mt-0.5">
+              Pour les requêtes complexes, la synthèse sur de très longs
+              contextes ou la comparaison des réponses.
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <Zap size={16} className="text-amber-600 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-semibold text-gray-900">
+              Volume élevé / latence critique —{" "}
+              <code className="text-blue-700">claude-haiku-4-5-20251001</code>
+            </p>
+            <p className="text-xs text-gray-600 mt-0.5">
+              Idéal pour les Q&A simples sur documents avec fort débit requis.
+              Fenêtre contextuelle limitée à 200k tokens.
+            </p>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function ConfigTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<Code2 size={20} />}
+        title="Configuration"
+        subtitle="Changer le modèle par défaut"
+      />
+      <p className="text-sm text-gray-700 mb-3">
+        Le modèle par défaut est défini par la variable d'environnement{" "}
+        <code className="bg-gray-100 px-1 rounded text-blue-700">
+          LLM_MODEL
+        </code>
+        . Il peut être surchargé par conversation via le panneau{" "}
+        <em>Parameters</em> dans l'interface de chat.
+      </p>
+      <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-xs font-mono leading-relaxed mb-4">
+        {`# .env
+LLM_MODEL=claude-sonnet-4-6       # défaut recommandé
+# LLM_MODEL=claude-opus-4-8       # haute qualité
+# LLM_MODEL=claude-fable-5        # capacité maximale
+# LLM_MODEL=claude-haiku-4-5-20251001  # vitesse max`}
+      </pre>
+      <Callout type="info">
+        Le modèle choisi au niveau conversation est stocké avec la conversation
+        et visible dans le panneau Parameters (read-only) lors de la relecture
+        d'une conversation existante.
+      </Callout>
+    </Card>
+  );
+}
+
 export default function LLMModelsPage() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    isTab(tabParam) ? tabParam : "Models",
+  );
+
+  useEffect(() => {
+    if (isTab(tabParam)) setActiveTab(tabParam);
+  }, [tabParam]);
+
   return (
     <div className="p-8 max-w-5xl">
-      <TechnicalNav />
-
       <PageHeader
         icon={<Brain className="text-blue-600" size={28} />}
         title="Modèles LLM — Comparaison"
         info="Vue d'ensemble des modèles Claude disponibles, leurs caractéristiques et quand les utiliser dans un pipeline RAG."
       />
 
-      {/* ── CARDS ────────────────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        {MODELS.map((m) => (
-          <ModelCard key={m.id} model={m} />
-        ))}
-      </div>
+      <TechnicalNav />
+      <TabBar active={activeTab} onChange={setActiveTab} />
 
-      {/* ── COMPARISON TABLE ─────────────────────────────────────────────────── */}
-      <Card className="mb-6">
-        <SectionTitle
-          icon={<Layers size={20} />}
-          title="Tableau comparatif"
-          subtitle="Tous les modèles courants côte à côte"
-        />
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Modèle
-                </th>
-                <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Contexte
-                </th>
-                <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Max output
-                </th>
-                <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Input/MTok
-                </th>
-                <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Output/MTok
-                </th>
-                <th className="text-center py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                  Adaptive
-                </th>
-                <th className="text-center py-2 font-semibold text-gray-500 uppercase tracking-wide">
-                  Extended
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {MODELS.map((m) => (
-                <tr
-                  key={m.id}
-                  className="border-b border-gray-100 last:border-0"
-                >
-                  <td className="py-2.5 pr-4">
-                    <div className="flex items-center gap-2">
-                      <TierBadge tier={m.tier} />
-                      <span className="font-medium text-gray-800">
-                        {m.name}
-                      </span>
-                    </div>
-                    <code className="text-[10px] text-gray-400">{m.id}</code>
-                  </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-700">
-                    {m.contextWindow}
-                  </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-700">
-                    {m.maxOutput}
-                  </td>
-                  <td className="py-2.5 pr-4 text-right font-medium text-gray-800">
-                    {m.inputPrice}
-                  </td>
-                  <td className="py-2.5 pr-4 text-right font-medium text-gray-800">
-                    {m.outputPrice}
-                  </td>
-                  <td className="py-2.5 pr-4 text-center">
-                    {m.adaptiveThinking ? (
-                      <CheckCircle
-                        size={13}
-                        className="text-green-500 mx-auto"
-                      />
-                    ) : (
-                      <span className="text-gray-300">—</span>
-                    )}
-                  </td>
-                  <td className="py-2.5 text-center">
-                    {m.extendedThinking ? (
-                      <CheckCircle
-                        size={13}
-                        className="text-green-500 mx-auto"
-                      />
-                    ) : (
-                      <span className="text-gray-300">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
-
-      {/* ── RAG RECOMMENDATION ───────────────────────────────────────────────── */}
-      <Card className="mb-6">
-        <SectionTitle
-          icon={<Zap size={20} />}
-          title="Recommandation pour ce projet RAG"
-          subtitle="Quel modèle choisir selon le cas d'usage"
-        />
-        <div className="space-y-3 text-sm text-gray-700">
-          <div className="flex gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <CheckCircle size={16} className="text-green-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="font-semibold text-gray-900">
-                Production —{" "}
-                <code className="text-blue-700">claude-sonnet-4-6</code>
-              </p>
-              <p className="text-xs text-gray-600 mt-0.5">
-                Meilleur équilibre pour un pipeline RAG : contexte 1M tokens,
-                sortie 64k, vitesse rapide et coût raisonnable ($3/$15).
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <CheckCircle size={16} className="text-blue-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="font-semibold text-gray-900">
-                Expérimentation / haute qualité —{" "}
-                <code className="text-blue-700">claude-opus-4-8</code> ou{" "}
-                <code className="text-blue-700">claude-fable-5</code>
-              </p>
-              <p className="text-xs text-gray-600 mt-0.5">
-                Pour les requêtes complexes, la synthèse sur de très longs
-                contextes ou la comparaison des réponses.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-            <Zap size={16} className="text-amber-600 mt-0.5 shrink-0" />
-            <div>
-              <p className="font-semibold text-gray-900">
-                Volume élevé / latence critique —{" "}
-                <code className="text-blue-700">claude-haiku-4-5-20251001</code>
-              </p>
-              <p className="text-xs text-gray-600 mt-0.5">
-                Idéal pour les Q&A simples sur documents avec fort débit requis.
-                Fenêtre contextuelle limitée à 200k tokens.
-              </p>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      {/* ── CONFIG ───────────────────────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle
-          icon={<Code2 size={20} />}
-          title="Configuration"
-          subtitle="Changer le modèle par défaut"
-        />
-        <p className="text-sm text-gray-700 mb-3">
-          Le modèle par défaut est défini par la variable d'environnement{" "}
-          <code className="bg-gray-100 px-1 rounded text-blue-700">
-            LLM_MODEL
-          </code>
-          . Il peut être surchargé par conversation via le panneau{" "}
-          <em>Parameters</em> dans l'interface de chat.
-        </p>
-        <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-xs font-mono leading-relaxed mb-4">
-          {`# .env
-LLM_MODEL=claude-sonnet-4-6       # défaut recommandé
-# LLM_MODEL=claude-opus-4-8       # haute qualité
-# LLM_MODEL=claude-fable-5        # capacité maximale
-# LLM_MODEL=claude-haiku-4-5-20251001  # vitesse max`}
-        </pre>
-        <Callout type="info">
-          Le modèle choisi au niveau conversation est stocké avec la
-          conversation et visible dans le panneau Parameters (read-only) lors de
-          la relecture d'une conversation existante.
-        </Callout>
-      </Card>
+      {activeTab === "Models" && <ModelsTab />}
+      {activeTab === "Comparison" && <ComparisonTab />}
+      {activeTab === "RAG Usage" && <RagUsageTab />}
+      {activeTab === "Config" && <ConfigTab />}
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ShieldCheck,
   AlertTriangle,
@@ -110,71 +112,103 @@ function StrategyBadge({
   );
 }
 
-export default function KnowledgeCheckPage() {
+const TABS = [
+  "Overview",
+  "Strategies",
+  "Implementation",
+  "Trade-offs",
+] as const;
+type Tab = (typeof TABS)[number];
+
+function TabBar({
+  active,
+  onChange,
+}: {
+  active: Tab;
+  onChange: (t: Tab) => void;
+}) {
   return (
-    <div className="p-8 max-w-4xl">
-      <TechnicalNav />
+    <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      {TABS.map((t) => (
+        <button
+          key={t}
+          onClick={() => onChange(t)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            active === t
+              ? "bg-white text-teal-700 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-white/60"
+          }`}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+}
 
-      <PageHeader
-        icon={<ShieldCheck className="text-teal-600" size={28} />}
-        title="Knowledge Check — Technical Deep Dive"
-        info="Three strategies to detect whether an LLM answer comes from retrieved documents or from the model's training data."
+function isTab(value: string | null): value is Tab {
+  return TABS.includes(value as Tab);
+}
+
+function OverviewTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<AlertTriangle size={20} />}
+        title="The problem: parametric vs contextual knowledge"
+        subtitle="Why a correct answer can still be the wrong answer"
+        color="teal"
       />
+      <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        In a RAG system the LLM receives retrieved chunks as context. Ideally
+        its answer is grounded in those chunks. But LLMs also carry{" "}
+        <strong>parametric knowledge</strong> — facts baked into their weights
+        during training. When retrieval fails (low scores, missing documents),
+        the model silently falls back to training data and still produces a
+        confident answer.
+      </p>
 
-      {/* ── PROBLEM ──────────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
-        <SectionTitle
-          icon={<AlertTriangle size={20} />}
-          title="The problem: parametric vs contextual knowledge"
-          subtitle="Why a correct answer can still be the wrong answer"
-          color="teal"
-        />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
-          In a RAG system the LLM receives retrieved chunks as context. Ideally
-          its answer is grounded in those chunks. But LLMs also carry{" "}
-          <strong>parametric knowledge</strong> — facts baked into their weights
-          during training. When retrieval fails (low scores, missing documents),
-          the model silently falls back to training data and still produces a
-          confident answer.
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+        <p className="text-sm font-semibold text-amber-900 mb-2">
+          Concrete example from this project
         </p>
-
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-          <p className="text-sm font-semibold text-amber-900 mb-2">
-            Concrete example from this project
-          </p>
-          <p className="text-sm text-gray-700 leading-relaxed">
-            Query:{" "}
-            <em className="text-teal-800">
-              "Quand a commencé l'Orient-Express ?"
-            </em>
-          </p>
-          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-            The retrieved chunks only contain a bibliography reference. The LLM
-            answers <em>"1883, Nagelmackers"</em> — correct, but sourced from
-            training data, not from the documents. The RAG pipeline silently
-            failed without anyone noticing.
-          </p>
-        </div>
-
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
-          Research (2025) on mechanistic interpretability confirms why this is
-          hard to detect:
+        <p className="text-sm text-gray-700 leading-relaxed">
+          Query:{" "}
+          <em className="text-teal-800">
+            "Quand a commencé l'Orient-Express ?"
+          </em>
         </p>
-        <blockquote className="border-l-4 border-teal-300 pl-4 text-sm text-gray-600 italic mb-4">
-          "Parametric and contextual knowledge are routed through largely
-          distinct attention circuits and coexist as superposed signals, with
-          conflicts resolved through differential accumulation of signal
-          strength across layers."
-        </blockquote>
-        <p className="text-sm text-gray-600 leading-relaxed">
-          There is no separate "reading from doc" register inside the model. The
-          two knowledge sources are blended in the same forward pass — which is
-          why the three strategies below work at the{" "}
-          <strong>output level</strong> (post-generation), not by peeking into
-          the model internals.
+        <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+          The retrieved chunks only contain a bibliography reference. The LLM
+          answers <em>"1883, Nagelmackers"</em> — correct, but sourced from
+          training data, not from the documents. The RAG pipeline silently
+          failed without anyone noticing.
         </p>
-      </Card>
+      </div>
 
+      <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        Research (2025) on mechanistic interpretability confirms why this is
+        hard to detect:
+      </p>
+      <blockquote className="border-l-4 border-teal-300 pl-4 text-sm text-gray-600 italic mb-4">
+        "Parametric and contextual knowledge are routed through largely distinct
+        attention circuits and coexist as superposed signals, with conflicts
+        resolved through differential accumulation of signal strength across
+        layers."
+      </blockquote>
+      <p className="text-sm text-gray-600 leading-relaxed">
+        There is no separate "reading from doc" register inside the model. The
+        two knowledge sources are blended in the same forward pass — which is
+        why the three strategies below work at the <strong>output level</strong>{" "}
+        (post-generation), not by peeking into the model internals.
+      </p>
+    </Card>
+  );
+}
+
+function StrategiesTab() {
+  return (
+    <>
       {/* ── STRATEGY 1: FAITHFULNESS ─────────────────────────────────────────── */}
       <Card className="mb-6">
         <div className="flex items-center gap-3 mb-1">
@@ -420,7 +454,7 @@ const claims = parsed.claims.map((c) => {
       </Card>
 
       {/* ── COMPARISON TABLE ─────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<Layers size={20} />}
           title="Strategy comparison"
@@ -494,8 +528,13 @@ const claims = parsed.claims.map((c) => {
           </Callout>
         </div>
       </Card>
+    </>
+  );
+}
 
-      {/* ── IMPLEMENTATION ───────────────────────────────────────────────────── */}
+function ImplementationTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<Code2 size={20} />}
@@ -552,8 +591,7 @@ async run(
         </div>
       </Card>
 
-      {/* ── DOMAIN TYPES ─────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<Info size={20} />}
           title="Domain types"
@@ -587,89 +625,121 @@ export interface Message {
 }`}
         />
       </Card>
+    </>
+  );
+}
 
-      {/* ── TRADE-OFFS ───────────────────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle
-          icon={<AlertTriangle size={20} />}
-          title="Trade-offs and limitations"
-          subtitle="What these checks can and cannot tell you"
-          color="teal"
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <div className="border border-teal-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-teal-800 uppercase tracking-wide mb-2">
-              These checks are useful when…
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1.5">
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-teal-500 mt-0.5 flex-shrink-0"
-                />
-                You need an audit trail for regulated domains (legal, medical)
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-teal-500 mt-0.5 flex-shrink-0"
-                />
-                Retrieval quality is uncertain (new documents, low scores)
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-teal-500 mt-0.5 flex-shrink-0"
-                />
-                You want to identify gaps in your knowledge base automatically
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-teal-500 mt-0.5 flex-shrink-0"
-                />
-                You need to trigger fallback strategies on low-score answers
-              </li>
-            </ul>
-          </div>
-          <div className="border border-amber-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
-              These checks won't tell you…
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1.5">
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Whether the answer is factually correct
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Whether the retrieved chunks themselves are accurate
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Whether the LLM judge is itself hallucinating claims
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Why retrieval failed (missing doc, wrong chunking, bad
-                embedding)
-              </li>
-            </ul>
-          </div>
+function TradeOffsTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<AlertTriangle size={20} />}
+        title="Trade-offs and limitations"
+        subtitle="What these checks can and cannot tell you"
+        color="teal"
+      />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="border border-teal-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-teal-800 uppercase tracking-wide mb-2">
+            These checks are useful when…
+          </p>
+          <ul className="text-xs text-gray-600 space-y-1.5">
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-teal-500 mt-0.5 flex-shrink-0"
+              />
+              You need an audit trail for regulated domains (legal, medical)
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-teal-500 mt-0.5 flex-shrink-0"
+              />
+              Retrieval quality is uncertain (new documents, low scores)
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-teal-500 mt-0.5 flex-shrink-0"
+              />
+              You want to identify gaps in your knowledge base automatically
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-teal-500 mt-0.5 flex-shrink-0"
+              />
+              You need to trigger fallback strategies on low-score answers
+            </li>
+          </ul>
         </div>
-      </Card>
+        <div className="border border-amber-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
+            These checks won't tell you…
+          </p>
+          <ul className="text-xs text-gray-600 space-y-1.5">
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Whether the answer is factually correct
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Whether the retrieved chunks themselves are accurate
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Whether the LLM judge is itself hallucinating claims
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Why retrieval failed (missing doc, wrong chunking, bad embedding)
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+export default function KnowledgeCheckPage() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    isTab(tabParam) ? tabParam : "Overview",
+  );
+
+  useEffect(() => {
+    if (isTab(tabParam)) setActiveTab(tabParam);
+  }, [tabParam]);
+
+  return (
+    <div className="p-8 max-w-4xl">
+      <PageHeader
+        icon={<ShieldCheck className="text-teal-600" size={28} />}
+        title="Knowledge Check — Technical Deep Dive"
+        info="Three strategies to detect whether an LLM answer comes from retrieved documents or from the model's training data."
+      />
+
+      <TechnicalNav />
+      <TabBar active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "Overview" && <OverviewTab />}
+      {activeTab === "Strategies" && <StrategiesTab />}
+      {activeTab === "Implementation" && <ImplementationTab />}
+      {activeTab === "Trade-offs" && <TradeOffsTab />}
     </div>
   );
 }

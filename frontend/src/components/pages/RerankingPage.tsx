@@ -1,3 +1,5 @@
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ArrowUpDown,
   Search,
@@ -131,18 +133,42 @@ function Arrow() {
   );
 }
 
-export default function RerankingPage() {
+const TABS = ["Overview", "Pipeline", "Implementation", "Trade-offs"] as const;
+type Tab = (typeof TABS)[number];
+
+function TabBar({
+  active,
+  onChange,
+}: {
+  active: Tab;
+  onChange: (t: Tab) => void;
+}) {
   return (
-    <div className="p-8 max-w-4xl">
-      <TechnicalNav />
+    <div className="flex gap-1 mb-6 bg-gray-100 p-1 rounded-xl w-fit">
+      {TABS.map((t) => (
+        <button
+          key={t}
+          onClick={() => onChange(t)}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            active === t
+              ? "bg-white text-purple-700 shadow-sm"
+              : "text-gray-600 hover:text-gray-900 hover:bg-white/60"
+          }`}
+        >
+          {t}
+        </button>
+      ))}
+    </div>
+  );
+}
 
-      <PageHeader
-        icon={<ArrowUpDown className="text-purple-600" size={28} />}
-        title="Re-ranking — Technical Deep Dive"
-        info="Why vector search alone isn't enough, how a cross-encoder fixes it, and how Voyage rerank-2.5 is wired into this project."
-      />
+function isTab(value: string | null): value is Tab {
+  return TABS.includes(value as Tab);
+}
 
-      {/* ── PROBLEM ──────────────────────────────────────────────────────────── */}
+function OverviewTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<AlertTriangle size={20} />}
@@ -199,8 +225,7 @@ export default function RerankingPage() {
         </ul>
       </Card>
 
-      {/* ── SOLUTION ─────────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<CheckCircle size={20} />}
           title="The solution: cross-encoder re-ranking"
@@ -250,8 +275,13 @@ score = cosine(q_vec, c_vec)
           candidates, then accurate cross-encoder to re-order them.
         </Callout>
       </Card>
+    </>
+  );
+}
 
-      {/* ── TWO-STAGE PIPELINE ───────────────────────────────────────────────── */}
+function PipelineTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<Layers size={20} />}
@@ -312,8 +342,7 @@ score = cosine(q_vec, c_vec)
         </p>
       </Card>
 
-      {/* ── VOYAGE RERANK ────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<Zap size={20} />}
           title="Voyage rerank-2.5 API"
@@ -377,8 +406,13 @@ Authorization: Bearer <VOYAGE_API_KEY>
           </Callout>
         </div>
       </Card>
+    </>
+  );
+}
 
-      {/* ── CODE ─────────────────────────────────────────────────────────────── */}
+function ImplementationTab() {
+  return (
+    <>
       <Card className="mb-6">
         <SectionTitle
           icon={<Search size={20} />}
@@ -438,8 +472,7 @@ async execute(query, limit, minScore) {
         </div>
       </Card>
 
-      {/* ── CONFIG ───────────────────────────────────────────────────────────── */}
-      <Card className="mb-6">
+      <Card>
         <SectionTitle
           icon={<Code2 size={20} />}
           title="Configuration"
@@ -492,88 +525,121 @@ async execute(query, limit, minScore) {
           </Callout>
         </div>
       </Card>
+    </>
+  );
+}
 
-      {/* ── TRADEOFFS ────────────────────────────────────────────────────────── */}
-      <Card>
-        <SectionTitle
-          icon={<ArrowUpDown size={20} />}
-          title="Trade-offs"
-          subtitle="When re-ranking helps and when it doesn't"
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <div className="border border-green-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-2">
-              Re-ranking helps most when…
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1.5">
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-green-500 mt-0.5 flex-shrink-0"
-                />
-                Questions ask for specific facts (dates, names, numbers)
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-green-500 mt-0.5 flex-shrink-0"
-                />
-                Documents are long and contain many related topics
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-green-500 mt-0.5 flex-shrink-0"
-                />
-                The query phrasing differs from the document phrasing
-              </li>
-              <li className="flex gap-2">
-                <CheckCircle
-                  size={12}
-                  className="text-green-500 mt-0.5 flex-shrink-0"
-                />
-                High precision is more important than raw speed
-              </li>
-            </ul>
-          </div>
-          <div className="border border-amber-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
-              Re-ranking adds less value when…
-            </p>
-            <ul className="text-xs text-gray-600 space-y-1.5">
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                The knowledge base is small (&lt; 100 chunks)
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Questions are broad / conceptual (vector search already works
-                well)
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                Latency is critical and &lt;100ms responses are required
-              </li>
-              <li className="flex gap-2">
-                <AlertTriangle
-                  size={12}
-                  className="text-amber-500 mt-0.5 flex-shrink-0"
-                />
-                The relevant answer is simply absent from the documents
-              </li>
-            </ul>
-          </div>
+function TradeOffsTab() {
+  return (
+    <Card>
+      <SectionTitle
+        icon={<ArrowUpDown size={20} />}
+        title="Trade-offs"
+        subtitle="When re-ranking helps and when it doesn't"
+      />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="border border-green-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-2">
+            Re-ranking helps most when…
+          </p>
+          <ul className="text-xs text-gray-600 space-y-1.5">
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-green-500 mt-0.5 flex-shrink-0"
+              />
+              Questions ask for specific facts (dates, names, numbers)
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-green-500 mt-0.5 flex-shrink-0"
+              />
+              Documents are long and contain many related topics
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-green-500 mt-0.5 flex-shrink-0"
+              />
+              The query phrasing differs from the document phrasing
+            </li>
+            <li className="flex gap-2">
+              <CheckCircle
+                size={12}
+                className="text-green-500 mt-0.5 flex-shrink-0"
+              />
+              High precision is more important than raw speed
+            </li>
+          </ul>
         </div>
-      </Card>
+        <div className="border border-amber-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
+            Re-ranking adds less value when…
+          </p>
+          <ul className="text-xs text-gray-600 space-y-1.5">
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              The knowledge base is small (&lt; 100 chunks)
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Questions are broad / conceptual (vector search already works
+              well)
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              Latency is critical and &lt;100ms responses are required
+            </li>
+            <li className="flex gap-2">
+              <AlertTriangle
+                size={12}
+                className="text-amber-500 mt-0.5 flex-shrink-0"
+              />
+              The relevant answer is simply absent from the documents
+            </li>
+          </ul>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+export default function RerankingPage() {
+  const [searchParams] = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    isTab(tabParam) ? tabParam : "Overview",
+  );
+
+  useEffect(() => {
+    if (isTab(tabParam)) setActiveTab(tabParam);
+  }, [tabParam]);
+
+  return (
+    <div className="p-8 max-w-4xl">
+      <PageHeader
+        icon={<ArrowUpDown className="text-purple-600" size={28} />}
+        title="Re-ranking — Technical Deep Dive"
+        info="Why vector search alone isn't enough, how a cross-encoder fixes it, and how Voyage rerank-2.5 is wired into this project."
+      />
+
+      <TechnicalNav />
+      <TabBar active={activeTab} onChange={setActiveTab} />
+
+      {activeTab === "Overview" && <OverviewTab />}
+      {activeTab === "Pipeline" && <PipelineTab />}
+      {activeTab === "Implementation" && <ImplementationTab />}
+      {activeTab === "Trade-offs" && <TradeOffsTab />}
     </div>
   );
 }
