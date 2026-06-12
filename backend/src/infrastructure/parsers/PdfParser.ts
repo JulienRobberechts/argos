@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require("pdf-parse/lib/pdf-parse");
 
 interface PdfData {

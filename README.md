@@ -1,5 +1,7 @@
 # Argos — RAG Backend
 
+![CI](https://github.com/JulienRobberechts/devknowledge/actions/workflows/ci.yml/badge.svg)
+
 A Retrieval-Augmented Generation API for querying internal knowledge bases.
 
 ## Limitations PDF
