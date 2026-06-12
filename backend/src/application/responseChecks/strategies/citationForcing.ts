@@ -78,6 +78,7 @@ export async function checkCitationForcing(
   query: string,
   answer: string,
   chunks: ChunkSearchResult[],
+  titleById: Map<string, string> = new Map(),
 ): Promise<KnowledgeCheckResult> {
   const sourcesText = chunks
     .map((c, i) => `SOURCE ${i + 1}:\n${c.chunk.content}`)
@@ -106,20 +107,24 @@ export async function checkCitationForcing(
     }>;
   };
 
-  const chunkTexts = chunks.map((c) => c.chunk.content);
-
   const claims: KnowledgeClaim[] = parsed.claims.map((c) => {
     if (c.status !== "SUPPORTED" || !c.sourceExcerpt) {
       return { claim: c.claim, status: "UNSUPPORTED" as const };
     }
     const excerpt = c.sourceExcerpt;
-    const verified = chunkTexts.some((text) =>
-      text.includes(excerpt.slice(0, 40)),
+    const matchedChunk = chunks.find((ch) =>
+      ch.chunk.content.includes(excerpt.slice(0, 40)),
     );
+    if (!matchedChunk) {
+      return { claim: c.claim, status: "UNSUPPORTED" as const };
+    }
+    const documentId = matchedChunk.chunk.documentId;
     return {
       claim: c.claim,
-      status: verified ? ("SUPPORTED" as const) : ("UNSUPPORTED" as const),
-      sourceExcerpt: verified ? excerpt : undefined,
+      status: "SUPPORTED" as const,
+      sourceExcerpt: excerpt,
+      documentId,
+      documentTitle: titleById.get(documentId) ?? documentId,
     };
   });
 

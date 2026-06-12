@@ -469,8 +469,8 @@ function ParamsPanel({
           {(
             [
               "faithfulness",
-              "counterfactual",
               "citation_forcing",
+              "counterfactual",
             ] as KnowledgeCheckStrategy[]
           ).map((strategy) => {
             const active = (params.knowledgeCheckStrategies ?? []).includes(

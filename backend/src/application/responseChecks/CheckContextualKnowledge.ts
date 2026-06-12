@@ -32,7 +32,13 @@ export class CheckContextualKnowledge {
           results.push(await checkCounterfactual(this.llm, query, answer));
         } else if (strategy === "citation_forcing") {
           results.push(
-            await checkCitationForcing(this.llm, query, answer, chunks),
+            await checkCitationForcing(
+              this.llm,
+              query,
+              answer,
+              chunks,
+              titleById,
+            ),
           );
         }
       } catch (err) {

@@ -43,8 +43,6 @@ export async function checkCounterfactual(
         status: parsed.similar ? "UNSUPPORTED" : "SUPPORTED",
       },
     ],
-    warning: parsed.similar
-      ? "Answer may rely on LLM training data rather than retrieved documents"
-      : undefined,
+    warning: undefined,
   };
 }
