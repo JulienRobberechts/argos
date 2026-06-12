@@ -49,7 +49,7 @@ export default function DashboardPage() {
           <img
             src="/logo-argos.jpg"
             alt="Argos"
-            className="h-20 w-auto rounded-2xl shadow-2xl shrink-0 border-2 border-sky-400/30"
+            className="h-32 w-32 rounded-full shrink-0 border-[6px] border-[#f59e0b] bg-white object-contain shadow-2xl"
             style={{ boxShadow: "0 0 40px rgba(34,211,238,0.25)" }}
           />
           <div

@@ -30,13 +30,11 @@ export default function IconNav() {
           <img
             src="/logo-argos.jpg"
             alt="Argos"
-            className={`w-10 h-auto rounded-lg transition-all ${
-              isActive
-                ? "ring-2 ring-cyan-400 shadow-lg"
-                : "opacity-80 hover:opacity-100"
+            className={`w-12 h-12 rounded-full object-contain bg-white border-2 border-[#f59e0b] shadow-2xl transition-all ${
+              isActive ? "" : "opacity-80 hover:opacity-100"
             }`}
             style={
-              isActive ? { boxShadow: "0 0 12px rgba(34,211,238,0.4)" } : {}
+              isActive ? { boxShadow: "0 0 40px rgba(34,211,238,0.25)" } : {}
             }
           />
         )}
