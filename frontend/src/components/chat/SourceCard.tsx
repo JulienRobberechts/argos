@@ -3,36 +3,6 @@ import { ChevronDown } from "lucide-react";
 import type { SourceCitation } from "../../types/domain";
 import DocumentTypeIcon from "../documents/DocumentTypeIcon";
 
-const SCORE_THRESHOLDS = [
-  { min: 85, bar: "bg-emerald-500", text: "text-emerald-600" },
-  { min: 70, bar: "bg-amber-400", text: "text-amber-600" },
-  { min: 0, bar: "bg-red-400", text: "text-red-600" },
-] as const;
-
-function scoreStyle(pct: number) {
-  return SCORE_THRESHOLDS.find((t) => pct >= t.min)!;
-}
-
-function ScoreRow({ score }: { score: number }) {
-  const pct = score * 100;
-  const { bar, text } = scoreStyle(Math.round(pct));
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-        <div
-          className={`h-full rounded-full ${bar} transition-all`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <span
-        className={`font-mono text-[11px] tabular-nums w-14 text-right ${text}`}
-      >
-        {score.toFixed(5)}
-      </span>
-    </div>
-  );
-}
-
 function IdCell({ value }: { value: string }) {
   return (
     <span
@@ -65,34 +35,29 @@ function Row({
 
 function DebugPanel({ source }: { source: SourceCitation }) {
   return (
-    <div className="border-t border-slate-200 bg-white px-4 py-3">
-      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-300 mb-2">
+    <div className="border-t border-slate-200 bg-white px-4 py-2">
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-300 mb-1">
         Technical details
       </p>
-      <Row label="Score">
-        <ScoreRow score={source.score} />
-      </Row>
-      <Row label="Type">
-        <span className="text-[11px] font-mono text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded">
-          {source.sourceType}
-        </span>
-      </Row>
       <Row label="Chunk ID">
         <IdCell value={source.chunkId} />
       </Row>
       <Row label="Document ID">
         <IdCell value={source.documentId} />
       </Row>
-      <Row label="Content">
-        <span className="text-[11px] font-mono text-slate-400 tabular-nums">
-          {source.excerpt.length} chars
-        </span>
-        <div className="overflow-x-auto mt-1">
-          <p className="text-[11px] font-mono text-slate-600 leading-relaxed whitespace-pre">
-            {source.excerpt}
-          </p>
+      <div className="pt-1">
+        <div className="flex items-center justify-between mb-0.5">
+          <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
+            Content
+          </span>
+          <span className="text-[11px] font-mono text-slate-400 tabular-nums">
+            {source.excerpt.length} chars
+          </span>
         </div>
-      </Row>
+        <p className="text-[11px] font-mono text-slate-600 leading-relaxed whitespace-pre-wrap break-all">
+          {source.excerpt}
+        </p>
+      </div>
     </div>
   );
 }
