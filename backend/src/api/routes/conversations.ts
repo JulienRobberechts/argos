@@ -95,7 +95,9 @@ export function conversationsRouter(
     "/:id",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const conversation = await conversationRepo.findById(req.params.id);
+        const conversation = await conversationRepo.findById(
+          String(req.params.id),
+        );
         if (!conversation) {
           res.status(404).json({ error: "Conversation not found" });
           return;
@@ -116,12 +118,17 @@ export function conversationsRouter(
           res.status(400).json({ error: "Validation error" });
           return;
         }
-        const conversation = await conversationRepo.findById(req.params.id);
+        const conversation = await conversationRepo.findById(
+          String(req.params.id),
+        );
         if (!conversation) {
           res.status(404).json({ error: "Conversation not found" });
           return;
         }
-        await conversationRepo.updateTitle(req.params.id, body.data.title);
+        await conversationRepo.updateTitle(
+          String(req.params.id),
+          body.data.title,
+        );
         res.json({ ...conversation, title: body.data.title });
       } catch (err) {
         next(err);
@@ -133,12 +140,14 @@ export function conversationsRouter(
     "/:id",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const conversation = await conversationRepo.findById(req.params.id);
+        const conversation = await conversationRepo.findById(
+          String(req.params.id),
+        );
         if (!conversation) {
           res.status(404).json({ error: "Conversation not found" });
           return;
         }
-        await conversationRepo.delete(req.params.id);
+        await conversationRepo.delete(String(req.params.id));
         res.status(204).send();
       } catch (err) {
         next(err);
@@ -153,7 +162,7 @@ export function conversationsRouter(
       if (!body.success) {
         res.status(400).json({
           error: "Validation error",
-          fields: body.error.errors.map((e) => ({
+          fields: body.error.issues.map((e) => ({
             path: e.path.join("."),
             message: e.message,
           })),
@@ -161,7 +170,9 @@ export function conversationsRouter(
         return;
       }
 
-      const conversation = await conversationRepo.findById(req.params.id);
+      const conversation = await conversationRepo.findById(
+        String(req.params.id),
+      );
       if (!conversation) {
         res.status(404).json({ error: "Conversation not found" });
         return;
@@ -187,7 +198,7 @@ export function conversationsRouter(
 
       try {
         const assistantMessage = await askQuestion.execute(
-          req.params.id,
+          String(req.params.id),
           body.data.content,
           (token: string) => {
             res.write(`event: delta\ndata: ${JSON.stringify({ token })}\n\n`);

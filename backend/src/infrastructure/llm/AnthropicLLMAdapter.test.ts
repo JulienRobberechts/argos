@@ -3,12 +3,11 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const mockStream = vi.fn();
 const mockAbort = vi.fn();
 
-vi.mock("@anthropic-ai/sdk", () => {
-  const MockAnthropic = vi.fn().mockImplementation(() => ({
-    messages: { stream: mockStream },
-  }));
-  return { default: MockAnthropic };
-});
+vi.mock("@anthropic-ai/sdk", () => ({
+  default: vi.fn().mockImplementation(function () {
+    this.messages = { stream: mockStream };
+  }),
+}));
 
 vi.mock("../../config", () => ({
   default: {

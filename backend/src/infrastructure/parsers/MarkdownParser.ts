@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
-import { marked } from "marked";
 import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
 
 export class MarkdownParser implements FileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
+    const { marked } = await import("marked");
     const content = await fs.promises.readFile(filePath, "utf-8");
     const stats = await fs.promises.stat(filePath);
     const html = marked.parse(content) as string;

@@ -92,7 +92,7 @@ export function documentsRouter(
     "/:id",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
@@ -108,12 +108,12 @@ export function documentsRouter(
     "/:id/chunks",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
         }
-        const chunks = await chunkRepo.findByDocumentId(req.params.id);
+        const chunks = await chunkRepo.findByDocumentId(String(req.params.id));
         res.json(
           chunks.map((chunk) => ({
             position: chunk.metadata.position,
@@ -131,12 +131,12 @@ export function documentsRouter(
     "/:id/content",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
         }
-        const chunks = await chunkRepo.findByDocumentId(req.params.id);
+        const chunks = await chunkRepo.findByDocumentId(String(req.params.id));
         if (chunks.length === 0) {
           res.status(404).json({ error: "Content not available" });
           return;
@@ -153,7 +153,7 @@ export function documentsRouter(
     "/:id/raw",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
@@ -180,12 +180,14 @@ export function documentsRouter(
     "/:id/summary",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
         }
-        const summary = await summaryRepo.findByDocumentId(req.params.id);
+        const summary = await summaryRepo.findByDocumentId(
+          String(req.params.id),
+        );
         if (!summary) {
           res.status(404).json({ error: "Summary not found" });
           return;
@@ -201,7 +203,7 @@ export function documentsRouter(
     "/:id/summary",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
@@ -210,7 +212,7 @@ export function documentsRouter(
           res.status(409).json({ error: "Document is not ready" });
           return;
         }
-        const content = await summarizeDocument.execute(req.params.id);
+        const content = await summarizeDocument.execute(String(req.params.id));
         res.json({ content });
       } catch (err) {
         next(err);
@@ -222,13 +224,13 @@ export function documentsRouter(
     "/:id",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const doc = await documentRepo.findById(req.params.id);
+        const doc = await documentRepo.findById(String(req.params.id));
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
         }
-        await chunkRepo.deleteByDocumentId(req.params.id);
-        await documentRepo.delete(req.params.id);
+        await chunkRepo.deleteByDocumentId(String(req.params.id));
+        await documentRepo.delete(String(req.params.id));
         res.status(204).send();
       } catch (err) {
         next(err);
