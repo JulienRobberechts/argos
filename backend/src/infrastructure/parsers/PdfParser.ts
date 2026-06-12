@@ -1,34 +1,33 @@
 import fs from "fs";
 import path from "path";
+import { PDFParse } from "pdf-parse";
 import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse/lib/pdf-parse");
-
-interface PdfData {
-  text: string;
-  numpages: number;
-}
 
 export class PdfParser implements FileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
-    const buffer = await fs.promises.readFile(filePath);
     const stats = await fs.promises.stat(filePath);
+    const url = `file://${filePath}`;
+    const parser = new PDFParse({ url });
     try {
-      const data = (await pdfParse(buffer)) as PdfData;
+      const [textResult, infoResult] = await Promise.all([
+        parser.getText(),
+        parser.getInfo(),
+      ]);
       return {
-        text: data.text,
+        text: textResult.text,
         metadata: {
           fileName: path.basename(filePath),
           fileSize: stats.size,
           mimeType: "application/pdf",
-          numPages: data.numpages,
+          numPages: infoResult.total,
         },
       };
     } catch (err) {
       throw new Error(
         `Failed to parse PDF "${path.basename(filePath)}": ${err instanceof Error ? err.message : String(err)}`,
       );
+    } finally {
+      await parser.destroy();
     }
   }
 }
