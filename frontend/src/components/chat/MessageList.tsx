@@ -1,6 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Bot, ShieldCheck, ShieldAlert, ChevronDown } from "lucide-react";
+import {
+  Bot,
+  ShieldCheck,
+  ShieldAlert,
+  ChevronDown,
+  Info,
+  ExternalLink,
+} from "lucide-react";
 import type {
   KnowledgeCheckResult,
   Message,
@@ -15,6 +22,24 @@ const STRATEGY_LABEL: Record<string, string> = {
   faithfulness: "Faithfulness",
   counterfactual: "Counterfactual",
   citation_forcing: "Citation forcing",
+};
+
+const STRATEGY_DESCRIPTION: Record<string, string> = {
+  faithfulness:
+    "Verifies that every claim in the response is directly supported by the retrieved documents, detecting hallucinations.",
+  counterfactual:
+    "Detects whether the model relies on its training-data knowledge instead of the provided context, by testing with a modified document.",
+  citation_forcing:
+    "Forces the model to cite a source for each claim and checks whether those citations genuinely support the claim.",
+};
+
+const STRATEGY_LINK: Record<string, string> = {
+  faithfulness:
+    "https://docs.ragas.io/en/latest/concepts/metrics/faithfulness/",
+  counterfactual:
+    "https://docs.ragas.io/en/latest/concepts/metrics/context_utilization/",
+  citation_forcing:
+    "https://docs.ragas.io/en/latest/concepts/metrics/answer_relevance/",
 };
 
 function ScoreBadge({ score }: { score: number }) {
@@ -38,10 +63,10 @@ function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
   const anyWarning = results.some((r) => r.warning);
 
   return (
-    <div className="mt-2 border border-gray-100 rounded-lg text-xs overflow-hidden">
+    <div className="mt-2 border border-gray-100 rounded-lg text-xs">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-left"
+        className="w-full flex items-center gap-2 px-3 py-2 bg-gray-50 hover:bg-gray-100 transition-colors text-left rounded-t-lg"
       >
         {anyWarning ? (
           <ShieldAlert size={13} className="text-amber-500 shrink-0" />
@@ -70,6 +95,25 @@ function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
                 <span className="font-semibold text-gray-700">
                   {STRATEGY_LABEL[result.strategy] ?? result.strategy}
                 </span>
+                {STRATEGY_DESCRIPTION[result.strategy] && (
+                  <div className="relative group inline-flex items-center">
+                    <Info size={11} className="text-gray-400 cursor-help" />
+                    <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-gray-200 rounded-lg shadow-md text-[10px] p-2.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 leading-relaxed">
+                      <p className="text-gray-600">
+                        {STRATEGY_DESCRIPTION[result.strategy]}
+                      </p>
+                      <a
+                        href={STRATEGY_LINK[result.strategy]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1 text-indigo-500 hover:text-indigo-700 font-medium"
+                      >
+                        Learn more
+                        <ExternalLink size={8} />
+                      </a>
+                    </div>
+                  </div>
+                )}
                 <ScoreBadge score={result.score} />
               </div>
               {result.warning && (
@@ -184,8 +228,7 @@ function SourcesList({ sources }: { sources: SourceCitation[] }) {
           onClick={() => setExpanded(true)}
           className="text-xs text-indigo-500 hover:text-indigo-700 text-left"
         >
-          + {hidden} autre{hidden > 1 ? "s" : ""} référence
-          {hidden > 1 ? "s" : ""}
+          + {hidden} more reference{hidden > 1 ? "s" : ""}
         </button>
       )}
     </div>

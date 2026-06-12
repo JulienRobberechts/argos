@@ -183,7 +183,7 @@ function Field({
               className="inline-flex items-center gap-0.5 ml-1.5 text-blue-500 hover:text-blue-700 font-medium transition-colors"
             >
               <BookOpen size={10} />
-              En savoir plus
+              Learn more
             </Link>
           )}
         </div>

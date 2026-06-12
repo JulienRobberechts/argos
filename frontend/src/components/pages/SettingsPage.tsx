@@ -41,7 +41,7 @@ function Row({
               className="inline-flex items-center gap-0.5 ml-1.5 text-blue-500 hover:text-blue-700 font-medium transition-colors"
             >
               <BookOpen size={11} />
-              En savoir plus
+              Learn more
             </Link>
           )}
         </div>

@@ -64,7 +64,7 @@ function Callout({
     tip: "bg-green-50 border-green-200 text-green-900",
     warning: "bg-amber-50 border-amber-200 text-amber-900",
   };
-  const labels = { info: "Note", tip: "Conseil", warning: "Important" };
+  const labels = { info: "Note", tip: "Tip", warning: "Important" };
   return (
     <div className={`border rounded-lg p-4 text-sm ${styles[type]}`}>
       <span className="font-semibold">{labels[type]}: </span>
@@ -84,7 +84,7 @@ const TIER_COLORS: Record<Tier, string> = {
 const TIER_LABELS: Record<Tier, string> = {
   flagship: "Flagship",
   performance: "Performance",
-  speed: "Vitesse",
+  speed: "Speed",
 };
 
 interface ModelSpec {
@@ -112,18 +112,18 @@ const MODELS: ModelSpec[] = [
     maxOutput: "128k tokens",
     inputPrice: "$10",
     outputPrice: "$50",
-    latency: "Modérée",
+    latency: "Moderate",
     knowledgeCutoff: "—",
     adaptiveThinking: true,
     extendedThinking: false,
     bestFor: [
-      "Tâches de raisonnement les plus complexes",
-      "Travail agentique longue durée",
-      "Cas nécessitant la meilleure intelligence disponible",
+      "Most complex reasoning tasks",
+      "Long-running agentic work",
+      "Cases requiring the best available intelligence",
     ],
     limitations: [
-      "Coût le plus élevé ($10/$50 par MTok)",
-      "Latence plus élevée que Sonnet/Haiku",
+      "Highest cost ($10/$50 per MTok)",
+      "Higher latency than Sonnet/Haiku",
     ],
   },
   {
@@ -134,18 +134,18 @@ const MODELS: ModelSpec[] = [
     maxOutput: "128k tokens",
     inputPrice: "$5",
     outputPrice: "$25",
-    latency: "Modérée",
+    latency: "Moderate",
     knowledgeCutoff: "Jan 2026",
     adaptiveThinking: true,
     extendedThinking: false,
     bestFor: [
-      "Raisonnement complexe et multi-étapes",
-      "Codage agentique longue durée",
-      "Analyse approfondie de documents longs",
+      "Complex multi-step reasoning",
+      "Long-running agentic coding",
+      "Deep analysis of long documents",
     ],
     limitations: [
-      "Coût élevé ($5/$25 par MTok)",
-      "Latence plus élevée que Sonnet/Haiku",
+      "High cost ($5/$25 per MTok)",
+      "Higher latency than Sonnet/Haiku",
     ],
   },
   {
@@ -156,16 +156,16 @@ const MODELS: ModelSpec[] = [
     maxOutput: "64k tokens",
     inputPrice: "$3",
     outputPrice: "$15",
-    latency: "Rapide",
-    knowledgeCutoff: "Août 2025",
+    latency: "Fast",
+    knowledgeCutoff: "Aug 2025",
     adaptiveThinking: true,
     extendedThinking: true,
     bestFor: [
-      "Meilleur rapport intelligence/vitesse/coût",
-      "Applications de production RAG",
-      "Génération de réponses structurées",
+      "Best intelligence/speed/cost ratio",
+      "RAG production applications",
+      "Structured response generation",
     ],
-    limitations: ["Max output inférieur à Opus (64k vs 128k)"],
+    limitations: ["Lower max output than Opus (64k vs 128k)"],
   },
   {
     id: "claude-haiku-4-5-20251001",
@@ -175,19 +175,19 @@ const MODELS: ModelSpec[] = [
     maxOutput: "64k tokens",
     inputPrice: "$1",
     outputPrice: "$5",
-    latency: "Le plus rapide",
-    knowledgeCutoff: "Fév 2025",
+    latency: "Fastest",
+    knowledgeCutoff: "Feb 2025",
     adaptiveThinking: false,
     extendedThinking: true,
     bestFor: [
-      "Réponses à faible latence",
-      "Volume élevé / coût réduit",
-      "Tâches simples de Q&A sur documents",
+      "Low-latency responses",
+      "High volume / reduced cost",
+      "Simple document Q&A tasks",
     ],
     limitations: [
-      "Fenêtre contextuelle plus petite (200k)",
-      "Pas d'adaptive thinking",
-      "Cutoff de connaissance plus ancien",
+      "Smaller context window (200k)",
+      "No adaptive thinking",
+      "Older knowledge cutoff",
     ],
   },
 ];
@@ -226,14 +226,14 @@ function ModelCard({ model }: { model: ModelSpec }) {
         <div className="flex items-center gap-1.5 text-gray-600">
           <Layers size={12} className="text-gray-400 shrink-0" />
           <span>
-            Contexte:{" "}
+            Context:{" "}
             <strong className="text-gray-800">{model.contextWindow}</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-gray-600">
           <ArrowRight size={12} className="text-gray-400 shrink-0" />
           <span>
-            Sortie max:{" "}
+            Max output:{" "}
             <strong className="text-gray-800">{model.maxOutput}</strong>
           </span>
         </div>
@@ -254,7 +254,7 @@ function ModelCard({ model }: { model: ModelSpec }) {
         <div className="flex items-center gap-1.5 text-gray-600">
           <Clock size={12} className="text-gray-400 shrink-0" />
           <span>
-            Latence: <strong className="text-gray-800">{model.latency}</strong>
+            Latency: <strong className="text-gray-800">{model.latency}</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-gray-600">
@@ -282,7 +282,7 @@ function ModelCard({ model }: { model: ModelSpec }) {
       <div className="space-y-2">
         <div>
           <p className="text-[10px] font-semibold text-green-700 uppercase tracking-wider mb-1">
-            Idéal pour
+            Best for
           </p>
           <ul className="space-y-0.5">
             {model.bestFor.map((item, i) => (
@@ -301,7 +301,7 @@ function ModelCard({ model }: { model: ModelSpec }) {
         </div>
         <div>
           <p className="text-[10px] font-semibold text-amber-700 uppercase tracking-wider mb-1">
-            Limites
+            Limitations
           </p>
           <ul className="space-y-0.5">
             {model.limitations.map((item, i) => (
@@ -371,15 +371,15 @@ function ComparisonTab() {
     <Card>
       <SectionTitle
         icon={<Layers size={20} />}
-        title="Tableau comparatif"
-        subtitle="Tous les modèles courants côte à côte"
+        title="Comparison table"
+        subtitle="All current models side by side"
       />
       <div className="overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
             <tr className="border-b border-gray-200">
               <th className="text-left py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
-                Modèle
+                Model
               </th>
               <th className="text-right py-2 pr-4 font-semibold text-gray-500 uppercase tracking-wide">
                 Contexte
@@ -451,8 +451,8 @@ function RagUsageTab() {
     <Card>
       <SectionTitle
         icon={<Zap size={20} />}
-        title="Recommandation pour ce projet RAG"
-        subtitle="Quel modèle choisir selon le cas d'usage"
+        title="Recommendation for this RAG project"
+        subtitle="Which model to choose based on the use case"
       />
       <div className="space-y-3 text-sm text-gray-700">
         <div className="flex gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -463,8 +463,8 @@ function RagUsageTab() {
               <code className="text-blue-700">claude-sonnet-4-6</code>
             </p>
             <p className="text-xs text-gray-600 mt-0.5">
-              Meilleur équilibre pour un pipeline RAG : contexte 1M tokens,
-              sortie 64k, vitesse rapide et coût raisonnable ($3/$15).
+              Best balance for a RAG pipeline: 1M token context, 64k output,
+              fast speed and reasonable cost ($3/$15).
             </p>
           </div>
         </div>
@@ -472,13 +472,13 @@ function RagUsageTab() {
           <CheckCircle size={16} className="text-blue-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-gray-900">
-              Expérimentation / haute qualité —{" "}
-              <code className="text-blue-700">claude-opus-4-8</code> ou{" "}
+              Experimentation / high quality —{" "}
+              <code className="text-blue-700">claude-opus-4-8</code> or{" "}
               <code className="text-blue-700">claude-fable-5</code>
             </p>
             <p className="text-xs text-gray-600 mt-0.5">
-              Pour les requêtes complexes, la synthèse sur de très longs
-              contextes ou la comparaison des réponses.
+              For complex queries, synthesis over very long contexts, or
+              response comparison.
             </p>
           </div>
         </div>
@@ -486,12 +486,12 @@ function RagUsageTab() {
           <Zap size={16} className="text-amber-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-gray-900">
-              Volume élevé / latence critique —{" "}
+              High volume / critical latency —{" "}
               <code className="text-blue-700">claude-haiku-4-5-20251001</code>
             </p>
             <p className="text-xs text-gray-600 mt-0.5">
-              Idéal pour les Q&A simples sur documents avec fort débit requis.
-              Fenêtre contextuelle limitée à 200k tokens.
+              Ideal for simple document Q&A with high throughput requirements.
+              Context window limited to 200k tokens.
             </p>
           </div>
         </div>
@@ -506,27 +506,27 @@ function ConfigTab() {
       <SectionTitle
         icon={<Code2 size={20} />}
         title="Configuration"
-        subtitle="Changer le modèle par défaut"
+        subtitle="Change the default model"
       />
       <p className="text-sm text-gray-700 mb-3">
-        Le modèle par défaut est défini par la variable d'environnement{" "}
+        The default model is set by the environment variable{" "}
         <code className="bg-gray-100 px-1 rounded text-blue-700">
           LLM_MODEL
         </code>
-        . Il peut être surchargé par conversation via le panneau{" "}
-        <em>Parameters</em> dans l'interface de chat.
+        . It can be overridden per conversation via the <em>Parameters</em>{" "}
+        panel in the chat interface.
       </p>
       <pre className="bg-gray-900 text-gray-100 rounded-lg p-4 text-xs font-mono leading-relaxed mb-4">
         {`# .env
-LLM_MODEL=claude-sonnet-4-6       # défaut recommandé
-# LLM_MODEL=claude-opus-4-8       # haute qualité
-# LLM_MODEL=claude-fable-5        # capacité maximale
-# LLM_MODEL=claude-haiku-4-5-20251001  # vitesse max`}
+LLM_MODEL=claude-sonnet-4-6       # recommended default
+# LLM_MODEL=claude-opus-4-8       # high quality
+# LLM_MODEL=claude-fable-5        # maximum capability
+# LLM_MODEL=claude-haiku-4-5-20251001  # max speed`}
       </pre>
       <Callout type="info">
-        Le modèle choisi au niveau conversation est stocké avec la conversation
-        et visible dans le panneau Parameters (read-only) lors de la relecture
-        d'une conversation existante.
+        The model chosen at the conversation level is stored with the
+        conversation and visible in the Parameters panel (read-only) when
+        reviewing an existing conversation.
       </Callout>
     </Card>
   );
@@ -547,8 +547,8 @@ export default function LLMModelsPage() {
     <div className="p-8 max-w-5xl">
       <PageHeader
         icon={<Brain className="text-blue-600" size={28} />}
-        title="Modèles LLM — Comparaison"
-        info="Vue d'ensemble des modèles Claude disponibles, leurs caractéristiques et quand les utiliser dans un pipeline RAG."
+        title="LLM Models — Comparison"
+        info="Overview of available Claude models, their characteristics, and when to use them in a RAG pipeline."
       />
 
       <TechnicalNav />
