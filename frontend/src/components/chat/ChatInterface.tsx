@@ -559,6 +559,9 @@ export default function ChatInterface() {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     });
+    return () => {
+      pendingSentRef.current = false;
+    };
   }, [id]);
 
   async function submitNew(content: string) {
