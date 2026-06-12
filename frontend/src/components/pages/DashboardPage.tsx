@@ -52,13 +52,20 @@ export default function DashboardPage() {
             className="h-20 w-auto rounded-2xl shadow-2xl shrink-0 border-2 border-sky-400/30"
             style={{ boxShadow: "0 0 40px rgba(34,211,238,0.25)" }}
           />
-          <div>
+          <div
+            style={{
+              display: "inline-grid",
+              gridTemplateColumns: "max-content",
+            }}
+          >
             <h1
               style={{
                 fontFamily: "'Audiowide', sans-serif",
                 fontWeight: 400,
                 fontSize: "2.75rem",
-                letterSpacing: "0.15em",
+                lineHeight: 1,
+                display: "flex",
+                justifyContent: "space-between",
                 background:
                   "linear-gradient(90deg, #b45309 0%, #f59e0b 40%, #fef08a 100%)",
                 WebkitBackgroundClip: "text",
@@ -67,11 +74,15 @@ export default function DashboardPage() {
                 color: "transparent",
               }}
             >
-              ARGOS
+              {"ARGOS".split("").map((char, i) => (
+                <span key={i}>{char}</span>
+              ))}
             </h1>
             <p
-              className="mt-1 text-sm font-medium tracking-wide"
+              className="text-sm font-medium"
               style={{
+                textAlign: "justify",
+                textAlignLast: "justify",
                 background:
                   "linear-gradient(90deg, #b45309 0%, #f59e0b 40%, #fef08a 100%)",
                 WebkitBackgroundClip: "text",
@@ -82,9 +93,11 @@ export default function DashboardPage() {
             >
               Knowledge Intelligence Platform
             </p>
-            <p className="mt-2 text-xs max-w-md italic text-slate-400">
-              Turn your documents into an intelligent, conversational knowledge
-              base.
+            <p className="mt-3 text-xs italic text-slate-400">
+              Turn your documents into an intelligent,
+            </p>
+            <p className="text-xs italic text-slate-400">
+              conversational knowledge base.
             </p>
           </div>
         </div>
