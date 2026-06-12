@@ -35,6 +35,7 @@ export async function checkCounterfactual(
   return {
     strategy: "counterfactual",
     score,
+    trainingAnswer: answerWithoutContext,
     claims: [
       {
         claim: parsed.reasoning,

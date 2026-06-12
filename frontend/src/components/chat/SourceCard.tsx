@@ -106,9 +106,14 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
         <DocumentTypeIcon sourceType={source.sourceType} size={14} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline gap-2 mb-1">
-            <span className="font-medium text-gray-700 truncate">
+            <a
+              href={`http://localhost:5173/documents/${source.documentId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-gray-700 truncate hover:text-indigo-600 hover:underline underline-offset-2"
+            >
               {source.documentTitle}
-            </span>
+            </a>
             <span className="text-xs text-gray-400 flex-shrink-0">
               {(source.score * 100).toFixed(0)}%
             </span>

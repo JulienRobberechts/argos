@@ -6,6 +6,73 @@ import {
 } from "../../../domain/entities/Message";
 import { extractJSON } from "./extractJSON";
 
+export function buildCitationForcingInstruction(): string {
+  return (
+    "For each factual claim you make, append [SOURCE N] where N is the number of the supporting source. " +
+    "If no source supports a claim, append [OWN KNOWLEDGE] instead."
+  );
+}
+
+export function parseCitationForcingResult(
+  raw: string,
+  chunks: ChunkSearchResult[] = [],
+  titleById: Map<string, string> = new Map(),
+): {
+  cleanContent: string;
+  result: KnowledgeCheckResult;
+} {
+  const claims: KnowledgeClaim[] = [];
+
+  const sourceRegex = /([^.!?\n]*?)\s*\[SOURCE\s+(\d+)\]/g;
+  let match;
+  while ((match = sourceRegex.exec(raw)) !== null) {
+    const claim = match[1].trim();
+    const sourceIndex = parseInt(match[2], 10) - 1;
+    if (claim.length > 0) {
+      const chunk = chunks[sourceIndex];
+      if (chunk) {
+        const documentId = chunk.chunk.documentId;
+        claims.push({
+          claim,
+          status: "SUPPORTED",
+          documentId,
+          documentTitle: titleById.get(documentId) ?? documentId,
+        });
+      } else {
+        claims.push({ claim, status: "SUPPORTED" });
+      }
+    }
+  }
+
+  const ownKnowledgeRegex = /([^.!?\n]*?)\s*\[OWN KNOWLEDGE\]/g;
+  while ((match = ownKnowledgeRegex.exec(raw)) !== null) {
+    const claim = match[1].trim();
+    if (claim.length > 0) {
+      claims.push({ claim, status: "UNSUPPORTED" });
+    }
+  }
+
+  const cleanContent = raw
+    .replace(/\s*\[SOURCE\s+\d+\]/g, "")
+    .replace(/\s*\[OWN KNOWLEDGE\]/g, "");
+
+  const supported = claims.filter((c) => c.status === "SUPPORTED").length;
+  const total = claims.length;
+  const score = total > 0 ? supported / total : 1;
+
+  return {
+    cleanContent,
+    result: {
+      strategy: "citation_forcing",
+      score,
+      claims,
+      warning: claims.some((c) => c.status === "UNSUPPORTED")
+        ? "Some claims are based on training data, not retrieved documents"
+        : undefined,
+    },
+  };
+}
+
 export async function checkCitationForcing(
   llm: LLMPort,
   query: string,

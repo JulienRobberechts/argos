@@ -1,5 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useNavigate, useLocation, Link } from "react-router-dom";
 import {
   useConversation,
   useCreateConversation,
@@ -9,7 +9,7 @@ import { useSSEStream } from "../../hooks/useSSEStream";
 import { useConfig } from "../../hooks/useConfig";
 import MessageList from "./MessageList";
 import { useState, useRef, useEffect } from "react";
-import { ArrowUp, Pencil, Settings2, X } from "lucide-react";
+import { ArrowUp, BookOpen, Info, Pencil, Settings2, X } from "lucide-react";
 import type {
   ConversationParams,
   KnowledgeCheckStrategy,
@@ -146,17 +146,48 @@ const LLM_MODELS = [
 
 function Field({
   label,
+  info,
+  techLink,
   children,
 }: {
   label: string;
+  info?: string;
+  techLink?: string;
   children: React.ReactNode;
 }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <div className="flex items-center justify-between gap-3 min-h-[28px]">
-      <span className="text-xs text-gray-500 leading-tight shrink-0">
-        {label}
-      </span>
-      <div className="shrink-0">{children}</div>
+    <div>
+      <div className="flex items-center justify-between gap-3 min-h-[28px]">
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="text-xs text-gray-500 leading-tight">{label}</span>
+          {info && (
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="text-gray-300 hover:text-blue-500 transition-colors"
+              aria-label={`About: ${label}`}
+            >
+              <Info size={11} />
+            </button>
+          )}
+        </div>
+        <div className="shrink-0">{children}</div>
+      </div>
+      {open && info && (
+        <div className="mt-1.5 text-[11px] text-gray-600 bg-blue-50/70 border-l-2 border-blue-300 rounded-r-md pl-2.5 pr-2 py-1.5 leading-relaxed">
+          {info}
+          {techLink && (
+            <Link
+              to={techLink}
+              className="inline-flex items-center gap-0.5 ml-1.5 text-blue-500 hover:text-blue-700 font-medium transition-colors"
+            >
+              <BookOpen size={10} />
+              En savoir plus
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -238,7 +269,11 @@ function ParamsPanel({
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
             Retrieval
           </p>
-          <Field label="Results limit">
+          <Field
+            label="Results limit"
+            info="Maximum number of chunks retrieved from the vector index and injected into the LLM context. A higher value provides more context but may dilute relevance."
+            techLink="/technical?tab=Config"
+          >
             <input
               type="number"
               value={params.retrievalLimit ?? 5}
@@ -257,7 +292,11 @@ function ParamsPanel({
               className={inputClass}
             />
           </Field>
-          <Field label="Min similarity score">
+          <Field
+            label="Min similarity score"
+            info="Cosine similarity threshold (0–1). Chunks with a score below this value are excluded from the context. A higher value filters out less relevant results."
+            techLink="/technical?tab=Config"
+          >
             <input
               type="number"
               value={params.retrievalMinScore ?? 0.5}
@@ -277,7 +316,11 @@ function ParamsPanel({
               className={inputClass}
             />
           </Field>
-          <Field label="Reranking">
+          <Field
+            label="Reranking"
+            info="Enables a second retrieval stage using a cross-encoder model to re-score and reorder candidates for improved relevance."
+            techLink="/technical/reranking"
+          >
             <Toggle
               checked={params.rerankEnabled ?? false}
               onChange={
@@ -289,7 +332,11 @@ function ParamsPanel({
             />
           </Field>
           {params.rerankEnabled && (
-            <Field label="Rerank model">
+            <Field
+              label="Rerank model"
+              info="Cross-encoder model used for the reranking stage."
+              techLink="/technical/reranking"
+            >
               <select
                 value={params.rerankModel ?? RERANK_MODELS[0].value}
                 disabled={readOnly}
@@ -310,7 +357,11 @@ function ParamsPanel({
             </Field>
           )}
           {params.rerankEnabled && (
-            <Field label="Candidate multiplier">
+            <Field
+              label="Candidate multiplier"
+              info="Retrieves N × limit candidates before reranking, then keeps only the top limit. A higher value improves recall at the cost of latency."
+              techLink="/technical/reranking"
+            >
               <input
                 type="number"
                 value={params.rerankCandidateMultiplier ?? 3}
@@ -338,7 +389,11 @@ function ParamsPanel({
           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
             Generation
           </p>
-          <Field label="Model">
+          <Field
+            label="Model"
+            info="LLM used for response generation. More capable models produce better answers but are slower and more expensive."
+            techLink="/technical/llm-models"
+          >
             <select
               value={params.llmModel ?? LLM_MODELS[0].value}
               disabled={readOnly}
@@ -356,7 +411,11 @@ function ParamsPanel({
               ))}
             </select>
           </Field>
-          <Field label="Temperature">
+          <Field
+            label="Temperature"
+            info="Controls response creativity (0 = deterministic, 1 = very creative). A low value is recommended for factual answers."
+            techLink="/technical?tab=Config"
+          >
             <input
               type="number"
               value={params.llmTemperature ?? 0.2}
@@ -376,7 +435,11 @@ function ParamsPanel({
               className={inputClass}
             />
           </Field>
-          <Field label="Max tokens">
+          <Field
+            label="Max tokens"
+            info="Maximum number of tokens the LLM can generate in a response. Increase this to allow longer answers."
+            techLink="/technical?tab=Config"
+          >
             <input
               type="number"
               value={params.llmMaxTokens ?? 1024}
@@ -419,8 +482,19 @@ function ParamsPanel({
                 : strategy === "counterfactual"
                   ? "Counterfactual"
                   : "Citation forcing";
+            const info =
+              strategy === "faithfulness"
+                ? "Checks whether each statement in the answer is supported by the retrieved sources (RAGAS metric)."
+                : strategy === "counterfactual"
+                  ? "Tests resistance to false context by injecting contradictory information into the sources."
+                  : "Forces the model to cite its sources and verifies that the citations are accurate.";
             return (
-              <Field key={strategy} label={label}>
+              <Field
+                key={strategy}
+                label={label}
+                info={info}
+                techLink="/technical/knowledge-check"
+              >
                 <Toggle
                   checked={active}
                   onChange={(v) => {

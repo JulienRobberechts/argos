@@ -1,4 +1,4 @@
-import { Info, Settings } from "lucide-react";
+import { BookOpen, Info, Settings } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useConfig } from "../../hooks/useConfig";
@@ -33,14 +33,15 @@ function Row({
         <span className="text-sm font-mono text-gray-900">{value}</span>
       </div>
       {open && (
-        <div className="mt-1 text-xs text-gray-500 bg-blue-50 rounded px-2 py-1 flex items-start justify-between gap-2">
-          <p>{info}</p>
+        <div className="mt-1.5 text-xs text-gray-600 bg-blue-50/70 border-l-2 border-blue-300 rounded-r-md pl-2.5 pr-2 py-1.5 leading-relaxed">
+          {info}
           {techLink && (
             <Link
               to={techLink}
-              className="flex-shrink-0 text-blue-500 hover:text-blue-700 underline whitespace-nowrap"
+              className="inline-flex items-center gap-0.5 ml-1.5 text-blue-500 hover:text-blue-700 font-medium transition-colors"
             >
-              En savoir plus →
+              <BookOpen size={11} />
+              En savoir plus
             </Link>
           )}
         </div>

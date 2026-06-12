@@ -77,6 +77,14 @@ function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
                   {result.warning}
                 </p>
               )}
+              {result.trainingAnswer && (
+                <div className="bg-gray-50 rounded px-2 py-1.5 text-gray-600">
+                  <span className="font-medium text-gray-500 text-[10px] uppercase tracking-wide">
+                    Training answer
+                  </span>
+                  <p className="mt-0.5">{result.trainingAnswer}</p>
+                </div>
+              )}
               {result.claims.length > 0 && (
                 <ul className="space-y-1">
                   {result.claims.map((claim, i) => (

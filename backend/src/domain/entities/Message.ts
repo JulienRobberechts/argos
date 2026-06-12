@@ -27,6 +27,7 @@ export interface KnowledgeCheckResult {
   score: number;
   claims: KnowledgeClaim[];
   warning?: string;
+  trainingAnswer?: string;
 }
 
 export interface Message {

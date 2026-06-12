@@ -6,6 +6,10 @@ import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { LLMPort } from "../domain/ports/LLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 import { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
+import {
+  buildCitationForcingInstruction,
+  parseCitationForcingResult,
+} from "./responseChecks/strategies/citationForcing";
 import { SearchKnowledge } from "./SearchKnowledge";
 
 const SLIDING_WINDOW_EXCHANGES = 4;
@@ -83,11 +87,19 @@ export class AskQuestion {
       return noInfoMessage;
     }
 
-    const prompt = this.buildPrompt(userContent, searchResults, history);
+    const strategies = params?.knowledgeCheckStrategies ?? [];
+    const useCitationForcing = strategies.includes("citation_forcing");
 
-    let assistantContent: string;
+    const prompt = this.buildPrompt(
+      userContent,
+      searchResults,
+      history,
+      useCitationForcing,
+    );
+
+    let rawContent: string;
     try {
-      assistantContent = await this.llmAdapter.stream(prompt, onToken, signal, {
+      rawContent = await this.llmAdapter.stream(prompt, onToken, signal, {
         model: params?.llmModel,
         temperature: params?.llmTemperature,
         maxTokens: params?.llmMaxTokens,
@@ -119,6 +131,18 @@ export class AskQuestion {
     const titleById = new Map(
       uniqueDocIds.map((id, i) => [id, docs[i]?.title ?? id]),
     );
+
+    let assistantContent = rawContent;
+    let inlineCitationResult;
+    if (useCitationForcing) {
+      const parsed = parseCitationForcingResult(
+        rawContent,
+        searchResults,
+        titleById,
+      );
+      assistantContent = parsed.cleanContent;
+      inlineCitationResult = parsed.result;
+    }
     const sourceTypeById = new Map(
       uniqueDocIds.map((id, i) => [id, docs[i]?.sourceType ?? "text"]),
     );
@@ -133,22 +157,27 @@ export class AskQuestion {
       score: result.score,
     }));
 
-    const strategies = params?.knowledgeCheckStrategies ?? [];
-    const knowledgeCheck =
-      this.knowledgeChecker && strategies.length > 0
+    const otherStrategies = strategies.filter((s) => s !== "citation_forcing");
+    const otherChecks =
+      this.knowledgeChecker && otherStrategies.length > 0
         ? await this.knowledgeChecker.run(
             userContent,
             assistantContent,
             searchResults,
-            strategies,
+            otherStrategies,
             titleById,
           )
-        : undefined;
+        : [];
+
+    const knowledgeCheck = [
+      ...(inlineCitationResult ? [inlineCitationResult] : []),
+      ...otherChecks,
+    ];
 
     this.logger.info("Knowledge check complete", {
       conversationId,
       strategies,
-      results: knowledgeCheck?.length ?? 0,
+      results: knowledgeCheck.length,
     });
 
     const assistantMessage: Message = {
@@ -157,7 +186,7 @@ export class AskQuestion {
       role: "assistant",
       content: assistantContent,
       sources,
-      knowledgeCheck,
+      knowledgeCheck: knowledgeCheck.length > 0 ? knowledgeCheck : undefined,
       createdAt: new Date(),
     };
     await this.conversationRepo.addMessage(conversationId, assistantMessage);
@@ -193,6 +222,7 @@ export class AskQuestion {
     question: string,
     searchResults: ChunkSearchResult[],
     allMessages: Message[],
+    useCitationForcing = false,
   ): string {
     const sourcesText = searchResults
       .map((r, i) => `SOURCE ${i + 1}:\n${r.chunk.content}`)
@@ -205,6 +235,7 @@ export class AskQuestion {
 
     const parts = [
       "You are a helpful assistant. Answer based only on the provided sources.",
+      ...(useCitationForcing ? [buildCitationForcingInstruction()] : []),
       "",
       "SOURCES:",
       sourcesText,
