@@ -77,46 +77,89 @@ function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
                   {result.warning}
                 </p>
               )}
-              {result.trainingAnswer && (
-                <div className="bg-gray-50 rounded px-2 py-1.5 text-gray-600">
-                  <span className="font-medium text-gray-500 text-[10px] uppercase tracking-wide">
-                    Training answer
-                  </span>
-                  <p className="mt-0.5">{result.trainingAnswer}</p>
-                </div>
-              )}
-              {result.claims.length > 0 && (
-                <ul className="space-y-1">
-                  {result.claims.map((claim, i) => (
-                    <li key={i} className="flex gap-2 text-gray-600">
+              {result.strategy === "counterfactual" ? (
+                <div className="space-y-2">
+                  {result.similar !== undefined && (
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-medium text-gray-500 uppercase tracking-wide">
+                        Answers similar:
+                      </span>
                       <span
-                        className={`mt-0.5 shrink-0 w-1.5 h-1.5 rounded-full ${
-                          claim.status === "SUPPORTED"
+                        className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold ${
+                          result.similar
+                            ? "bg-amber-100 text-amber-700"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {result.similar ? "yes" : "no"}
+                      </span>
+                    </div>
+                  )}
+                  {result.trainingAnswer && (
+                    <div className="bg-gray-50 rounded px-2 py-1.5 text-gray-600">
+                      <span className="font-medium text-gray-500 text-[10px] uppercase tracking-wide">
+                        Training-only answer
+                      </span>
+                      <p className="mt-0.5">{result.trainingAnswer}</p>
+                    </div>
+                  )}
+                  {result.claims.length > 0 && (
+                    <div className="flex gap-1.5 items-start text-gray-600">
+                      <span
+                        className={`mt-1 shrink-0 w-1.5 h-1.5 rounded-full ${
+                          result.claims[0].status === "SUPPORTED"
                             ? "bg-green-400"
                             : "bg-red-400"
                         }`}
                       />
-                      <span>
-                        {claim.claim}
-                        {claim.sourceExcerpt && (
-                          <span className="ml-1 text-gray-400 italic">
-                            — "{claim.sourceExcerpt.slice(0, 80)}…"
-                          </span>
-                        )}
-                        {claim.documentId && claim.documentTitle && (
-                          <a
-                            href={`http://localhost:5173/documents/${claim.documentId}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="ml-1.5 text-indigo-500 hover:text-indigo-700 underline underline-offset-2"
-                          >
-                            {claim.documentTitle}
-                          </a>
-                        )}
+                      <span>{result.claims[0].claim}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {result.trainingAnswer && (
+                    <div className="bg-gray-50 rounded px-2 py-1.5 text-gray-600">
+                      <span className="font-medium text-gray-500 text-[10px] uppercase tracking-wide">
+                        Training answer
                       </span>
-                    </li>
-                  ))}
-                </ul>
+                      <p className="mt-0.5">{result.trainingAnswer}</p>
+                    </div>
+                  )}
+                  {result.claims.length > 0 && (
+                    <ul className="space-y-1">
+                      {result.claims.map((claim, i) => (
+                        <li key={i} className="flex gap-2 text-gray-600">
+                          <span
+                            className={`mt-0.5 shrink-0 w-1.5 h-1.5 rounded-full ${
+                              claim.status === "SUPPORTED"
+                                ? "bg-green-400"
+                                : "bg-red-400"
+                            }`}
+                          />
+                          <span>
+                            {claim.claim}
+                            {claim.sourceExcerpt && (
+                              <span className="ml-1 text-gray-400 italic">
+                                — "{claim.sourceExcerpt.slice(0, 80)}…"
+                              </span>
+                            )}
+                            {claim.documentId && claim.documentTitle && (
+                              <a
+                                href={`http://localhost:5173/documents/${claim.documentId}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="ml-1.5 text-indigo-500 hover:text-indigo-700 underline underline-offset-2"
+                              >
+                                {claim.documentTitle}
+                              </a>
+                            )}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </>
               )}
             </div>
           ))}

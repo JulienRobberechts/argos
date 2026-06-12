@@ -20,8 +20,8 @@ export async function checkCounterfactual(
   const comparePrompt = [
     `Question: "${query}"`,
     "",
-    `Answer A (with retrieved documents): "${answerWithContext}"`,
-    `Answer B (training knowledge only): "${answerWithoutContext}"`,
+    `Answer with documents: "${answerWithContext}"`,
+    `Answer without documents: "${answerWithoutContext}"`,
     "",
     "Do these two answers convey essentially the same information?",
     'Reply ONLY with valid JSON: {"similar": true|false, "reasoning": "one sentence"}',
@@ -35,6 +35,7 @@ export async function checkCounterfactual(
   return {
     strategy: "counterfactual",
     score,
+    similar: parsed.similar,
     trainingAnswer: answerWithoutContext,
     claims: [
       {

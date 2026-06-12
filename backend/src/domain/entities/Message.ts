@@ -28,6 +28,7 @@ export interface KnowledgeCheckResult {
   claims: KnowledgeClaim[];
   warning?: string;
   trainingAnswer?: string;
+  similar?: boolean;
 }
 
 export interface Message {
