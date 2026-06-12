@@ -51,13 +51,11 @@ export default function ChatInterface() {
       ?.pendingMessage;
     if (!pending || !id || pendingSentRef.current) return;
     pendingSentRef.current = true;
+    navigate(location.pathname, { replace: true, state: {} });
     stream.send(pending, () => {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     });
-    return () => {
-      pendingSentRef.current = false;
-    };
   }, [id]);
 
   async function submitNew(content: string) {
