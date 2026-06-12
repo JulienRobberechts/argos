@@ -1,10 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
-import { Document, Page, pdfjs } from "react-pdf";
-import "react-pdf/dist/Page/AnnotationLayer.css";
-import "react-pdf/dist/Page/TextLayer.css";
 import { api } from "../../services/api";
 import {
   useDeleteDocument,
@@ -14,106 +11,15 @@ import {
 } from "../../hooks/useDocuments";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 import DocumentTypeIcon from "./DocumentTypeIcon";
-
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  "pdfjs-dist/build/pdf.worker.min.mjs",
-  import.meta.url,
-).toString();
+import PdfViewer from "./PdfViewer";
+import TextViewer from "./TextViewer";
+import MarkdownViewer from "./MarkdownViewer";
 
 const sourceTypeLabel: Record<string, string> = {
   pdf: "PDF",
   markdown: "Markdown",
   text: "Text",
 };
-
-function PdfViewer({ id }: { id: string }) {
-  const [numPages, setNumPages] = useState(0);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(800);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setWidth(entry.contentRect.width);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  const {
-    data: pdfData,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["documents", id, "raw"],
-    queryFn: () => api.getDocumentRaw(id),
-    gcTime: 0,
-    retry: false,
-  });
-
-  return (
-    <div
-      ref={containerRef}
-      className="h-full overflow-y-auto bg-gray-50 p-6 flex flex-col items-center"
-    >
-      {isLoading && <p className="text-sm text-gray-400 mt-8">Loading…</p>}
-      {isError && (
-        <p className="text-sm text-gray-500 mt-8">
-          The original file is no longer available.
-        </p>
-      )}
-      {pdfData && (
-        <Document
-          file={pdfData}
-          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-        >
-          {Array.from({ length: numPages }, (_, i) => (
-            <div key={i} className="mb-4 shadow-md">
-              <Page pageNumber={i + 1} width={Math.max(width - 48, 200)} />
-            </div>
-          ))}
-        </Document>
-      )}
-    </div>
-  );
-}
-
-function TextViewer({ id }: { id: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["documents", id, "content"],
-    queryFn: () => api.getDocumentContent(id),
-  });
-
-  return (
-    <div className="h-full overflow-y-auto bg-gray-50 p-8">
-      {isLoading && <p className="text-sm text-gray-400">Loading…</p>}
-      {data && (
-        <pre className="max-w-3xl mx-auto text-sm text-gray-800 font-mono whitespace-pre-wrap break-words leading-relaxed bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-          {data.content}
-        </pre>
-      )}
-    </div>
-  );
-}
-
-function MarkdownViewer({ id }: { id: string }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ["documents", id, "content"],
-    queryFn: () => api.getDocumentContent(id),
-  });
-
-  return (
-    <div className="h-full overflow-y-auto bg-gray-50 p-8">
-      {isLoading && <p className="text-sm text-gray-400">Loading…</p>}
-      {data && (
-        <div className="prose prose-sm max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
-          <ReactMarkdown>{data.content}</ReactMarkdown>
-        </div>
-      )}
-    </div>
-  );
-}
 
 function TrashIcon() {
   return (
@@ -132,6 +38,50 @@ function TrashIcon() {
       <path d="M10 11v6M14 11v6" />
       <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
     </svg>
+  );
+}
+
+function SummaryTab({ id }: { id: string }) {
+  const { data: summary, isLoading: summaryLoading } = useDocumentSummary(id);
+  const generateSummary = useGenerateDocumentSummary();
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden">
+      {summary && (
+        <div className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
+          <p className="text-xs text-gray-400">
+            {summary.content.length.toLocaleString()} characters
+          </p>
+          <button
+            onClick={() => generateSummary.mutate(id)}
+            disabled={generateSummary.isPending}
+            className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 transition-colors"
+          >
+            {generateSummary.isPending ? "Refreshing…" : "Refresh"}
+          </button>
+        </div>
+      )}
+      <div className="flex-1 overflow-y-auto bg-gray-50 p-8">
+        {summaryLoading && <p className="text-sm text-gray-400">Loading…</p>}
+        {!summaryLoading && !summary && (
+          <div className="flex flex-col items-center justify-center h-full gap-3">
+            <p className="text-sm text-gray-500">No summary yet.</p>
+            <button
+              onClick={() => generateSummary.mutate(id)}
+              disabled={generateSummary.isPending}
+              className="px-4 py-2 text-xs font-medium text-white bg-gray-900 rounded-md hover:bg-gray-700 disabled:opacity-50 transition-colors"
+            >
+              {generateSummary.isPending ? "Generating…" : "Generate summary"}
+            </button>
+          </div>
+        )}
+        {summary && (
+          <div className="prose prose-sm max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+            <ReactMarkdown>{summary.content}</ReactMarkdown>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -155,11 +105,6 @@ export default function DocumentDetail() {
   );
   const charCount = chunks?.reduce((sum, c) => sum + c.contentLength, 0);
   const chunkCount = chunks?.length;
-
-  const { data: summary, isLoading: summaryLoading } = useDocumentSummary(
-    tab === "summary" && doc?.status === "ready" ? id : undefined,
-  );
-  const generateSummary = useGenerateDocumentSummary();
 
   if (isLoading) {
     return (
@@ -189,7 +134,6 @@ export default function DocumentDetail() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="shrink-0 border-b border-gray-200 bg-white px-6 pt-5 pb-0">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-start gap-3 min-w-0">
@@ -210,7 +154,6 @@ export default function DocumentDetail() {
             </div>
           </div>
 
-          {/* Delete action */}
           {confirmDelete ? (
             <div className="flex items-center gap-2 shrink-0 ml-4">
               <span className="text-xs text-gray-500">Delete?</span>
@@ -239,38 +182,25 @@ export default function DocumentDetail() {
           )}
         </div>
 
-        {/* Tabs */}
         <div className="flex">
           {canPreview && (
             <button
               onClick={() => setTab("document")}
-              className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
-                tab === "document"
-                  ? "border-gray-900 text-gray-900"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
+              className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "document" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-700"}`}
             >
               Document
             </button>
           )}
           <button
             onClick={() => setTab("details")}
-            className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
-              tab === "details"
-                ? "border-gray-900 text-gray-900"
-                : "border-transparent text-gray-500 hover:text-gray-700"
-            }`}
+            className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "details" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-700"}`}
           >
             Details
           </button>
           {doc.status === "ready" && (
             <button
               onClick={() => setTab("summary")}
-              className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${
-                tab === "summary"
-                  ? "border-gray-900 text-gray-900"
-                  : "border-transparent text-gray-500 hover:text-gray-700"
-              }`}
+              className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "summary" ? "border-gray-900 text-gray-900" : "border-transparent text-gray-500 hover:text-gray-700"}`}
             >
               Summary
             </button>
@@ -278,7 +208,6 @@ export default function DocumentDetail() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="flex-1 overflow-hidden">
         {tab === "document" && canPreview && (
           <>
@@ -288,52 +217,10 @@ export default function DocumentDetail() {
           </>
         )}
 
-        {tab === "summary" && (
-          <div className="h-full flex flex-col overflow-hidden">
-            {summary && (
-              <div className="shrink-0 flex items-center justify-between px-6 py-3 border-b border-gray-100 bg-white">
-                <p className="text-xs text-gray-400">
-                  {summary.content.length.toLocaleString()} characters
-                </p>
-                <button
-                  onClick={() => generateSummary.mutate(id!)}
-                  disabled={generateSummary.isPending}
-                  className="px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 disabled:opacity-50 transition-colors"
-                >
-                  {generateSummary.isPending ? "Refreshing…" : "Refresh"}
-                </button>
-              </div>
-            )}
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-8">
-              {summaryLoading && (
-                <p className="text-sm text-gray-400">Loading…</p>
-              )}
-              {!summaryLoading && !summary && (
-                <div className="flex flex-col items-center justify-center h-full gap-3">
-                  <p className="text-sm text-gray-500">No summary yet.</p>
-                  <button
-                    onClick={() => generateSummary.mutate(id!)}
-                    disabled={generateSummary.isPending}
-                    className="px-4 py-2 text-xs font-medium text-white bg-gray-900 rounded-md hover:bg-gray-700 disabled:opacity-50 transition-colors"
-                  >
-                    {generateSummary.isPending
-                      ? "Generating…"
-                      : "Generate summary"}
-                  </button>
-                </div>
-              )}
-              {summary && (
-                <div className="prose prose-sm max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
-                  <ReactMarkdown>{summary.content}</ReactMarkdown>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        {tab === "summary" && <SummaryTab id={id!} />}
 
         {tab === "details" && (
           <div className="h-full overflow-y-auto p-6">
-            {/* Stats cards */}
             {doc.status === "ready" && (
               <div className="grid grid-cols-2 gap-3 mb-6">
                 <div className="bg-white border border-gray-200 rounded-lg p-4">
@@ -354,8 +241,6 @@ export default function DocumentDetail() {
                 </div>
               </div>
             )}
-
-            {/* Metadata */}
             <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
               <div className="px-4 py-2.5 border-b border-gray-100 bg-gray-50">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">

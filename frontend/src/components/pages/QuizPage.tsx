@@ -26,7 +26,6 @@ function SetupScreen({
   const { data: documents = [], isLoading } = useDocuments();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [count, setCount] = useState(5);
-
   const ready = documents.filter((d) => d.status === "ready");
 
   function toggleDoc(id: string) {
@@ -126,10 +125,7 @@ function QuizScreen({
   const question = questions[index];
   const isLast = index === questions.length - 1;
   const confirmed = selected !== null;
-
-  function confirm(optionIndex: number) {
-    setSelected(optionIndex);
-  }
+  const progress = ((index + 1) / questions.length) * 100;
 
   function next() {
     const newAnswers = [...answers, selected!];
@@ -142,8 +138,6 @@ function QuizScreen({
     }
   }
 
-  const progress = ((index + 1) / questions.length) * 100;
-
   return (
     <div className="max-w-xl space-y-5">
       <div className="flex items-center justify-between text-sm text-gray-500">
@@ -151,39 +145,33 @@ function QuizScreen({
           Question {index + 1} / {questions.length}
         </span>
       </div>
-
       <div className="w-full bg-gray-100 rounded-full h-1.5">
         <div
           className="bg-blue-500 h-1.5 rounded-full transition-all"
           style={{ width: `${progress}%` }}
         />
       </div>
-
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 space-y-4">
         <p className="text-gray-800 font-medium leading-snug">
           {question.text}
         </p>
-
         <div className="space-y-2">
           {question.options.map((option, i) => {
             let style =
               "border border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50";
             if (confirmed) {
-              if (i === question.correctIndex) {
+              if (i === question.correctIndex)
                 style = "border border-green-400 bg-green-50 text-green-800";
-              } else if (i === selected) {
+              else if (i === selected)
                 style = "border border-red-400 bg-red-50 text-red-700";
-              } else {
-                style = "border border-gray-100 text-gray-400";
-              }
+              else style = "border border-gray-100 text-gray-400";
             } else if (i === selected) {
               style = "border border-blue-500 bg-blue-50 text-blue-700";
             }
-
             return (
               <button
                 key={i}
-                onClick={() => !confirmed && confirm(i)}
+                onClick={() => !confirmed && setSelected(i)}
                 disabled={confirmed}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-colors flex items-center gap-3 ${style}`}
               >
@@ -207,7 +195,6 @@ function QuizScreen({
             );
           })}
         </div>
-
         {confirmed && (
           <button
             onClick={next}
@@ -234,9 +221,7 @@ function ResultsScreen({
   const correct = answers.filter(
     (a, i) => a === questions[i].correctIndex,
   ).length;
-  const total = questions.length;
-  const pct = Math.round((correct / total) * 100);
-
+  const pct = Math.round((correct / questions.length) * 100);
   const color =
     pct >= 80
       ? "text-green-600"
@@ -251,7 +236,7 @@ function ResultsScreen({
         <div>
           <p className={`text-4xl font-bold ${color}`}>{pct}%</p>
           <p className="text-sm text-gray-500 mt-1">
-            {correct} correct out of {total}
+            {correct} correct out of {questions.length}
           </p>
         </div>
         <button
@@ -262,7 +247,6 @@ function ResultsScreen({
           New quiz
         </button>
       </div>
-
       <div className="space-y-3">
         {questions.map((q, i) => {
           const isCorrect = answers[i] === q.correctIndex;
@@ -322,21 +306,6 @@ export default function QuizPage() {
     },
   });
 
-  function handleStart(documentIds: string[], count: number) {
-    generate({ documentIds, count });
-  }
-
-  function handleFinish(userAnswers: number[]) {
-    setAnswers(userAnswers);
-    setPhase("results");
-  }
-
-  function handleRestart() {
-    setPhase("setup");
-    setQuestions([]);
-    setAnswers([]);
-  }
-
   return (
     <div className="p-8 space-y-6">
       <PageHeader
@@ -344,7 +313,6 @@ export default function QuizPage() {
         title="Quiz"
         info="Generate multiple-choice questions from your documents to test your knowledge."
       />
-
       {isPending ? (
         <div className="flex items-center gap-3 text-gray-500">
           <Loader2 size={20} className="animate-spin" />
@@ -355,17 +323,31 @@ export default function QuizPage() {
           <p className="text-sm text-red-500">
             {error instanceof Error ? error.message : "Generation failed"}
           </p>
-          <SetupScreen onStart={handleStart} />
+          <SetupScreen
+            onStart={(ids, count) => generate({ documentIds: ids, count })}
+          />
         </div>
       ) : phase === "setup" ? (
-        <SetupScreen onStart={handleStart} />
+        <SetupScreen
+          onStart={(ids, count) => generate({ documentIds: ids, count })}
+        />
       ) : phase === "quiz" ? (
-        <QuizScreen questions={questions} onFinish={handleFinish} />
+        <QuizScreen
+          questions={questions}
+          onFinish={(a) => {
+            setAnswers(a);
+            setPhase("results");
+          }}
+        />
       ) : (
         <ResultsScreen
           questions={questions}
           answers={answers}
-          onRestart={handleRestart}
+          onRestart={() => {
+            setPhase("setup");
+            setQuestions([]);
+            setAnswers([]);
+          }}
         />
       )}
     </div>
