@@ -55,14 +55,16 @@ export default function DashboardPage() {
           <div>
             <h1
               style={{
-                fontFamily: "'Montserrat', sans-serif",
-                fontWeight: 600,
+                fontFamily: "'Audiowide', sans-serif",
+                fontWeight: 400,
                 fontSize: "2.75rem",
-                letterSpacing: "0.18em",
+                letterSpacing: "0.15em",
                 background:
-                  "linear-gradient(90deg, var(--argos-bright) 0%, var(--argos-glow) 50%, #fff 100%)",
+                  "linear-gradient(90deg, #22d3ee 0%, #38bdf8 50%, #fff 100%)",
                 WebkitBackgroundClip: "text",
+                backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
+                color: "transparent",
               }}
             >
               ARGOS

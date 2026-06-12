@@ -19,6 +19,7 @@ import RerankingPage from "./components/pages/RerankingPage";
 import LLMModelsPage from "./components/pages/LLMModelsPage";
 import KnowledgeCheckPage from "./components/pages/KnowledgeCheckPage";
 import HybridSearchPage from "./components/pages/HybridSearchPage";
+import FontPreviewPage from "./components/pages/FontPreviewPage";
 import { useConversations } from "./hooks/useConversation";
 import { MessageSquare } from "lucide-react";
 import PageHeader from "./components/ui/PageHeader";
@@ -84,6 +85,7 @@ export default function App() {
               element={<KnowledgeCheckPage />}
             />
             <Route path="settings" element={<SettingsPage />} />
+            <Route path="font-preview" element={<FontPreviewPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
