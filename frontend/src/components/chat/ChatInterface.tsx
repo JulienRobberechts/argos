@@ -9,7 +9,7 @@ import { useSSEStream } from "../../hooks/useSSEStream";
 import { useConfig } from "../../hooks/useConfig";
 import MessageList from "./MessageList";
 import { useState, useRef, useEffect } from "react";
-import { ArrowUp, Pencil, Settings2 } from "lucide-react";
+import { ArrowUp, Pencil, Settings2, X } from "lucide-react";
 import type {
   ConversationParams,
   KnowledgeCheckStrategy,
@@ -144,15 +144,7 @@ const LLM_MODELS = [
   { value: "claude-opus-4-5-20251101", label: "Claude Opus 4.5 (legacy)" },
 ];
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mt-1 mb-0.5">
-      {children}
-    </p>
-  );
-}
-
-function Row({
+function Field({
   label,
   children,
 }: {
@@ -160,9 +152,11 @@ function Row({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <span className="text-xs text-gray-500 shrink-0">{label}</span>
-      {children}
+    <div className="flex items-center justify-between gap-3 min-h-[28px]">
+      <span className="text-xs text-gray-500 leading-tight shrink-0">
+        {label}
+      </span>
+      <div className="shrink-0">{children}</div>
     </div>
   );
 }
@@ -182,7 +176,7 @@ function Toggle({
       onClick={() => !disabled && onChange(!checked)}
       className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors ${
         checked ? "bg-indigo-500" : "bg-gray-200"
-      } ${disabled ? "opacity-50 cursor-default" : ""}`}
+      } ${disabled ? "opacity-50 cursor-default" : "cursor-pointer"}`}
     >
       <span
         className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
@@ -197,219 +191,255 @@ function ParamsPanel({
   params,
   onChange,
   readOnly = false,
+  onClose,
 }: {
   params: Partial<ConversationParams>;
   onChange?: (p: Partial<ConversationParams>) => void;
   readOnly?: boolean;
+  onClose?: () => void;
 }) {
-  const fieldClass = readOnly
-    ? "w-20 text-xs text-right border border-gray-100 rounded-md px-2 py-1 bg-gray-50 text-gray-400 cursor-default"
-    : "w-20 text-xs text-right border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 bg-gray-50";
+  const inputClass = readOnly
+    ? "w-16 text-xs text-right border border-gray-100 rounded-md px-2 py-1 bg-gray-50 text-gray-400 cursor-default"
+    : "w-16 text-xs text-right border border-gray-200 rounded-md px-2 py-1 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100 bg-white text-gray-700";
+
+  const selectClass = `text-xs border rounded-md px-2 py-1 max-w-[140px] outline-none ${
+    readOnly
+      ? "bg-gray-50 border-gray-100 text-gray-400 cursor-default"
+      : "bg-white border-gray-200 text-gray-700 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100"
+  }`;
 
   return (
-    <div
-      className={`bg-white border rounded-xl px-5 py-4 flex flex-col gap-2.5 w-full max-w-2xl shadow-sm ${readOnly ? "border-gray-100" : "border-gray-200"}`}
-    >
-      <div className="flex items-center gap-2">
-        <p className="text-xs font-semibold text-gray-700">Parameters</p>
-        {readOnly && (
-          <span className="text-[10px] text-gray-400 border border-gray-200 rounded px-1.5 py-0.5 leading-none">
-            read-only
-          </span>
+    <div className="flex flex-col h-full bg-white">
+      <div className="flex items-start justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+        <div>
+          <p className="text-sm font-semibold text-gray-800">Settings</p>
+          {readOnly ? (
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              Read-only · active conversation
+            </p>
+          ) : (
+            <p className="text-[11px] text-gray-400 mt-0.5">
+              Applied to the next conversation
+            </p>
+          )}
+        </div>
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-1 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors mt-0.5"
+          >
+            <X className="w-4 h-4" />
+          </button>
         )}
       </div>
-      <div className="h-px bg-gray-100" />
 
-      <SectionLabel>Retrieval</SectionLabel>
-      <Row label="Results limit">
-        <input
-          type="number"
-          value={params.retrievalLimit ?? 5}
-          min={1}
-          max={20}
-          readOnly={readOnly}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) =>
-                  onChange?.({
-                    ...params,
-                    retrievalLimit: parseFloat(e.target.value),
-                  })
-          }
-          className={fieldClass}
-        />
-      </Row>
-      <Row label="Min similarity score">
-        <input
-          type="number"
-          value={params.retrievalMinScore ?? 0.5}
-          min={0}
-          max={1}
-          step={0.05}
-          readOnly={readOnly}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) =>
-                  onChange?.({
-                    ...params,
-                    retrievalMinScore: parseFloat(e.target.value),
-                  })
-          }
-          className={fieldClass}
-        />
-      </Row>
-      <Row label="Reranking">
-        <Toggle
-          checked={params.rerankEnabled ?? false}
-          onChange={
-            readOnly
-              ? () => {}
-              : (v) => onChange?.({ ...params, rerankEnabled: v })
-          }
-          disabled={readOnly}
-        />
-      </Row>
-      {params.rerankEnabled && (
-        <Row label="Rerank model">
-          <select
-            value={params.rerankModel ?? RERANK_MODELS[0].value}
-            disabled={readOnly}
-            onChange={
-              readOnly
-                ? undefined
-                : (e) => onChange?.({ ...params, rerankModel: e.target.value })
-            }
-            className={`text-xs border rounded-md px-2 py-1 outline-none bg-gray-50 text-gray-700 ${readOnly ? "border-gray-100 text-gray-400 cursor-default" : "border-gray-200 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100"}`}
-          >
-            {RERANK_MODELS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
-              </option>
-            ))}
-          </select>
-        </Row>
-      )}
-      {params.rerankEnabled && (
-        <Row label="Rerank candidate multiplier">
-          <input
-            type="number"
-            value={params.rerankCandidateMultiplier ?? 3}
-            min={1}
-            max={10}
-            readOnly={readOnly}
-            onChange={
-              readOnly
-                ? undefined
-                : (e) =>
-                    onChange?.({
-                      ...params,
-                      rerankCandidateMultiplier: parseFloat(e.target.value),
-                    })
-            }
-            className={fieldClass}
-          />
-        </Row>
-      )}
-
-      <div className="h-px bg-gray-100" />
-      <SectionLabel>Generation</SectionLabel>
-      <Row label="Model">
-        <select
-          value={params.llmModel ?? LLM_MODELS[0].value}
-          disabled={readOnly}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) => onChange?.({ ...params, llmModel: e.target.value })
-          }
-          className={`text-xs border rounded-md px-2 py-1 outline-none bg-gray-50 text-gray-700 ${readOnly ? "border-gray-100 text-gray-400 cursor-default" : "border-gray-200 focus:border-indigo-400 focus:ring-1 focus:ring-indigo-100"}`}
-        >
-          {LLM_MODELS.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
-      </Row>
-      <Row label="Temperature">
-        <input
-          type="number"
-          value={params.llmTemperature ?? 0.2}
-          min={0}
-          max={1}
-          step={0.05}
-          readOnly={readOnly}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) =>
-                  onChange?.({
-                    ...params,
-                    llmTemperature: parseFloat(e.target.value),
-                  })
-          }
-          className={fieldClass}
-        />
-      </Row>
-      <Row label="Max tokens">
-        <input
-          type="number"
-          value={params.llmMaxTokens ?? 1024}
-          min={64}
-          max={8192}
-          readOnly={readOnly}
-          onChange={
-            readOnly
-              ? undefined
-              : (e) =>
-                  onChange?.({
-                    ...params,
-                    llmMaxTokens: parseFloat(e.target.value),
-                  })
-          }
-          className={fieldClass}
-        />
-      </Row>
-
-      <div className="h-px bg-gray-100" />
-      <SectionLabel>Knowledge Check</SectionLabel>
-      {(
-        [
-          "faithfulness",
-          "counterfactual",
-          "citation_forcing",
-        ] as KnowledgeCheckStrategy[]
-      ).map((strategy) => {
-        const active = (params.knowledgeCheckStrategies ?? []).includes(
-          strategy,
-        );
-        const label =
-          strategy === "faithfulness"
-            ? "Faithfulness (RAGAS)"
-            : strategy === "counterfactual"
-              ? "Counterfactual"
-              : "Citation forcing";
-        return (
-          <Row key={strategy} label={label}>
+      <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-5">
+        <section className="flex flex-col gap-2.5">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
+            Retrieval
+          </p>
+          <Field label="Results limit">
+            <input
+              type="number"
+              value={params.retrievalLimit ?? 5}
+              min={1}
+              max={20}
+              readOnly={readOnly}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (e) =>
+                      onChange?.({
+                        ...params,
+                        retrievalLimit: parseFloat(e.target.value),
+                      })
+              }
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Min similarity score">
+            <input
+              type="number"
+              value={params.retrievalMinScore ?? 0.5}
+              min={0}
+              max={1}
+              step={0.05}
+              readOnly={readOnly}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (e) =>
+                      onChange?.({
+                        ...params,
+                        retrievalMinScore: parseFloat(e.target.value),
+                      })
+              }
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Reranking">
             <Toggle
-              checked={active}
-              onChange={(v) => {
-                if (readOnly) return;
-                const current = params.knowledgeCheckStrategies ?? [];
-                onChange?.({
-                  ...params,
-                  knowledgeCheckStrategies: v
-                    ? [...current, strategy]
-                    : current.filter((s) => s !== strategy),
-                });
-              }}
+              checked={params.rerankEnabled ?? false}
+              onChange={
+                readOnly
+                  ? () => {}
+                  : (v) => onChange?.({ ...params, rerankEnabled: v })
+              }
               disabled={readOnly}
             />
-          </Row>
-        );
-      })}
+          </Field>
+          {params.rerankEnabled && (
+            <Field label="Rerank model">
+              <select
+                value={params.rerankModel ?? RERANK_MODELS[0].value}
+                disabled={readOnly}
+                onChange={
+                  readOnly
+                    ? undefined
+                    : (e) =>
+                        onChange?.({ ...params, rerankModel: e.target.value })
+                }
+                className={selectClass}
+              >
+                {RERANK_MODELS.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+          )}
+          {params.rerankEnabled && (
+            <Field label="Candidate multiplier">
+              <input
+                type="number"
+                value={params.rerankCandidateMultiplier ?? 3}
+                min={1}
+                max={10}
+                readOnly={readOnly}
+                onChange={
+                  readOnly
+                    ? undefined
+                    : (e) =>
+                        onChange?.({
+                          ...params,
+                          rerankCandidateMultiplier: parseFloat(e.target.value),
+                        })
+                }
+                className={inputClass}
+              />
+            </Field>
+          )}
+        </section>
+
+        <div className="h-px bg-gray-100" />
+
+        <section className="flex flex-col gap-2.5">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
+            Generation
+          </p>
+          <Field label="Model">
+            <select
+              value={params.llmModel ?? LLM_MODELS[0].value}
+              disabled={readOnly}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (e) => onChange?.({ ...params, llmModel: e.target.value })
+              }
+              className={selectClass}
+            >
+              {LLM_MODELS.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Temperature">
+            <input
+              type="number"
+              value={params.llmTemperature ?? 0.2}
+              min={0}
+              max={1}
+              step={0.05}
+              readOnly={readOnly}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (e) =>
+                      onChange?.({
+                        ...params,
+                        llmTemperature: parseFloat(e.target.value),
+                      })
+              }
+              className={inputClass}
+            />
+          </Field>
+          <Field label="Max tokens">
+            <input
+              type="number"
+              value={params.llmMaxTokens ?? 1024}
+              min={64}
+              max={8192}
+              readOnly={readOnly}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (e) =>
+                      onChange?.({
+                        ...params,
+                        llmMaxTokens: parseFloat(e.target.value),
+                      })
+              }
+              className={inputClass}
+            />
+          </Field>
+        </section>
+
+        <div className="h-px bg-gray-100" />
+
+        <section className="flex flex-col gap-2.5">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-0.5">
+            Knowledge check
+          </p>
+          {(
+            [
+              "faithfulness",
+              "counterfactual",
+              "citation_forcing",
+            ] as KnowledgeCheckStrategy[]
+          ).map((strategy) => {
+            const active = (params.knowledgeCheckStrategies ?? []).includes(
+              strategy,
+            );
+            const label =
+              strategy === "faithfulness"
+                ? "Faithfulness (RAGAS)"
+                : strategy === "counterfactual"
+                  ? "Counterfactual"
+                  : "Citation forcing";
+            return (
+              <Field key={strategy} label={label}>
+                <Toggle
+                  checked={active}
+                  onChange={(v) => {
+                    if (readOnly) return;
+                    const current = params.knowledgeCheckStrategies ?? [];
+                    onChange?.({
+                      ...params,
+                      knowledgeCheckStrategies: v
+                        ? [...current, strategy]
+                        : current.filter((s) => s !== strategy),
+                    });
+                  }}
+                  disabled={readOnly}
+                />
+              </Field>
+            );
+          })}
+        </section>
+      </div>
     </div>
   );
 }
@@ -479,52 +509,54 @@ export default function ChatInterface() {
     });
   }
 
-  const isEmpty =
-    !id ||
-    (!!conversation &&
-      conversation.messages.length === 0 &&
-      !stream.isStreaming);
-
-  useEffect(() => {
-    if (!isEmpty) setShowParams(false);
-  }, [isEmpty]);
-
-  const emptyState = (disabled: boolean) => (
-    <div className="flex-1 flex flex-col items-center justify-center px-4 gap-4">
-      <p className="text-gray-400 text-sm">
-        Ask anything about your knowledge base
-      </p>
-      <div className="w-full max-w-2xl flex flex-col gap-3">
-        <div className="flex justify-end">
-          <button
-            onClick={() => setShowParams((v) => !v)}
-            className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-colors ${
-              showParams
-                ? "border-indigo-300 bg-indigo-50 text-indigo-600"
-                : "border-gray-200 bg-white text-gray-400 hover:text-gray-600"
-            }`}
-          >
-            <Settings2 className="w-3.5 h-3.5" />
-            Parameters
-          </button>
-        </div>
-        {showParams && (
-          <ParamsPanel params={pendingParams} onChange={setPendingParams} />
-        )}
-        <InputForm
-          input={input}
-          setInput={setInput}
-          onSubmit={submit}
-          disabled={disabled}
-        />
-      </div>
-    </div>
+  const settingsButton = (
+    <button
+      onClick={() => setShowParams((v) => !v)}
+      title={showParams ? "Hide settings" : "Show settings"}
+      className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${
+        showParams
+          ? "border-indigo-300 bg-indigo-50 text-indigo-600"
+          : "border-gray-200 bg-white text-gray-500 hover:text-gray-700 hover:border-gray-300"
+      }`}
+    >
+      <Settings2 className="w-3.5 h-3.5" />
+      Settings
+    </button>
   );
 
   if (!id) {
     return (
-      <div className="flex flex-col h-screen bg-gray-50">
-        {emptyState(createConversation.isPending)}
+      <div className="flex h-screen bg-gray-50">
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="border-b border-gray-200 bg-white px-6 py-3 shrink-0 flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-400">
+              New conversation
+            </span>
+            {settingsButton}
+          </div>
+          <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
+            <p className="text-gray-400 text-sm">
+              Ask anything about your knowledge base
+            </p>
+            <div className="w-full max-w-2xl">
+              <InputForm
+                input={input}
+                setInput={setInput}
+                onSubmit={submit}
+                disabled={createConversation.isPending}
+              />
+            </div>
+          </div>
+        </div>
+        {showParams && (
+          <aside className="w-72 border-l border-gray-200 shrink-0 flex flex-col">
+            <ParamsPanel
+              params={pendingParams}
+              onChange={setPendingParams}
+              onClose={() => setShowParams(false)}
+            />
+          </aside>
+        )}
       </div>
     );
   }
@@ -545,52 +577,66 @@ export default function ChatInterface() {
     );
   }
 
+  const isEmpty = conversation.messages.length === 0 && !stream.isStreaming;
+
   return (
     <div className="flex flex-col h-screen bg-gray-50">
-      <div className="border-b border-gray-200 bg-white px-6 py-3 shrink-0 flex items-center">
+      <div className="border-b border-gray-200 bg-white px-6 py-3 shrink-0 flex items-center justify-between">
         <EditableTitle id={conversation.id} title={conversation.title} />
+        {settingsButton}
       </div>
-      {isEmpty ? (
-        emptyState(stream.isStreaming)
-      ) : (
-        <>
-          <div className="flex-1 overflow-y-auto">
-            <MessageList
-              messages={conversation.messages}
-              streamingText={stream.isStreaming ? stream.text : undefined}
-              streamingSources={stream.sources}
-              streamingKnowledgeCheck={stream.knowledgeCheck}
-              isStreaming={stream.isStreaming}
-            />
-          </div>
-          <div className="border-t border-gray-200 bg-white px-4 py-3">
-            <div className="max-w-3xl mx-auto flex flex-col gap-2">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setShowParams((v) => !v)}
-                  className={`flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-colors ${
-                    showParams
-                      ? "border-indigo-300 bg-indigo-50 text-indigo-600"
-                      : "border-gray-200 bg-white text-gray-400 hover:text-gray-600"
-                  }`}
-                >
-                  <Settings2 className="w-3.5 h-3.5" />
-                  Parameters
-                </button>
+
+      <div className="flex flex-1 overflow-hidden">
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          {isEmpty ? (
+            <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
+              <p className="text-gray-400 text-sm">
+                Ask anything about your knowledge base
+              </p>
+              <div className="w-full max-w-2xl">
+                <InputForm
+                  input={input}
+                  setInput={setInput}
+                  onSubmit={submit}
+                  disabled={stream.isStreaming}
+                />
               </div>
-              {showParams && (
-                <ParamsPanel params={conversation.params} readOnly />
-              )}
-              <InputForm
-                input={input}
-                setInput={setInput}
-                onSubmit={submit}
-                disabled={stream.isStreaming}
-              />
             </div>
-          </div>
-        </>
-      )}
+          ) : (
+            <>
+              <div className="flex-1 overflow-y-auto">
+                <MessageList
+                  messages={conversation.messages}
+                  streamingText={stream.isStreaming ? stream.text : undefined}
+                  streamingSources={stream.sources}
+                  streamingKnowledgeCheck={stream.knowledgeCheck}
+                  isStreaming={stream.isStreaming}
+                />
+              </div>
+              <div className="border-t border-gray-200 bg-white px-4 py-3 shrink-0">
+                <div className="max-w-3xl mx-auto">
+                  <InputForm
+                    input={input}
+                    setInput={setInput}
+                    onSubmit={submit}
+                    disabled={stream.isStreaming}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </main>
+
+        {showParams && (
+          <aside className="w-72 border-l border-gray-200 shrink-0 flex flex-col overflow-hidden">
+            <ParamsPanel
+              params={conversation.params}
+              readOnly
+              onClose={() => setShowParams(false)}
+            />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
