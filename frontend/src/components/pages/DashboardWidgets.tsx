@@ -13,21 +13,25 @@ export function StatCard({
   value,
   icon,
   color,
+  border = "border-slate-200",
   sub,
 }: {
   label: string;
   value: string | number;
   icon: React.ReactNode;
   color: string;
+  border?: string;
   sub?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 flex items-center gap-4">
+    <div
+      className={`bg-white rounded-xl border ${border} shadow-sm p-5 flex items-center gap-4`}
+    >
       <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
       <div>
-        <p className="text-2xl font-bold text-gray-800">{value}</p>
-        <p className="text-sm text-gray-500">{label}</p>
-        {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+        <p className="text-2xl font-bold text-slate-900">{value}</p>
+        <p className="text-sm text-slate-600">{label}</p>
+        {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
       </div>
     </div>
   );
@@ -127,13 +131,13 @@ export function RecentDocuments({ documents }: { documents: Document[] }) {
       {recent.map((doc) => (
         <div
           key={doc.id}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sky-50 transition-colors"
         >
           {statusIcon[doc.status]}
-          <span className="flex-1 text-sm text-gray-700 truncate">
+          <span className="flex-1 text-sm text-slate-700 truncate">
             {doc.title}
           </span>
-          <span className="text-xs bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono">
+          <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">
             {typeLabel[doc.sourceType] ?? doc.sourceType}
           </span>
         </div>
@@ -162,13 +166,13 @@ export function RecentConversations({
           <Link
             key={conv.id}
             to={`/conversations/${conv.id}`}
-            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-blue-50 transition-colors group"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-sky-50 transition-colors group"
           >
-            <MessageSquare size={14} className="text-blue-400 shrink-0" />
-            <span className="flex-1 text-sm text-gray-700 truncate group-hover:text-blue-700">
+            <MessageSquare size={14} className="text-cyan-500 shrink-0" />
+            <span className="flex-1 text-sm text-slate-700 truncate group-hover:text-sky-700">
               {conv.title}
             </span>
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-slate-400">
               {msgCount} msg{msgCount > 1 ? "s" : ""}
             </span>
           </Link>
@@ -200,18 +204,21 @@ export function RagConfigCard({
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         {items.map(({ label, value }) => (
-          <div key={label} className="bg-gray-50 rounded-lg px-3 py-2">
-            <p className="text-xs text-gray-400">{label}</p>
-            <p className="text-sm font-semibold text-gray-700">{value}</p>
+          <div
+            key={label}
+            className="bg-sky-50 border border-sky-100 rounded-lg px-3 py-2"
+          >
+            <p className="text-xs text-slate-500">{label}</p>
+            <p className="text-sm font-semibold text-slate-800">{value}</p>
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-2 bg-sky-50 border border-sky-100 rounded-lg">
         <span
-          className={`inline-block w-2 h-2 rounded-full ${config.reranking.enabled ? "bg-green-400" : "bg-gray-300"}`}
+          className={`inline-block w-2 h-2 rounded-full ${config.reranking.enabled ? "bg-sky-400" : "bg-slate-300"}`}
         />
-        <span className="text-xs text-gray-400">Reranking</span>
-        <span className="text-sm font-semibold text-gray-700 ml-auto">
+        <span className="text-xs text-slate-500">Reranking</span>
+        <span className="text-sm font-semibold text-slate-800 ml-auto">
           {config.reranking.enabled ? "active" : "disabled"}
         </span>
       </div>

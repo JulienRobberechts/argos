@@ -9,7 +9,6 @@ import {
 import { useConfig } from "../../hooks/useConfig";
 
 const navItems = [
-  { to: "/", icon: null, label: "Argos" },
   { to: "/documents", icon: FileText, label: "Documents" },
   { to: "/conversations", icon: MessageSquare, label: "Conversations" },
   { to: "/quiz", icon: SquareCheck, label: "Quiz" },
@@ -21,7 +20,28 @@ export default function IconNav() {
   const { data: config } = useConfig();
 
   return (
-    <nav className="flex flex-col items-center py-4 gap-1 w-14 shrink-0 bg-slate-900 h-full">
+    <nav
+      className="flex flex-col items-center py-3 gap-1 w-14 shrink-0 h-full"
+      style={{ background: "var(--argos-navy)" }}
+    >
+      {/* Logo / home link */}
+      <NavLink to="/" end title="Argos — Dashboard" className="mb-2 shrink-0">
+        {({ isActive }) => (
+          <img
+            src="/logo-argos.jpg"
+            alt="Argos"
+            className={`w-9 h-9 rounded-lg object-cover transition-all ${
+              isActive
+                ? "ring-2 ring-cyan-400 shadow-lg"
+                : "opacity-80 hover:opacity-100"
+            }`}
+            style={
+              isActive ? { boxShadow: "0 0 12px rgba(34,211,238,0.4)" } : {}
+            }
+          />
+        )}
+      </NavLink>
+
       {navItems.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
@@ -31,18 +51,12 @@ export default function IconNav() {
           className={({ isActive }) =>
             `flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
               isActive
-                ? "bg-blue-600 text-white"
+                ? "bg-sky-500 text-white"
                 : "text-slate-400 hover:bg-slate-700 hover:text-white"
             }`
           }
         >
-          {Icon ? (
-            <Icon size={20} />
-          ) : (
-            <span className="text-[10px] font-bold tracking-widest">
-              {label}
-            </span>
-          )}
+          <Icon size={20} />
         </NavLink>
       ))}
       <div className="mt-auto flex flex-col items-center gap-0.5 pb-1">

@@ -37,7 +37,7 @@ export default function Sidebar() {
       />
       <button
         onClick={() => navigate("/conversations/new")}
-        className="w-full mb-4 px-3 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700"
+        className="w-full mb-4 px-3 py-2 bg-sky-500 text-white rounded-md text-sm font-medium hover:bg-sky-600"
       >
         + New conversation
       </button>
@@ -47,8 +47,8 @@ export default function Sidebar() {
             key={conv.id}
             className={`group flex items-center justify-between px-3 py-2 rounded-md text-sm ${
               activeId === conv.id
-                ? "bg-blue-100 text-blue-800 font-medium"
-                : "text-gray-700 hover:bg-gray-100"
+                ? "bg-sky-50 text-sky-800 font-medium border border-sky-200"
+                : "text-slate-700 hover:bg-slate-50"
             }`}
           >
             <Link

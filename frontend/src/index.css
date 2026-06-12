@@ -1,6 +1,15 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+:root {
+  --argos-navy:   #0c1a2e;
+  --argos-deep:   #0d2d5e;
+  --argos-cyan:   #0ea5e9;
+  --argos-bright: #22d3ee;
+  --argos-glow:   #38bdf8;
+  --argos-tint:   #f0f9ff;
+}
+
 .streaming-cursor > :last-child::after {
   content: '▌';
   animation: blink 1s step-end infinite;

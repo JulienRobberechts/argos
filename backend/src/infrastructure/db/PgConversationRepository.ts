@@ -27,6 +27,7 @@ function toParams(raw: unknown): ConversationParams {
     knowledgeCheckStrategies: Array.isArray(p.knowledgeCheckStrategies)
       ? p.knowledgeCheckStrategies
       : config.rag.knowledgeCheckStrategies,
+    searchMode: p.searchMode ?? config.rag.searchMode,
   };
 }
 

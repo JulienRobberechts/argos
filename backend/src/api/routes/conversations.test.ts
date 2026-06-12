@@ -17,6 +17,7 @@ const DEFAULT_PARAMS = {
   llmTemperature: 0.1,
   llmMaxTokens: 1024,
   knowledgeCheckStrategies: [],
+  searchMode: "hybrid" as const,
 };
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {

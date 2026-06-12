@@ -24,6 +24,7 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
       llmTemperature: 0.1,
       llmMaxTokens: 1024,
       knowledgeCheckStrategies: [],
+      searchMode: "hybrid" as const,
     },
     ...overrides,
   };
