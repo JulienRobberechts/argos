@@ -60,7 +60,7 @@ export default function DashboardPage() {
                 fontSize: "2.75rem",
                 letterSpacing: "0.15em",
                 background:
-                  "linear-gradient(90deg, #22d3ee 0%, #38bdf8 50%, #fff 100%)",
+                  "linear-gradient(90deg, #b45309 0%, #f59e0b 40%, #fef08a 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -69,11 +69,22 @@ export default function DashboardPage() {
             >
               ARGOS
             </h1>
-            <p className="mt-1 text-sky-300 text-sm font-medium tracking-wide">
+            <p
+              className="mt-1 text-sm font-medium tracking-wide"
+              style={{
+                background:
+                  "linear-gradient(90deg, #b45309 0%, #f59e0b 40%, #fef08a 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                color: "transparent",
+              }}
+            >
               Knowledge Intelligence Platform
             </p>
-            <p className="mt-2 text-slate-400 text-xs max-w-md">
-              demo of Indexed documents, RAG pipeline and conversations.
+            <p className="mt-2 text-xs max-w-md italic text-slate-400">
+              Turn your documents into an intelligent, conversational knowledge
+              base.
             </p>
           </div>
         </div>
