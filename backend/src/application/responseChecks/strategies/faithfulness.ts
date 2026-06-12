@@ -5,6 +5,9 @@ import {
   KnowledgeCheckResult,
 } from "../../../domain/entities/Message";
 import { extractJSON } from "./extractJSON";
+import { Logger } from "../../../infrastructure/logger/Logger";
+
+const logger = new Logger("faithfulness");
 
 export async function checkFaithfulness(
   llm: LLMPort,
@@ -27,7 +30,32 @@ export async function checkFaithfulness(
     '{"claims": [{"claim": "...", "status": "SUPPORTED|UNSUPPORTED", "sourceExcerpt": "exact quote or null"}]}',
   ].join("\n");
 
-  const raw = await llm.stream(prompt, () => {});
+  logger.info("Faithfulness check starting", {
+    query,
+    answerLength: answer.length,
+    chunkCount: chunks.length,
+    promptLength: prompt.length,
+  });
+
+  const raw = await llm.stream(prompt, () => {}, undefined, {
+    maxTokens: 4096,
+  });
+
+  logger.info("Faithfulness raw LLM response", {
+    responseLength: raw.length,
+    endsWithBrace: raw.trimEnd().endsWith("}"),
+    tail: raw.slice(-200),
+  });
+
+  if (!raw.trimEnd().endsWith("}")) {
+    logger.warn(
+      "Faithfulness response appears truncated (does not end with '}')",
+      {
+        last50chars: JSON.stringify(raw.slice(-50)),
+      },
+    );
+  }
+
   const parsed = extractJSON(raw) as {
     claims: Array<{
       claim: string;
