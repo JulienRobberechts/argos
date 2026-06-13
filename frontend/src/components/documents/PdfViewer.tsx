@@ -39,11 +39,11 @@ export default function PdfViewer({ id }: { id: string }) {
   return (
     <div
       ref={containerRef}
-      className="h-full overflow-y-auto bg-gray-50 p-6 flex flex-col items-center"
+      className="h-full overflow-y-auto bg-slate-50 p-6 flex flex-col items-center"
     >
-      {isLoading && <p className="text-sm text-gray-400 mt-8">Loading…</p>}
+      {isLoading && <p className="text-sm text-slate-400 mt-8">Loading…</p>}
       {isError && (
-        <p className="text-sm text-gray-500 mt-8">
+        <p className="text-sm text-slate-500 mt-8">
           The original file is no longer available.
         </p>
       )}

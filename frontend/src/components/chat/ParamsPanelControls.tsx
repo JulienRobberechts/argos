@@ -50,7 +50,7 @@ export function Field({
         <div className="shrink-0">{children}</div>
       </div>
       {open && info && (
-        <div className="mt-1.5 text-[11px] text-gray-600 bg-amber-50 border-l-2 border-[#d97706] rounded-r-md pl-2.5 pr-2 py-1.5 leading-relaxed">
+        <div className="mt-1.5 text-[11px] text-slate-600 bg-amber-50 border-l-2 border-[#d97706] rounded-r-md pl-2.5 pr-2 py-1.5 leading-relaxed">
           {info}
           {techLink && (
             <Link

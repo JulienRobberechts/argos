@@ -1,0 +1,114 @@
+[
+  {
+    "id": "oe-01",
+    "dataset": "orient-express",
+    "difficulty": "easy",
+    "question": "Qui a fondé la Compagnie Internationale des Wagons-Lits et en quelle année ?",
+    "expected_answer": "La Compagnie Internationale des Wagons-Lits a été fondée par Georges Nagelmackers, ingénieur liégeois, en 1876. Il avait publié en 1870 un projet de wagons-lits inspiré de son voyage aux États-Unis.",
+    "document_ids": ["Orient-Express/orient-express.md"]
+  },
+  {
+    "id": "oe-02",
+    "dataset": "orient-express",
+    "difficulty": "easy",
+    "question": "En quelle année l'Orient-Express a-t-il effectué son premier voyage et quelle était la liaison assurée ?",
+    "expected_answer": "L'Orient-Express a été lancé en 1883. Il reliait Paris à Constantinople (aujourd'hui Istanbul), en traversant Strasbourg, Stuttgart, Munich, Vienne, Budapest et Bucarest.",
+    "document_ids": ["Orient-Express/orient-express.md", "Orient-Express/orient-express.questions.md"]
+  },
+  {
+    "id": "oe-03",
+    "dataset": "orient-express",
+    "difficulty": "medium",
+    "question": "Quels artistes-décorateurs ont travaillé sur les voitures de l'Orient-Express dans les années 1920 ?",
+    "expected_answer": "Dans les années 1920, sous la direction de lord Davison Dalziel, les voitures-salons Pullman ont été décorées par René Prou (1887–1947) et René Lalique (1860–1945). Des affiches Art Déco ont également été réalisées par Cassandre.",
+    "document_ids": ["Orient-Express/orient-express.md", "Orient-Express/René Prou.md", "Orient-Express/René Jules Lalique.md"]
+  },
+  {
+    "id": "oe-04",
+    "dataset": "orient-express",
+    "difficulty": "medium",
+    "question": "Qui a lancé le Venice Simplon Orient-Express, en quelle année, et quel groupe en est propriétaire aujourd'hui ?",
+    "expected_answer": "Le Venice Simplon Orient-Express a été lancé en 1982 par l'Américain James Sherwood, patron de la Sea Containers. Il a été racheté par le groupe hôtelier Belmond, lui-même acquis par LVMH fin 2018.",
+    "document_ids": ["Orient-Express/orient-express.md", "Orient-Express/Venise-Simplon-Orient-Express.md"]
+  },
+  {
+    "id": "oe-05",
+    "dataset": "orient-express",
+    "difficulty": "hard",
+    "question": "Quel accord a été conclu entre la SNCF et Belmond concernant la marque Orient-Express ?",
+    "expected_answer": "La SNCF, propriétaire de la marque Orient-Express, a récupéré les droits d'utilisation dans le domaine de l'hôtellerie (tous les hôtels Orient-Express ont été renommés Belmond en 2014). En échange, la SNCF a accordé à Belmond une prolongation de 75 ans de la licence ferroviaire permettant d'exploiter le nom Venice Simplon Orient-Express. La SNCF s'est ensuite alliée au groupe Accor en 2017 pour lancer l'Orient Express La Dolce Vita.",
+    "document_ids": ["Orient-Express/orient-express.md", "Orient-Express/marque-orient-express.md"]
+  },
+  {
+    "id": "oe-06",
+    "dataset": "orient-express",
+    "difficulty": "medium",
+    "question": "Pourquoi le service Direct-Orient-Express a-t-il cessé en 1977 ?",
+    "expected_answer": "Le service Direct-Orient-Express a cessé en 1977 principalement en raison de la concurrence de l'aviation de masse. Le train était devenu très lent (à peine 55 km/h de vitesse commerciale), subissait des retards dus à la traversée du rideau de fer en Yougoslavie, et avait perdu son label de train de luxe dès 1948.",
+    "document_ids": ["Orient-Express/orient-express.md", "Orient-Express/orient-express.questions.md"]
+  },
+  {
+    "id": "vs-01",
+    "dataset": "val-en-selve",
+    "difficulty": "easy",
+    "question": "Quelle est la population de Val-en-Selve et dans quel type de territoire se trouve-t-elle ?",
+    "expected_answer": "Val-en-Selve compte 42 500 habitants. La ville est située dans une zone de moyenne montagne ou piémont, construite dans une reculée karstique unique en forme de fer à cheval, bordée de falaises de calcaire de 120 mètres de haut.",
+    "document_ids": ["ville-Val-en-Selve/presentation.md"]
+  },
+  {
+    "id": "vs-02",
+    "dataset": "val-en-selve",
+    "difficulty": "medium",
+    "question": "Qu'est-ce que le Grand Effondrement de 1911 à Val-en-Selve et quelles en ont été les conséquences urbanistiques ?",
+    "expected_answer": "Le 14 novembre 1911, à 4h00 du matin, une section entière du quartier des tanneries et des verriers s'est effondrée dans les Catacombes Blanches, créant un cratère de 80 mètres de large et causant 142 victimes. À la suite de ce drame, un décret a interdit à jamais la construction de bâtiments de plus de deux étages au fond de la combe, forçant la ville à s'étendre vers le haut (les Corniches).",
+    "document_ids": ["ville-Val-en-Selve/histoire.md", "ville-Val-en-Selve/presentation.md"]
+  },
+  {
+    "id": "vs-03",
+    "dataset": "val-en-selve",
+    "difficulty": "easy",
+    "question": "Qui est Marc Leneindre et quel est son rôle au conseil municipal de Val-en-Selve ?",
+    "expected_answer": "Marc Leneindre est un réparateur de vélos de 34 ans, désigné par tirage au sort comme 1er Adjoint au Maire de Val-en-Selve pour un mandat non-renouvelable de 2 ans. Il est chargé de la démocratie participative, conformément au système du Pacte des Deux-Versants qui intègre des citoyens tirés au sort dans la gouvernance.",
+    "document_ids": ["ville-Val-en-Selve/elus.md", "ville-Val-en-Selve/presentation.md"]
+  },
+  {
+    "id": "vs-04",
+    "dataset": "val-en-selve",
+    "difficulty": "hard",
+    "question": "Comment fonctionne le Passe-Nuage et quelles gratuités spéciales prévoit-il ?",
+    "expected_answer": "Le Passe-Nuage est une carte de transport connectée aux capteurs météo de Val-en-Selve. Il prévoit deux gratuités spéciales : premièrement, dès que l'Institut de l'Air Pur déclare un épisode d'inversion thermique, l'intégralité du réseau (funiculaires, navettes, ascenseurs) devient 100 % gratuite pour inciter les habitants du Bas-Selve à monter respirer sur les Corniches ; deuxièmement, les personnes de plus de 65 ans résidant dans les zones peu ensoleillées bénéficient de la gratuité totale sur le Funiculaire Bleu.",
+    "document_ids": ["ville-Val-en-Selve/transport.md"]
+  },
+  {
+    "id": "vs-05",
+    "dataset": "val-en-selve",
+    "difficulty": "medium",
+    "question": "Quelle mesure de santé publique unique a mis en place la régie municipale des eaux de Val-en-Selve pour compenser le manque de soleil hivernal ?",
+    "expected_answer": "Entre novembre et février, la régie municipale des eaux enrichit légèrement l'eau potable en vitamine D3, une mesure approuvée par décret spécial pour compenser le faible ensoleillement des habitants du Bas-Selve en hiver. Les enfants du Bas-Selve bénéficient par ailleurs de deux semaines de cure gratuite à l'Institut de l'Air Pur pendant les mois de forte inversion (janvier et février).",
+    "document_ids": ["ville-Val-en-Selve/sante-publique.md"]
+  },
+  {
+    "id": "vs-06",
+    "dataset": "val-en-selve",
+    "difficulty": "hard",
+    "question": "Comment fonctionne la collecte des déchets dans le centre historique de Val-en-Selve et pourquoi ce système a-t-il été mis en place ?",
+    "expected_answer": "Le centre historique est équipé d'un réseau pneumatique de collecte sous vide : les habitants déposent leurs sacs dans des bornes de rue, aspirés à 70 km/h à travers des tubes souterrains jusqu'à une usine de tri située 2 kilomètres hors de la reculée. Ce système évite la circulation de camions-poubelles dans les rues étroites du centre historique et protège les voûtes des cavités souterraines fragiles.",
+    "document_ids": ["ville-Val-en-Selve/gestion-dechets.md"]
+  },
+  {
+    "id": "cross-01",
+    "dataset": "orient-express",
+    "difficulty": "hard",
+    "question": "Quelle est la composition actuelle du Venice Simplon Orient-Express en termes de voitures et à quelle époque datent-elles ?",
+    "expected_answer": "La rame est composée de 18 voitures bleu et or, dont 17 pour les passagers : des voitures-lits, voitures-restaurants et voitures-salons Pullman des années 1920, originellement construites pour la Compagnie Internationale des Wagons-Lits. Parmi elles, des voitures décorées par René Prou, René Lalique (la voiture-restaurant Pullman 4141 « Côte d'Azur »), Morrison et Nelson. Plusieurs ont été rénovées pour accueillir des Grand-Suites entre 2017 et 2025.",
+    "document_ids": ["Orient-Express/Venise-Simplon-Orient-Express.md", "Orient-Express/orient-express.md"]
+  },
+  {
+    "id": "cross-02",
+    "dataset": "val-en-selve",
+    "difficulty": "medium",
+    "question": "Pourquoi Val-en-Selve interdit-elle les camions de plus de 3,5 tonnes dans son centre-ville, et comment les livraisons sont-elles organisées ?",
+    "expected_answer": "Les camions lourds sont interdits car le sol du centre-ville repose sur d'anciennes galeries de mine fragiles (les Catacombes Blanches). Le critère d'accès n'est pas les émissions de CO2 mais le poids par essieu. Les marchandises sont transbordées aux Portes de l'Est et de l'Ouest dans des micro-cargos électriques municipaux qui n'endommagent pas les voûtes souterraines.",
+    "document_ids": ["ville-Val-en-Selve/transport.md", "ville-Val-en-Selve/histoire.md"]
+  }
+]

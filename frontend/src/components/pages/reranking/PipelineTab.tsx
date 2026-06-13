@@ -4,22 +4,22 @@ import SectionTitle from "../../ui/SectionTitle";
 import CodeBlock from "../../ui/CodeBlock";
 import Callout from "../../ui/Callout";
 
-type FlowBoxColor = "purple" | "blue" | "green" | "gray";
+type FlowBoxColor = "amber" | "yellow" | "green" | "slate";
 
 function FlowBox({
   label,
   sub,
-  color = "purple",
+  color = "amber",
 }: {
   label: string;
   sub?: string;
   color?: FlowBoxColor;
 }) {
   const colors: Record<FlowBoxColor, string> = {
-    purple: "bg-purple-50 border-purple-200 text-purple-900",
-    blue: "bg-blue-50 border-blue-200 text-blue-900",
+    amber: "bg-amber-50 border-amber-200 text-amber-900",
+    yellow: "bg-yellow-50 border-yellow-200 text-yellow-900",
     green: "bg-green-50 border-green-200 text-green-900",
-    gray: "bg-gray-50 border-gray-200 text-gray-600",
+    slate: "bg-slate-50 border-slate-200 text-slate-600",
   };
   return (
     <div className={`border rounded-lg px-4 py-3 text-center ${colors[color]}`}>
@@ -31,7 +31,7 @@ function FlowBox({
 
 function Arrow() {
   return (
-    <div className="flex items-center justify-center text-gray-400 py-1">
+    <div className="flex items-center justify-center text-slate-400 py-1">
       <ArrowRight size={16} />
     </div>
   );
@@ -51,19 +51,19 @@ export default function PipelineTab() {
           <FlowBox
             label="User question"
             sub="'Quand a commencé l'Orient-Express ?'"
-            color="blue"
+            color="yellow"
           />
           <Arrow />
           <FlowBox
             label="Stage 1 — Vector search"
             sub={`embed(question, "query") → cosine search → top ${String(3 * 8)} candidates (3× limit)`}
-            color="purple"
+            color="amber"
           />
           <Arrow />
           <FlowBox
             label="Stage 2 — Cross-encoder re-ranking"
             sub="Voyage rerank-2.5: score each (question, chunk) pair together"
-            color="purple"
+            color="amber"
           />
           <Arrow />
           <FlowBox
@@ -73,25 +73,25 @@ export default function PipelineTab() {
           />
         </div>
 
-        <p className="text-sm font-medium text-gray-800 mb-2">
+        <p className="text-sm font-medium text-slate-800 mb-2">
           Why 3× candidates?
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed mb-4">
+        <p className="text-sm text-slate-600 leading-relaxed mb-4">
           Because vector search may rank the right chunks at positions 9–15
           (just outside the final limit), the first stage fetches{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             limit × candidateMultiplier
           </code>{" "}
           candidates (default: 8 × 3 = 24). The re-ranker then sees a wider pool
           and can promote the best chunks to the top-8.
         </p>
-        <p className="text-sm font-medium text-gray-800 mb-2">
+        <p className="text-sm font-medium text-slate-800 mb-2">
           Score threshold during stage 1
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed">
+        <p className="text-sm text-slate-600 leading-relaxed">
           When re-ranking is enabled, the first stage uses a more permissive
           cosine threshold:{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             minScore × 0.5
           </code>
           . This casts a wider net so that relevant chunks with lower cosine
@@ -106,9 +106,9 @@ export default function PipelineTab() {
           title="Voyage rerank-2.5 API"
           subtitle="The cross-encoder used in this project"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           This project uses Voyage AI's{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             rerank-2.5
           </code>{" "}
           model — the same provider as the embeddings, which ensures the
@@ -116,7 +116,7 @@ export default function PipelineTab() {
           documents, and returns relevance scores.
         </p>
 
-        <p className="text-sm font-medium text-gray-800 mb-2">API request</p>
+        <p className="text-sm font-medium text-slate-800 mb-2">API request</p>
         <CodeBlock
           code={`POST https://api.voyageai.com/v1/rerank
 Authorization: Bearer <VOYAGE_API_KEY>
@@ -133,7 +133,7 @@ Authorization: Bearer <VOYAGE_API_KEY>
 }`}
         />
 
-        <p className="text-sm font-medium text-gray-800 mt-4 mb-2">
+        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
           API response
         </p>
         <CodeBlock
@@ -148,13 +148,13 @@ Authorization: Bearer <VOYAGE_API_KEY>
         />
 
         <div className="mt-4 space-y-3">
-          <p className="text-sm text-gray-600 leading-relaxed">
+          <p className="text-sm text-slate-600 leading-relaxed">
             The adapter sorts results by{" "}
-            <code className="bg-gray-100 px-1 rounded">relevance_score</code>{" "}
+            <code className="bg-slate-100 px-1 rounded">relevance_score</code>{" "}
             descending and returns the list of{" "}
-            <code className="bg-gray-100 px-1 rounded">index</code> values. Each
-            index maps back to the original candidate array, so the final chunks
-            preserve their full content and metadata.
+            <code className="bg-slate-100 px-1 rounded">index</code> values.
+            Each index maps back to the original candidate array, so the final
+            chunks preserve their full content and metadata.
           </p>
           <Callout type="tip">
             The <code>relevance_score</code> from a cross-encoder is not

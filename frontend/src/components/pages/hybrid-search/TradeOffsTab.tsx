@@ -35,12 +35,12 @@ export default function TradeOffsTab() {
               why: "Opaque strings with no semantic content — vector is useless, BM25 is exact.",
             },
           ].map(({ type, example, why }) => (
-            <div key={type} className="border border-gray-100 rounded-lg p-3">
-              <p className="text-xs font-semibold text-gray-700">{type}</p>
-              <p className="text-xs text-purple-700 mt-0.5 font-mono">
+            <div key={type} className="border border-slate-100 rounded-lg p-3">
+              <p className="text-xs font-semibold text-slate-700">{type}</p>
+              <p className="text-xs text-amber-700 mt-0.5 font-mono">
                 {example}
               </p>
-              <p className="text-xs text-gray-500 mt-1">{why}</p>
+              <p className="text-xs text-slate-500 mt-1">{why}</p>
             </div>
           ))}
         </div>
@@ -71,10 +71,10 @@ export default function TradeOffsTab() {
               why: "No single term dominates. Vector captures the full conceptual field.",
             },
           ].map(({ type, example, why }) => (
-            <div key={type} className="border border-gray-100 rounded-lg p-3">
-              <p className="text-xs font-semibold text-gray-700">{type}</p>
-              <p className="text-xs text-purple-700 mt-0.5 italic">{example}</p>
-              <p className="text-xs text-gray-500 mt-1">{why}</p>
+            <div key={type} className="border border-slate-100 rounded-lg p-3">
+              <p className="text-xs font-semibold text-slate-700">{type}</p>
+              <p className="text-xs text-amber-700 mt-0.5 italic">{example}</p>
+              <p className="text-xs text-slate-500 mt-1">{why}</p>
             </div>
           ))}
         </div>
@@ -94,43 +94,43 @@ export default function TradeOffsTab() {
         <div className="overflow-x-auto mb-4">
           <table className="w-full text-xs text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="py-2 pr-4 font-semibold text-gray-600">Mode</th>
-                <th className="py-2 pr-4 font-semibold text-gray-600">
+              <tr className="border-b border-slate-200">
+                <th className="py-2 pr-4 font-semibold text-slate-600">Mode</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">
                   DB queries
                 </th>
-                <th className="py-2 pr-4 font-semibold text-gray-600">
+                <th className="py-2 pr-4 font-semibold text-slate-600">
                   Typical overhead
                 </th>
-                <th className="py-2 font-semibold text-gray-600">Notes</th>
+                <th className="py-2 font-semibold text-slate-600">Notes</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100">
               <tr>
-                <td className="py-2 pr-4 text-gray-700">vector</td>
-                <td className="py-2 pr-4 text-gray-700">1</td>
-                <td className="py-2 pr-4 text-gray-700">baseline</td>
-                <td className="py-2 text-gray-500">HNSW index only</td>
+                <td className="py-2 pr-4 text-slate-700">vector</td>
+                <td className="py-2 pr-4 text-slate-700">1</td>
+                <td className="py-2 pr-4 text-slate-700">baseline</td>
+                <td className="py-2 text-slate-500">HNSW index only</td>
               </tr>
               <tr>
-                <td className="py-2 pr-4 text-gray-700">hybrid</td>
-                <td className="py-2 pr-4 text-gray-700">2 (parallel)</td>
-                <td className="py-2 pr-4 text-gray-700">+10–30 ms</td>
-                <td className="py-2 text-gray-500">
+                <td className="py-2 pr-4 text-slate-700">hybrid</td>
+                <td className="py-2 pr-4 text-slate-700">2 (parallel)</td>
+                <td className="py-2 pr-4 text-slate-700">+10–30 ms</td>
+                <td className="py-2 text-slate-500">
                   GIN index + in-memory RRF
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-sm text-slate-700 leading-relaxed mb-3">
           The two queries run via <code>Promise.all</code>, so the total DB time
           is <code>max(vector_query, text_query)</code> rather than their sum.
           The GIN index on <code>ts_content</code> keeps the full-text pass
           comparable to the HNSW pass for typical corpus sizes (&lt; 1 M
           chunks).
         </p>
-        <p className="text-sm text-gray-700 leading-relaxed">
+        <p className="text-sm text-slate-700 leading-relaxed">
           The in-memory RRF fusion is O(n) where n = 2 × candidateLimit — at
           limit=8 and candidateMultiplier=3, that's merging at most 48 rows.
           Negligible.

@@ -15,7 +15,7 @@ export default function TradeOffsTab() {
           <p className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-2">
             Re-ranking helps most when…
           </p>
-          <ul className="text-xs text-gray-600 space-y-1.5">
+          <ul className="text-xs text-slate-600 space-y-1.5">
             <li className="flex gap-2">
               <CheckCircle
                 size={12}
@@ -50,7 +50,7 @@ export default function TradeOffsTab() {
           <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
             Re-ranking adds less value when…
           </p>
-          <ul className="text-xs text-gray-600 space-y-1.5">
+          <ul className="text-xs text-slate-600 space-y-1.5">
             <li className="flex gap-2">
               <AlertTriangle
                 size={12}

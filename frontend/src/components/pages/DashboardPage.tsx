@@ -186,7 +186,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <MessageSquare size={16} className="text-cyan-500" />
+                <MessageSquare size={16} className="text-amber-500" />
                 <h2 className="font-semibold text-slate-800 text-sm">
                   Recent conversations
                 </h2>

@@ -14,14 +14,14 @@ export default function ConfigTab() {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gray-200">
-              <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+            <tr className="border-b border-slate-200">
+              <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Env var
               </th>
-              <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Default
               </th>
-              <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <th className="text-left py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                 Effect
               </th>
             </tr>

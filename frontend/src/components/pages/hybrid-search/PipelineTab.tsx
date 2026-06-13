@@ -47,21 +47,21 @@ export default function PipelineTab() {
           title="Reciprocal Rank Fusion (RRF)"
           subtitle="The formula that makes rank fusion work"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           RRF was introduced by Cormack, Clarke & Buettcher (SIGIR 2009). The
           idea: replace raw scores with their reciprocal rank, then sum across
           sources. A chunk that ranks 1st in both lists scores much higher than
           a chunk that is 1st in one and absent from the other.
         </p>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-4 font-mono text-sm text-center">
-          <p className="text-gray-800">
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4 font-mono text-sm text-center">
+          <p className="text-slate-800">
             RRF(chunk) = 1 / (k + rank_vector) + 1 / (k + rank_bm25)
           </p>
-          <p className="text-xs text-gray-500 mt-1">k = 60 (constant)</p>
+          <p className="text-xs text-slate-500 mt-1">k = 60 (constant)</p>
         </div>
 
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-sm text-slate-700 leading-relaxed mb-3">
           The constant <strong>k = 60</strong> is the original paper's
           recommendation. It prevents a rank-1 result from dominating when the
           other source gives it a very low rank: 1/(60+1) ≈ 0.016 whereas
@@ -98,52 +98,52 @@ for (const row of textResult.rows) {
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="py-2 pr-4 font-semibold text-gray-600">Chunk</th>
-                <th className="py-2 pr-4 font-semibold text-gray-600">
+              <tr className="border-b border-slate-200">
+                <th className="py-2 pr-4 font-semibold text-slate-600">Chunk</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">
                   Vector rank
                 </th>
-                <th className="py-2 pr-4 font-semibold text-gray-600">
+                <th className="py-2 pr-4 font-semibold text-slate-600">
                   BM25 rank
                 </th>
-                <th className="py-2 pr-4 font-semibold text-gray-600">
+                <th className="py-2 pr-4 font-semibold text-slate-600">
                   RRF score
                 </th>
-                <th className="py-2 font-semibold text-gray-600">Why</th>
+                <th className="py-2 font-semibold text-slate-600">Why</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-slate-100">
               <tr>
-                <td className="py-2 pr-4 text-gray-800">A</td>
-                <td className="py-2 pr-4 text-gray-700">1</td>
-                <td className="py-2 pr-4 text-gray-700">1</td>
+                <td className="py-2 pr-4 text-slate-800">A</td>
+                <td className="py-2 pr-4 text-slate-700">1</td>
+                <td className="py-2 pr-4 text-slate-700">1</td>
                 <td className="py-2 pr-4 font-semibold text-green-700">
                   0.0323
                 </td>
-                <td className="py-2 text-gray-500">Top of both lists</td>
+                <td className="py-2 text-slate-500">Top of both lists</td>
               </tr>
               <tr>
-                <td className="py-2 pr-4 text-gray-800">B</td>
-                <td className="py-2 pr-4 text-gray-700">2</td>
-                <td className="py-2 pr-4 text-gray-500">—</td>
-                <td className="py-2 pr-4 text-gray-700">0.0161</td>
-                <td className="py-2 text-gray-500">Vector only</td>
+                <td className="py-2 pr-4 text-slate-800">B</td>
+                <td className="py-2 pr-4 text-slate-700">2</td>
+                <td className="py-2 pr-4 text-slate-500">—</td>
+                <td className="py-2 pr-4 text-slate-700">0.0161</td>
+                <td className="py-2 text-slate-500">Vector only</td>
               </tr>
               <tr>
-                <td className="py-2 pr-4 text-gray-800">C</td>
-                <td className="py-2 pr-4 text-gray-500">—</td>
-                <td className="py-2 pr-4 text-gray-700">2</td>
-                <td className="py-2 pr-4 text-gray-700">0.0161</td>
-                <td className="py-2 text-gray-500">
+                <td className="py-2 pr-4 text-slate-800">C</td>
+                <td className="py-2 pr-4 text-slate-500">—</td>
+                <td className="py-2 pr-4 text-slate-700">2</td>
+                <td className="py-2 pr-4 text-slate-700">0.0161</td>
+                <td className="py-2 text-slate-500">
                   BM25 only — exact token match
                 </td>
               </tr>
               <tr>
-                <td className="py-2 pr-4 text-gray-800">D</td>
-                <td className="py-2 pr-4 text-gray-700">3</td>
-                <td className="py-2 pr-4 text-gray-700">5</td>
-                <td className="py-2 pr-4 text-gray-700">0.0153</td>
-                <td className="py-2 text-gray-500">Moderate in both</td>
+                <td className="py-2 pr-4 text-slate-800">D</td>
+                <td className="py-2 pr-4 text-slate-700">3</td>
+                <td className="py-2 pr-4 text-slate-700">5</td>
+                <td className="py-2 pr-4 text-slate-700">0.0153</td>
+                <td className="py-2 text-slate-500">Moderate in both</td>
               </tr>
             </tbody>
           </table>

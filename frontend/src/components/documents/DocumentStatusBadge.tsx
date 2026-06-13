@@ -4,7 +4,7 @@ const statusConfig: Record<
   DocumentStatus,
   { label: string; className: string }
 > = {
-  pending: { label: "Pending", className: "bg-gray-100 text-gray-600" },
+  pending: { label: "Pending", className: "bg-slate-100 text-slate-600" },
   processing: {
     label: "Processing",
     className: "bg-yellow-100 text-yellow-700",

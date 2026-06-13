@@ -13,7 +13,7 @@ export default function ImplementationTab() {
           title="Database schema"
           subtitle="Migration 005_hybrid_search.sql"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           The migration adds a <code>tsvector</code> column to the{" "}
           <code>chunks</code> table and keeps it in sync automatically via a
           PostgreSQL trigger.
@@ -45,7 +45,7 @@ CREATE TRIGGER chunks_ts_content_update
 CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
   ON chunks USING GIN(ts_content);`}
         />
-        <p className="text-sm text-gray-600 mt-3 leading-relaxed">
+        <p className="text-sm text-slate-600 mt-3 leading-relaxed">
           The <code>'simple'</code> text search configuration tokenises by
           whitespace and lowercases — no stemming, no stop-word removal. This
           preserves acronyms and proper nouns exactly as they appear.
@@ -125,10 +125,10 @@ CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
           title="searchMode per conversation"
           subtitle="Config default + per-conversation override"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           The mode is resolved in two layers:
         </p>
-        <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700 mb-4">
+        <ol className="list-decimal list-inside space-y-2 text-sm text-slate-700 mb-4">
           <li>
             <strong>Global default</strong> — <code>SEARCH_MODE</code>{" "}
             environment variable (defaults to <code>"hybrid"</code>), read at

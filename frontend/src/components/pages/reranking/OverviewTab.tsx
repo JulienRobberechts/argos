@@ -13,7 +13,7 @@ export default function OverviewTab() {
           title="The problem with vector search alone"
           subtitle="Why a score of 0.92 can still be the wrong chunk"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           Vector search computes the cosine similarity between a{" "}
           <strong>question vector</strong> and each{" "}
           <strong>chunk vector</strong>. Both vectors are produced independently
@@ -26,13 +26,13 @@ export default function OverviewTab() {
           <p className="text-sm font-semibold text-amber-900 mb-2">
             Concrete example from this project
           </p>
-          <p className="text-sm text-gray-700 leading-relaxed">
+          <p className="text-sm text-slate-700 leading-relaxed">
             Query:{" "}
-            <em className="text-purple-800">
+            <em className="text-amber-800">
               "Quand a commencé l'Orient-Express ?"
             </em>
           </p>
-          <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+          <p className="text-sm text-slate-600 mt-2 leading-relaxed">
             The top-ranked chunk contains only a bibliography reference
             (Sherwood, 1984) — score <strong>0.39</strong>. The chunk that
             actually says <em>"lancé en 1883"</em> ranks lower because the
@@ -42,10 +42,10 @@ export default function OverviewTab() {
           </p>
         </div>
 
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-sm text-slate-700 leading-relaxed mb-3">
           This mismatch happens because:
         </p>
-        <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+        <ul className="list-disc list-inside space-y-1 text-sm text-slate-600">
           <li>
             A <strong>question</strong> and its <strong>answer</strong> have
             different linguistic structures — they don't look alike in embedding
@@ -69,7 +69,7 @@ export default function OverviewTab() {
           title="The solution: cross-encoder re-ranking"
           subtitle="Seeing the question and the chunk together"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           A <strong>cross-encoder</strong> is a model that takes the{" "}
           <em>concatenation</em> of the question and a chunk as input, and
           outputs a single relevance score. Because it reads both texts
@@ -78,8 +78,8 @@ export default function OverviewTab() {
         </p>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <div className="border border-slate-200 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Bi-encoder (vector search)
             </p>
             <CodeBlock
@@ -91,8 +91,8 @@ score = cosine(q_vec, c_vec)
 # seen together`}
             />
           </div>
-          <div className="border border-purple-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">
+          <div className="border border-amber-200 rounded-lg p-4">
+            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
               Cross-encoder (re-ranker)
             </p>
             <CodeBlock

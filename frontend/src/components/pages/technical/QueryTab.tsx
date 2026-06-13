@@ -40,7 +40,7 @@ export default function QueryTab() {
           isLast
         />
 
-        <p className="text-sm font-medium text-gray-800 mt-2 mb-2">
+        <p className="text-sm font-medium text-slate-800 mt-2 mb-2">
           Prompt structure
         </p>
         <CodeBlock
@@ -78,17 +78,17 @@ User: <current question>`}
           title="The Language Model — Claude Haiku"
           subtitle="Generating the final answer"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-4">
+        <p className="text-sm text-slate-700 leading-relaxed mb-4">
           This project uses <strong>Claude Haiku 4.5</strong> (Anthropic) as its
           LLM. Haiku is fast and cost-efficient, well-suited for answering
           questions from a pre-filtered context.
         </p>
         <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <div className="border border-slate-200 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Streaming (SSE)
             </p>
-            <p className="text-xs text-gray-600 leading-relaxed">
+            <p className="text-xs text-slate-600 leading-relaxed">
               The Anthropic SDK streams tokens back one by one. Each token is
               pushed immediately to the browser via{" "}
               <strong>Server-Sent Events</strong> (SSE), so the user sees the
@@ -96,26 +96,26 @@ User: <current question>`}
               completion.
             </p>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <div className="border border-slate-200 rounded-lg p-4">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
               Abort / cancellation
             </p>
-            <p className="text-xs text-gray-600 leading-relaxed">
-              An <code className="bg-gray-100 px-1 rounded">AbortSignal</code>{" "}
+            <p className="text-xs text-slate-600 leading-relaxed">
+              An <code className="bg-slate-100 px-1 rounded">AbortSignal</code>{" "}
               is passed all the way from the HTTP request to the Anthropic
               stream. If the user navigates away, the stream is cancelled
               immediately — no wasted tokens.
             </p>
           </div>
         </div>
-        <p className="text-sm font-medium text-gray-800 mb-2">
+        <p className="text-sm font-medium text-slate-800 mb-2">
           Auto-generated conversation title
         </p>
-        <p className="text-sm text-gray-600 leading-relaxed">
+        <p className="text-sm text-slate-600 leading-relaxed">
           After the first exchange in a conversation, the LLM is called a second
           time with a short meta-prompt asking it to summarise the exchange in 5
           words. This title is stored in the{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             conversations
           </code>{" "}
           table and shown in the sidebar.

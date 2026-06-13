@@ -17,24 +17,24 @@ function FaithfulnessCard() {
       <div className="mb-3">
         <StrategyBadge label="faithfulness" color="teal" />
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed mb-4">
+      <p className="text-sm text-slate-700 leading-relaxed mb-4">
         A second LLM call (the <em>judge</em>) receives the original question,
         the retrieved chunks, and the generated answer. It extracts every
         factual claim from the answer and checks whether each claim is
         explicitly stated in the sources.
       </p>
-      <div className="bg-teal-50 border border-teal-200 rounded-lg p-4 mb-4">
-        <p className="text-xs font-semibold text-teal-800 uppercase tracking-wide mb-2">
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+        <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
           Score formula
         </p>
-        <p className="text-sm font-mono text-teal-900">
+        <p className="text-sm font-mono text-amber-900">
           score = supported_claims / total_claims
         </p>
-        <p className="text-xs text-teal-700 mt-1">
+        <p className="text-xs text-amber-700 mt-1">
           score = 1.0 → fully grounded · score = 0 → fully from training data
         </p>
       </div>
-      <p className="text-sm font-medium text-gray-800 mb-2">Judge prompt</p>
+      <p className="text-sm font-medium text-slate-800 mb-2">Judge prompt</p>
       <CodeBlock
         code={`Question: "Quand a commencé l'Orient-Express ?"
 
@@ -56,7 +56,7 @@ Reply ONLY with valid JSON:
 }`}
       />
       <div className="mt-4 space-y-3">
-        <p className="text-sm text-gray-600 leading-relaxed">
+        <p className="text-sm text-slate-600 leading-relaxed">
           In the example above both claims are <strong>UNSUPPORTED</strong> —
           the bibliography chunk doesn't contain the date or the founder's name.
           Score = 0/2 = 0.
@@ -83,36 +83,36 @@ function CounterfactualCard() {
       <div className="mb-3">
         <StrategyBadge label="counterfactual" color="purple" />
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed mb-4">
+      <p className="text-sm text-slate-700 leading-relaxed mb-4">
         The strategy generates two answers to the same question — one with the
         retrieved chunks (the RAG answer), one without any context (training
         only). A judge then compares the two.
       </p>
       <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="border border-gray-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+        <div className="border border-slate-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">
             Answer A — with context
           </p>
-          <p className="text-xs text-gray-600 leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             LLM receives the retrieved chunks + question.
           </p>
-          <div className="mt-2 bg-gray-50 rounded p-2 text-xs font-mono text-gray-700">
+          <div className="mt-2 bg-slate-50 rounded p-2 text-xs font-mono text-slate-700">
             "L'Orient-Express a été lancé en 1883…"
           </div>
         </div>
-        <div className="border border-purple-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide mb-2">
+        <div className="border border-amber-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">
             Answer B — without context
           </p>
-          <p className="text-xs text-gray-600 leading-relaxed">
+          <p className="text-xs text-slate-600 leading-relaxed">
             Same question, no documents. LLM draws on training data only.
           </p>
-          <div className="mt-2 bg-gray-50 rounded p-2 text-xs font-mono text-gray-700">
+          <div className="mt-2 bg-slate-50 rounded p-2 text-xs font-mono text-slate-700">
             "L'Orient-Express a été inauguré en 1883…"
           </div>
         </div>
       </div>
-      <p className="text-sm font-medium text-gray-800 mb-2">
+      <p className="text-sm font-medium text-slate-800 mb-2">
         Comparison judge prompt
       </p>
       <CodeBlock
@@ -126,25 +126,25 @@ Reply ONLY with valid JSON:
 {"similar": true, "reasoning": "Both answers state the same date and origin."}`}
       />
       <div className="mt-4 space-y-3">
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <p className="text-xs font-semibold text-purple-800 uppercase tracking-wide mb-2">
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
             Score interpretation
           </p>
-          <div className="space-y-1 text-xs text-gray-700">
+          <div className="space-y-1 text-xs text-slate-700">
             <div className="flex items-center gap-2">
-              <span className="w-20 font-mono font-semibold text-purple-700">
+              <span className="w-20 font-mono font-semibold text-amber-700">
                 similar = true
               </span>
-              <ArrowRight size={12} className="text-gray-400" />
+              <ArrowRight size={12} className="text-slate-400" />
               <span>
                 score = 0 — RAG didn't add information beyond training data
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-20 font-mono font-semibold text-teal-700">
+              <span className="w-20 font-mono font-semibold text-amber-700">
                 similar = false
               </span>
-              <ArrowRight size={12} className="text-gray-400" />
+              <ArrowRight size={12} className="text-slate-400" />
               <span>
                 score = 1 — the context genuinely influenced the answer
               </span>
@@ -172,13 +172,13 @@ function CitationForcingCard() {
       <div className="mb-3">
         <StrategyBadge label="citation_forcing" color="blue" />
       </div>
-      <p className="text-sm text-gray-700 leading-relaxed mb-4">
+      <p className="text-sm text-slate-700 leading-relaxed mb-4">
         The judge is asked to map every factual claim to an <em>exact quote</em>{" "}
         from the numbered source list. The adapter then{" "}
         <strong>verifies</strong> each reported excerpt against the actual chunk
         text — LLMs hallucinate citations.
       </p>
-      <p className="text-sm font-medium text-gray-800 mb-2">Judge prompt</p>
+      <p className="text-sm font-medium text-slate-800 mb-2">Judge prompt</p>
       <CodeBlock
         code={`Question: Quand a commencé l'Orient-Express ?
 
@@ -196,7 +196,7 @@ Reply ONLY with valid JSON:
   ]
 }`}
       />
-      <p className="text-sm font-medium text-gray-800 mt-4 mb-2">
+      <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
         Hallucination guard
       </p>
       <CodeBlock
@@ -231,43 +231,43 @@ export default function StrategiesTab() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Strategy
                 </th>
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   LLM calls
                 </th>
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Signal
                 </th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <th className="text-left py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Best for
                 </th>
               </tr>
             </thead>
             <tbody>
-              <tr className="border-b border-gray-100">
+              <tr className="border-b border-slate-100">
                 <td className="py-3 pr-4">
                   <StrategyBadge label="faithfulness" color="teal" />
                 </td>
-                <td className="py-3 pr-4 text-xs text-gray-700">1</td>
-                <td className="py-3 pr-4 text-xs text-gray-600">
+                <td className="py-3 pr-4 text-xs text-slate-700">1</td>
+                <td className="py-3 pr-4 text-xs text-slate-600">
                   Fraction of claims grounded in sources
                 </td>
-                <td className="py-3 text-xs text-gray-600">
+                <td className="py-3 text-xs text-slate-600">
                   General grounding check, low overhead
                 </td>
               </tr>
-              <tr className="border-b border-gray-100">
+              <tr className="border-b border-slate-100">
                 <td className="py-3 pr-4">
                   <StrategyBadge label="counterfactual" color="purple" />
                 </td>
-                <td className="py-3 pr-4 text-xs text-gray-700">2</td>
-                <td className="py-3 pr-4 text-xs text-gray-600">
+                <td className="py-3 pr-4 text-xs text-slate-700">2</td>
+                <td className="py-3 pr-4 text-xs text-slate-600">
                   Did retrieval actually change the answer?
                 </td>
-                <td className="py-3 text-xs text-gray-600">
+                <td className="py-3 text-xs text-slate-600">
                   Detecting silent RAG failure
                 </td>
               </tr>
@@ -275,11 +275,11 @@ export default function StrategiesTab() {
                 <td className="py-3 pr-4">
                   <StrategyBadge label="citation_forcing" color="blue" />
                 </td>
-                <td className="py-3 pr-4 text-xs text-gray-700">1</td>
-                <td className="py-3 pr-4 text-xs text-gray-600">
+                <td className="py-3 pr-4 text-xs text-slate-700">1</td>
+                <td className="py-3 pr-4 text-xs text-slate-600">
                   Exact source quote per claim (verified)
                 </td>
-                <td className="py-3 text-xs text-gray-600">
+                <td className="py-3 text-xs text-slate-600">
                   Audit trail, explainability
                 </td>
               </tr>

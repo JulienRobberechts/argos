@@ -66,7 +66,7 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-lg border border-gray-200 text-sm overflow-hidden bg-gray-50">
+    <div className="rounded-lg border border-slate-200 text-sm overflow-hidden bg-slate-50">
       <div className="flex gap-2.5 p-3">
         <DocumentTypeIcon sourceType={source.sourceType} size={14} />
         <div className="min-w-0 flex-1">
@@ -75,16 +75,16 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
               href={`http://localhost:5173/documents/${source.documentId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-gray-700 truncate hover:text-indigo-600 hover:underline underline-offset-2"
+              className="font-medium text-slate-700 truncate hover:text-amber-600 hover:underline underline-offset-2"
             >
               {source.documentTitle}
             </a>
-            <span className="text-xs text-gray-400 flex-shrink-0">
+            <span className="text-xs text-slate-400 flex-shrink-0">
               {(source.score * 100).toFixed(0)}%
             </span>
             <button
               onClick={() => setOpen((v) => !v)}
-              className="flex-shrink-0 ml-auto text-gray-300 hover:text-gray-500 transition-colors"
+              className="flex-shrink-0 ml-auto text-slate-300 hover:text-slate-500 transition-colors"
               title="Détails techniques"
             >
               <ChevronDown
@@ -92,7 +92,7 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
               />
             </button>
           </div>
-          <p className="text-gray-500 text-xs line-clamp-2 leading-relaxed">
+          <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">
             {source.excerpt}
           </p>
         </div>

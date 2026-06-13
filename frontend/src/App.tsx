@@ -19,6 +19,7 @@ import RerankingPage from "./components/pages/RerankingPage";
 import LLMModelsPage from "./components/pages/LLMModelsPage";
 import KnowledgeCheckPage from "./components/pages/KnowledgeCheckPage";
 import HybridSearchPage from "./components/pages/HybridSearchPage";
+import EvaluationPage from "./components/pages/EvaluationPage";
 import FontPreviewPage from "./components/pages/FontPreviewPage";
 import ColorPalettePage from "./components/pages/ColorPalettePage";
 import { useConversations } from "./hooks/useConversation";
@@ -53,7 +54,7 @@ function ConversationsPage() {
   return (
     <div className="p-8">
       <PageHeader
-        icon={<MessageSquare className="text-blue-500" size={28} />}
+        icon={<MessageSquare className="text-amber-500" size={28} />}
         title="Conversations"
         info="Ask questions about your documents. The system retrieves relevant passages and generates a contextual answer."
       />
@@ -85,6 +86,7 @@ export default function App() {
               path="technical/knowledge-check"
               element={<KnowledgeCheckPage />}
             />
+            <Route path="technical/evaluation" element={<EvaluationPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="font-preview" element={<FontPreviewPage />} />
             <Route path="color-palette" element={<ColorPalettePage />} />

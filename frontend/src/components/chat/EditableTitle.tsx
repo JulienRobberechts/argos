@@ -45,14 +45,14 @@ export default function EditableTitle({
             setEditing(false);
           }
         }}
-        className="text-base font-semibold text-gray-800 bg-transparent border-b border-gray-400 outline-none w-full"
+        className="text-base font-semibold text-slate-800 bg-transparent border-b border-slate-400 outline-none w-full"
       />
     );
   }
 
   return (
     <button
-      className="group flex items-center gap-1.5 text-base font-semibold text-gray-800 hover:text-gray-600 transition-colors"
+      className="group flex items-center gap-1.5 text-base font-semibold text-slate-800 hover:text-slate-600 transition-colors"
       onClick={() => setEditing(true)}
       title="Edit title"
     >

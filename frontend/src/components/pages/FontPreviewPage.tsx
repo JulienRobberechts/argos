@@ -141,9 +141,9 @@ const CATEGORIES = [...new Set(FONTS.map((f) => f.category))];
 
 const CATEGORY_COLORS: Record<string, string> = {
   Géométrique: "bg-yellow-100 text-yellow-700",
-  Tech: "bg-violet-100 text-violet-700",
+  Tech: "bg-slate-200 text-slate-700",
   Élégant: "bg-amber-100 text-amber-700",
-  Display: "bg-rose-100 text-rose-700",
+  Display: "bg-amber-200 text-amber-800",
 };
 
 export default function FontPreviewPage() {

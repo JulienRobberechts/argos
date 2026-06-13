@@ -14,16 +14,16 @@ export default function ImplementationTab() {
           title="Implementation — SearchKnowledge"
           subtitle="How the two stages are orchestrated"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-sm text-slate-700 leading-relaxed mb-3">
           The{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             SearchKnowledge
           </code>{" "}
           use case accepts an optional{" "}
-          <code className="bg-gray-100 px-1 rounded text-purple-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             RerankPort
           </code>
-          . When <code className="bg-gray-100 px-1 rounded">null</code>, it
+          . When <code className="bg-slate-100 px-1 rounded">null</code>, it
           falls back to single-stage vector search.
         </p>
         <CodeBlock
@@ -76,14 +76,14 @@ async execute(query, limit, minScore) {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <tr className="border-b border-slate-200">
+                <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Env var
                 </th>
-                <th className="text-left py-2 pr-4 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <th className="text-left py-2 pr-4 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Default
                 </th>
-                <th className="text-left py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <th className="text-left py-2 text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   Effect
                 </th>
               </tr>

@@ -14,14 +14,14 @@ export default function ImplementationTab() {
           subtitle="How the three strategies are orchestrated"
           accentColor="teal"
         />
-        <p className="text-sm text-gray-700 leading-relaxed mb-3">
+        <p className="text-sm text-slate-700 leading-relaxed mb-3">
           The{" "}
-          <code className="bg-gray-100 px-1 rounded text-teal-700">
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
             CheckContextualKnowledge
           </code>{" "}
           use case runs after the LLM has generated its answer. It loops over
           the requested strategies and accumulates results. A failed strategy
-          returns <code className="bg-gray-100 px-1 rounded">score = -1</code>{" "}
+          returns <code className="bg-slate-100 px-1 rounded">score = -1</code>{" "}
           with a warning rather than crashing the request.
         </p>
         <CodeBlock

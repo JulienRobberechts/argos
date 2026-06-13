@@ -31,8 +31,8 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
     <div className={`bg-white border ${borderColor} rounded-xl p-5 shadow-sm`}>
       <div className="flex items-start justify-between mb-3">
         <div>
-          <p className="font-semibold text-gray-900 text-sm">{model.name}</p>
-          <code className="text-[11px] text-gray-400 font-mono">
+          <p className="font-semibold text-slate-900 text-sm">{model.name}</p>
+          <code className="text-[11px] text-slate-400 font-mono">
             {model.id}
           </code>
         </div>
@@ -40,45 +40,45 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
       </div>
 
       <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4 text-xs">
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <Layers size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <Layers size={12} className="text-slate-400 shrink-0" />
           <span>
             Context:{" "}
-            <strong className="text-gray-800">{model.contextWindow}</strong>
+            <strong className="text-slate-800">{model.contextWindow}</strong>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <ArrowRight size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <ArrowRight size={12} className="text-slate-400 shrink-0" />
           <span>
             Max output:{" "}
-            <strong className="text-gray-800">{model.maxOutput}</strong>
+            <strong className="text-slate-800">{model.maxOutput}</strong>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <DollarSign size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <DollarSign size={12} className="text-slate-400 shrink-0" />
           <span>
             Input:{" "}
-            <strong className="text-gray-800">{model.inputPrice}/MTok</strong>
+            <strong className="text-slate-800">{model.inputPrice}/MTok</strong>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <DollarSign size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <DollarSign size={12} className="text-slate-400 shrink-0" />
           <span>
             Output:{" "}
-            <strong className="text-gray-800">{model.outputPrice}/MTok</strong>
+            <strong className="text-slate-800">{model.outputPrice}/MTok</strong>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <Clock size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <Clock size={12} className="text-slate-400 shrink-0" />
           <span>
-            Latency: <strong className="text-gray-800">{model.latency}</strong>
+            Latency: <strong className="text-slate-800">{model.latency}</strong>
           </span>
         </div>
-        <div className="flex items-center gap-1.5 text-gray-600">
-          <Brain size={12} className="text-gray-400 shrink-0" />
+        <div className="flex items-center gap-1.5 text-slate-600">
+          <Brain size={12} className="text-slate-400 shrink-0" />
           <span>
             Cutoff:{" "}
-            <strong className="text-gray-800">{model.knowledgeCutoff}</strong>
+            <strong className="text-slate-800">{model.knowledgeCutoff}</strong>
           </span>
         </div>
       </div>
@@ -90,7 +90,7 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
           </span>
         )}
         {model.extendedThinking && (
-          <span className="text-[10px] bg-stone-100 text-stone-700 border border-stone-200 rounded px-1.5 py-0.5 font-medium">
+          <span className="text-[10px] bg-slate-100 text-slate-700 border border-slate-200 rounded px-1.5 py-0.5 font-medium">
             Extended thinking
           </span>
         )}
@@ -105,7 +105,7 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
             {model.bestFor.map((item, i) => (
               <li
                 key={i}
-                className="flex items-start gap-1.5 text-xs text-gray-600"
+                className="flex items-start gap-1.5 text-xs text-slate-600"
               >
                 <CheckCircle
                   size={11}
@@ -124,7 +124,7 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
             {model.limitations.map((item, i) => (
               <li
                 key={i}
-                className="flex items-start gap-1.5 text-xs text-gray-600"
+                className="flex items-start gap-1.5 text-xs text-slate-600"
               >
                 <AlertTriangle
                   size={11}

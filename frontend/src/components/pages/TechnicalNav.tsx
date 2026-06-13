@@ -5,6 +5,7 @@ import {
   Brain,
   ShieldCheck,
   Combine,
+  Gauge,
 } from "lucide-react";
 
 const pages = [
@@ -17,6 +18,7 @@ const pages = [
     label: "Knowledge Check",
     icon: ShieldCheck,
   },
+  { to: "/technical/evaluation", label: "Evaluation", icon: Gauge },
 ];
 
 export default function TechnicalNav() {
