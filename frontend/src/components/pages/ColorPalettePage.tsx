@@ -10,8 +10,7 @@ const PALETTE = {
     { label: "Ardoise", hex: "#374151", usage: "Fond tertiaire" },
     { label: "Bronze", hex: "#92400e", usage: "Accent foncé" },
     { label: "Soleil", hex: "#d97706", usage: "Accent principal" },
-    { label: "Jaune", hex: "#fcd34d", usage: "Accent clair" },
-    { label: "Ciel", hex: "#38bdf8", usage: "Interactif / liens" },
+    { label: "Jaune", hex: "#fcd34d", usage: "Accent clair / Interactif" },
   ],
 };
 
@@ -43,7 +42,9 @@ export default function ColorPalettePage() {
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">{PALETTE.name}</h1>
+        <h1 className="text-2xl font-bold text-slate-800 font-audiowide">
+          {PALETTE.name}
+        </h1>
         <p className="text-sm text-slate-500 mt-1">{PALETTE.desc}</p>
       </div>
 

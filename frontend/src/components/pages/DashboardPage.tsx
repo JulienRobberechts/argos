@@ -150,14 +150,14 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Database size={16} className="text-sky-500" />
+                <Database size={16} className="text-amber-500" />
                 <h2 className="font-semibold text-slate-800 text-sm">
                   Recent documents
                 </h2>
               </div>
               <Link
                 to="/documents"
-                className="text-xs text-sky-600 hover:text-sky-800 flex items-center gap-1 font-medium"
+                className="text-xs text-amber-600 hover:text-amber-800 flex items-center gap-1 font-medium"
               >
                 View all <ArrowRight size={12} />
               </Link>
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-slate-400">No documents</p>
                 <Link
                   to="/documents"
-                  className="mt-2 inline-block text-xs text-sky-600 hover:underline"
+                  className="mt-2 inline-block text-xs text-amber-600 hover:underline"
                 >
                   Import a document →
                 </Link>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
               </div>
               <Link
                 to="/conversations"
-                className="text-xs text-sky-600 hover:text-sky-800 flex items-center gap-1 font-medium"
+                className="text-xs text-amber-600 hover:text-amber-800 flex items-center gap-1 font-medium"
               >
                 View all <ArrowRight size={12} />
               </Link>
@@ -209,7 +209,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-slate-400">No conversations</p>
                 <Link
                   to="/conversations/new"
-                  className="mt-2 inline-block text-xs text-sky-600 hover:underline"
+                  className="mt-2 inline-block text-xs text-amber-600 hover:underline"
                 >
                   Start a conversation →
                 </Link>
@@ -224,14 +224,14 @@ export default function DashboardPage() {
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap size={16} className="text-sky-500" />
+                <Zap size={16} className="text-amber-500" />
                 <h2 className="font-semibold text-slate-800 text-sm">
                   Active RAG configuration
                 </h2>
               </div>
               <Link
                 to="/settings"
-                className="text-xs text-sky-600 hover:text-sky-800 flex items-center gap-1 font-medium"
+                className="text-xs text-amber-600 hover:text-amber-800 flex items-center gap-1 font-medium"
               >
                 Edit <ArrowRight size={12} />
               </Link>

@@ -78,7 +78,7 @@ export default function TradeOffsTab() {
             </div>
           ))}
         </div>
-        <Callout type="info" className="mt-4">
+        <Callout type="info">
           In practice, mixed corpora (technical docs + conceptual notes) benefit
           from hybrid mode by default. Switch to vector-only only if you measure
           a latency impact that matters for your use case.

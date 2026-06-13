@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+.font-audiowide {
+  font-family: 'Audiowide', sans-serif;
+}
+
 :root {
   --argos-navy:   #111827;
   --argos-deep:   #1f2937;

@@ -148,7 +148,7 @@ for (const row of textResult.rows) {
             </tbody>
           </table>
         </div>
-        <Callout type="info" className="mt-4">
+        <Callout type="info">
           Chunk C (BM25-only) beats chunk D (present in both but ranked lower).
           This is the key property: a strong exact match can outrank a mediocre
           semantic match even with no vector signal.

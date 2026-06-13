@@ -111,7 +111,7 @@ CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
     .map(({ row, score }) => ({ chunk: mapRow(row), score }));
 }`}
         />
-        <Callout type="info" className="mt-4">
+        <Callout type="info">
           <code>_minScore</code> is intentionally ignored in hybrid mode: BM25
           scores are not on the same scale as cosine similarity, so a unified
           threshold is meaningless. The limit parameter acts as the cutoff

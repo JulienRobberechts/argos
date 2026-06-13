@@ -140,7 +140,7 @@ function buildGoogleFontsUrl(fonts: typeof FONTS) {
 const CATEGORIES = [...new Set(FONTS.map((f) => f.category))];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Géométrique: "bg-sky-100 text-sky-700",
+  Géométrique: "bg-yellow-100 text-yellow-700",
   Tech: "bg-violet-100 text-violet-700",
   Élégant: "bg-amber-100 text-amber-700",
   Display: "bg-rose-100 text-rose-700",
@@ -162,7 +162,7 @@ export default function FontPreviewPage() {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">
+          <h1 className="text-2xl font-bold text-slate-800 font-audiowide">
             Aperçu des polices — ARGOS
           </h1>
           <p className="text-sm text-slate-500 mt-1">
@@ -218,7 +218,7 @@ export default function FontPreviewPage() {
                         letterSpacing: "0.15em",
                         fontSize: "1.35rem",
                         background:
-                          "linear-gradient(90deg, #22d3ee 0%, #38bdf8 50%, #fff 100%)",
+                          "linear-gradient(90deg, #92400e 0%, #d97706 50%, #fcd34d 100%)",
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                       }}
