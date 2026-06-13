@@ -28,7 +28,7 @@ export default function ChatInterface() {
     Partial<ConversationParams>
   >({});
   const stream = useSSEStream(id ?? "");
-  const pendingSentRef = useRef(false);
+  const pendingSentForIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (appConfig && Object.keys(pendingParams).length === 0) {
@@ -50,8 +50,8 @@ export default function ChatInterface() {
   useEffect(() => {
     const pending = (location.state as { pendingMessage?: string } | null)
       ?.pendingMessage;
-    if (!pending || !id || pendingSentRef.current) return;
-    pendingSentRef.current = true;
+    if (!pending || !id || pendingSentForIdRef.current === id) return;
+    pendingSentForIdRef.current = id;
     navigate(location.pathname, { replace: true, state: {} });
     stream.send(pending, () => {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
