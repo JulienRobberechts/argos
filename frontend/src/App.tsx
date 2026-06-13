@@ -20,6 +20,7 @@ import LLMModelsPage from "./features/technical/LLMModelsPage";
 import KnowledgeCheckPage from "./features/technical/KnowledgeCheckPage";
 import HybridSearchPage from "./features/technical/HybridSearchPage";
 import EvaluationPage from "./features/technical/EvaluationPage";
+import RagPipelinePage from "./features/technical/RagPipelinePage";
 import FontPreviewPage from "./components/pages/FontPreviewPage";
 import ColorPalettePage from "./components/pages/ColorPalettePage";
 import { useConversations } from "./hooks/useConversation";
@@ -87,6 +88,10 @@ export default function App() {
               element={<KnowledgeCheckPage />}
             />
             <Route path="technical/evaluation" element={<EvaluationPage />} />
+            <Route
+              path="technical/rag-pipeline"
+              element={<RagPipelinePage />}
+            />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="font-preview" element={<FontPreviewPage />} />
             <Route path="color-palette" element={<ColorPalettePage />} />
