@@ -2,7 +2,6 @@ import { NavLink } from "react-router-dom";
 import {
   FileText,
   MessageSquare,
-  Settings,
   FlaskConical,
   SquareCheck,
 } from "lucide-react";
@@ -13,7 +12,6 @@ const navItems = [
   { to: "/conversations", icon: MessageSquare, label: "Conversations" },
   { to: "/quiz", icon: SquareCheck, label: "Quiz" },
   { to: "/technical", icon: FlaskConical, label: "Technical" },
-  { to: "/settings", icon: Settings, label: "Settings" },
 ];
 
 export default function IconNav() {

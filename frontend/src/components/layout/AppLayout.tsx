@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import IconNav from "./IconNav";
 import Sidebar from "./Sidebar";
 import DocumentsSidebar from "../documents/DocumentsSidebar";
+import SettingsPage from "../pages/SettingsPage";
 
 const MIN_WIDTH = 200;
 const DEFAULT_WIDTH = 288;
@@ -29,6 +30,7 @@ export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const dragging = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -60,7 +62,10 @@ export default function AppLayout() {
   const sidebarContent = onConversations ? (
     <Sidebar />
   ) : onDocuments ? (
-    <DocumentsSidebar />
+    <DocumentsSidebar
+      showSettings={showSettings}
+      onToggleSettings={() => setShowSettings((v) => !v)}
+    />
   ) : null;
 
   return (
@@ -105,8 +110,12 @@ export default function AppLayout() {
           </div>
         </>
       )}
-      <main ref={mainRef} className="flex-1 overflow-y-auto">
-        <Outlet />
+      <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden">
+        {onDocuments && showSettings ? (
+          <SettingsPage onClose={() => setShowSettings(false)} />
+        ) : (
+          <Outlet />
+        )}
       </main>
     </div>
   );

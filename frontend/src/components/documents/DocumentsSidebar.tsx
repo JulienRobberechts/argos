@@ -1,12 +1,18 @@
 import { useNavigate, useMatch } from "react-router-dom";
-import { FileText } from "lucide-react";
+import { FileText, Settings2 } from "lucide-react";
 import { useDocuments } from "../../hooks/useDocuments";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 import DocumentTypeIcon from "./DocumentTypeIcon";
 import DocumentUpload from "./DocumentUpload";
 import PageHeader from "../ui/PageHeader";
 
-export default function DocumentsSidebar() {
+export default function DocumentsSidebar({
+  showSettings,
+  onToggleSettings,
+}: {
+  showSettings?: boolean;
+  onToggleSettings?: () => void;
+}) {
   const navigate = useNavigate();
   const match = useMatch("/documents/:id");
   const activeId = match?.params.id;
@@ -47,6 +53,21 @@ export default function DocumentsSidebar() {
           <p className="text-xs text-slate-400 px-3 py-2">No documents yet.</p>
         )}
       </nav>
+      {onToggleSettings && (
+        <div className="mt-2 pt-2 border-t border-slate-100">
+          <button
+            onClick={onToggleSettings}
+            className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg transition-colors ${
+              showSettings
+                ? "bg-amber-50 text-[#92400e] border border-amber-200 font-medium"
+                : "text-slate-500 hover:bg-slate-50"
+            }`}
+          >
+            <Settings2 size={14} />
+            Settings
+          </button>
+        </div>
+      )}
     </div>
   );
 }

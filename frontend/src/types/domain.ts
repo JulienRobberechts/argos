@@ -90,6 +90,9 @@ export interface DocumentSummary {
 export interface AppConfig {
   version: string;
   logLevel: string;
+  storage: {
+    backend: "local" | "r2";
+  };
   rag: {
     chunkingStrategy: string;
     chunkSize: number;

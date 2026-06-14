@@ -13,7 +13,6 @@ import DocumentDetail from "./components/documents/DocumentDetail";
 import DocumentUpload from "./components/documents/DocumentUpload";
 import DashboardPage from "./components/pages/DashboardPage";
 import QuizPage from "./components/pages/QuizPage";
-import SettingsPage from "./components/pages/SettingsPage";
 import TechnicalPage from "./features/technical/TechnicalPage";
 import TechnicalLayout from "./features/technical/TechnicalLayout";
 import RerankingPage from "./features/technical/RerankingPage";
@@ -84,7 +83,6 @@ export default function App() {
               <Route path="knowledge-check" element={<KnowledgeCheckPage />} />
               <Route path="evaluation" element={<EvaluationPage />} />
             </Route>
-            <Route path="settings" element={<SettingsPage />} />
             <Route path="font-preview" element={<FontPreviewPage />} />
             <Route path="color-palette" element={<ColorPalettePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

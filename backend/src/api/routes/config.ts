@@ -31,6 +31,9 @@ export function configRouter(): Router {
         provider: "voyage",
         model: config.embeddings.voyage.model,
       },
+      storage: {
+        backend: config.storage.backend,
+      },
     });
   });
 
