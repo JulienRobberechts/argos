@@ -93,16 +93,27 @@ export interface ConsistencyReport {
   missingFiles: string[];
 }
 
+export interface ProviderOption {
+  provider: string;
+  model: string;
+  label: string;
+  available: boolean;
+}
+
+export interface StorageOption {
+  provider: string;
+  label: string;
+  available: boolean;
+}
+
 export interface AppSettings {
-  storage: { provider: string; bucketName: string; endpoint: string };
-  embedding: { provider: string; model: string; apiKeySet: boolean };
-  llm: { provider: string; model: string; apiKeySet: boolean };
+  embedding: { provider: string; model: string; options: ProviderOption[] };
+  storage: { provider: string; options: StorageOption[] };
 }
 
 export interface AppSettingsPatch {
-  storage?: Partial<{ provider: string; bucketName: string; endpoint: string }>;
-  embedding?: Partial<{ provider: string; model: string; apiKey: string }>;
-  llm?: Partial<{ provider: string; model: string; apiKey: string }>;
+  embedding?: { provider: string };
+  storage?: { provider: string };
 }
 
 export interface AppConfig {

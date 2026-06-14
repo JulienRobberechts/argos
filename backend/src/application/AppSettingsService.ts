@@ -1,16 +1,51 @@
 import config from "../config";
 import { PgAppSettingsRepository } from "../infrastructure/db/PgAppSettingsRepository";
 
+export interface ProviderOption {
+  provider: string;
+  model: string;
+  label: string;
+  available: boolean;
+}
+
+export interface StorageOption {
+  provider: string;
+  label: string;
+  available: boolean;
+}
+
 export interface AppSettings {
-  storage: { provider: string; bucketName: string; endpoint: string };
-  embedding: { provider: string; model: string; apiKeySet: boolean };
-  llm: { provider: string; model: string; apiKeySet: boolean };
+  embedding: { provider: string; model: string; options: ProviderOption[] };
+  storage: { provider: string; options: StorageOption[] };
 }
 
 export interface AppSettingsPatch {
-  storage?: Partial<{ provider: string; bucketName: string; endpoint: string }>;
-  embedding?: Partial<{ provider: string; model: string; apiKey: string }>;
-  llm?: Partial<{ provider: string; model: string; apiKey: string }>;
+  embedding?: { provider: string };
+  storage?: { provider: string };
+}
+
+const EMBEDDING_PRESETS: Omit<ProviderOption, "available">[] = [
+  {
+    provider: "voyage",
+    model: "voyage-4-lite",
+    label: "Voyage AI — voyage-4-lite",
+  },
+  {
+    provider: "openai",
+    model: "text-embedding-3-small",
+    label: "OpenAI — text-embedding-3-small",
+  },
+  {
+    provider: "mistral",
+    model: "mistral-embed",
+    label: "Mistral — mistral-embed",
+  },
+];
+
+function r2Available(): boolean {
+  const { accountId, accessKeyId, secretAccessKey, bucketName } =
+    config.storage.r2;
+  return !!(accountId && accessKeyId && secretAccessKey && bucketName);
 }
 
 export class AppSettingsService {
@@ -18,55 +53,51 @@ export class AppSettingsService {
 
   async getSettings(): Promise<AppSettings> {
     const stored = await this.repo.getAll();
-    const r2 = config.storage.r2;
-    const defaultEndpoint = r2.accountId
-      ? `https://${r2.accountId}.r2.cloudflarestorage.com`
-      : "";
+
+    const currentEmbeddingProvider = stored["embedding.provider"] ?? "voyage";
+    const preset =
+      EMBEDDING_PRESETS.find((p) => p.provider === currentEmbeddingProvider) ??
+      EMBEDDING_PRESETS[0];
+
+    const embeddingOptions: ProviderOption[] = EMBEDDING_PRESETS.map((p) => ({
+      ...p,
+      available: !!(p.provider === "voyage"
+        ? config.embeddings.voyage.apiKey
+        : p.provider === "openai"
+          ? process.env.OPENAI_API_KEY
+          : p.provider === "mistral"
+            ? process.env.MISTRAL_API_KEY
+            : false),
+    }));
+
+    const currentStorageProvider =
+      stored["storage.provider"] ?? config.storage.backend;
+
+    const storageOptions: StorageOption[] = [
+      { provider: "r2", label: "Cloudflare R2", available: r2Available() },
+      { provider: "local", label: "Local disk", available: true },
+    ];
 
     return {
-      storage: {
-        provider: stored["storage.provider"] ?? config.storage.backend,
-        bucketName: stored["storage.bucketName"] ?? r2.bucketName,
-        endpoint: stored["storage.endpoint"] ?? defaultEndpoint,
-      },
       embedding: {
-        provider: stored["embedding.provider"] ?? "voyage",
-        model: stored["embedding.model"] ?? config.embeddings.voyage.model,
-        apiKeySet: !!(
-          stored["embedding.apiKey"] ?? config.embeddings.voyage.apiKey
-        ),
+        provider: preset.provider,
+        model: preset.model,
+        options: embeddingOptions,
       },
-      llm: {
-        provider: stored["llm.provider"] ?? "anthropic",
-        model: stored["llm.model"] ?? config.llm.anthropic.model,
-        apiKeySet: !!(stored["llm.apiKey"] ?? config.llm.anthropic.apiKey),
+      storage: {
+        provider: currentStorageProvider,
+        options: storageOptions,
       },
     };
   }
 
   async updateSettings(patch: AppSettingsPatch): Promise<AppSettings> {
     const entries: Record<string, string> = {};
-
-    if (patch.storage?.provider)
-      entries["storage.provider"] = patch.storage.provider;
-    if (patch.storage?.bucketName)
-      entries["storage.bucketName"] = patch.storage.bucketName;
-    if (patch.storage?.endpoint)
-      entries["storage.endpoint"] = patch.storage.endpoint;
     if (patch.embedding?.provider)
       entries["embedding.provider"] = patch.embedding.provider;
-    if (patch.embedding?.model)
-      entries["embedding.model"] = patch.embedding.model;
-    if (patch.embedding?.apiKey)
-      entries["embedding.apiKey"] = patch.embedding.apiKey;
-    if (patch.llm?.provider) entries["llm.provider"] = patch.llm.provider;
-    if (patch.llm?.model) entries["llm.model"] = patch.llm.model;
-    if (patch.llm?.apiKey) entries["llm.apiKey"] = patch.llm.apiKey;
-
-    if (Object.keys(entries).length > 0) {
-      await this.repo.setMany(entries);
-    }
-
+    if (patch.storage?.provider)
+      entries["storage.provider"] = patch.storage.provider;
+    if (Object.keys(entries).length > 0) await this.repo.setMany(entries);
     return this.getSettings();
   }
 }

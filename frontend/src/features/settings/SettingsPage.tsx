@@ -1,13 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Settings,
-  ChevronDown,
-  ChevronRight,
-  AlertTriangle,
-  CheckCircle,
-  X,
-} from "lucide-react";
+import { Settings, AlertTriangle, CheckCircle, X, Lock } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/api";
 import type {
@@ -15,261 +8,157 @@ import type {
   AppSettingsPatch,
   ConsistencyReport,
 } from "../../types/domain";
+import { useDocuments } from "../../hooks/useDocuments";
+import { useConversations } from "../../hooks/useConversation";
 import PageHeader from "../../components/ui/PageHeader";
 
-// ─── RAG Config Section ──────────────────────────────────────────────────────
+// ─── Config Form ──────────────────────────────────────────────────────────────
 
-function Collapsible({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(true);
-  return (
-    <div className="border border-slate-200 rounded-lg mb-3">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 rounded-lg"
-      >
-        {title}
-        {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-      </button>
-      {open && <div className="px-4 pb-4 space-y-3">{children}</div>}
-    </div>
-  );
-}
-
-function Field({
+function ProviderSelect({
   label,
-  children,
+  value,
+  options,
+  onChange,
+  disabled,
 }: {
   label: string;
-  children: React.ReactNode;
+  value: string;
+  options: { value: string; label: string; available: boolean }[];
+  onChange: (v: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-1">
       <label className="text-xs text-slate-500">{label}</label>
-      {children}
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        className="text-sm border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value} disabled={!o.available}>
+            {o.label}
+            {!o.available ? " (not configured)" : ""}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
 
-function Select({
-  value,
-  options,
-  onChange,
-}: {
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="text-sm border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
-    >
-      {options.map((o) => (
-        <option key={o} value={o}>
-          {o}
-        </option>
-      ))}
-    </select>
-  );
+interface FormState {
+  embeddingProvider: string;
+  storageProvider: string;
 }
 
-function Input({
-  value,
-  onChange,
-  type = "text",
-  placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  type?: string;
-  placeholder?: string;
-}) {
-  return (
-    <input
-      type={type}
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="text-sm border border-slate-200 rounded-md px-2 py-1.5 focus:outline-none focus:ring-1 focus:ring-amber-400"
-    />
-  );
-}
-
-interface FormStorage {
-  provider: string;
-  bucketName: string;
-  endpoint: string;
-}
-interface FormEmbedding {
-  provider: string;
-  model: string;
-  apiKey: string;
-}
-interface FormLLM {
-  provider: string;
-  model: string;
-  apiKey: string;
-}
-
-interface RagFormState {
-  storage: FormStorage;
-  embedding: FormEmbedding;
-  llm: FormLLM;
-}
-
-function buildInitialForm(settings: AppSettings): RagFormState {
+function buildForm(settings: AppSettings): FormState {
   return {
-    storage: {
-      provider: settings.storage.provider,
-      bucketName: settings.storage.bucketName,
-      endpoint: settings.storage.endpoint,
-    },
-    embedding: {
-      provider: settings.embedding.provider,
-      model: settings.embedding.model,
-      apiKey: "",
-    },
-    llm: {
-      provider: settings.llm.provider,
-      model: settings.llm.model,
-      apiKey: "",
-    },
+    embeddingProvider: settings.embedding.provider,
+    storageProvider: settings.storage.provider,
   };
 }
 
-function RagConfigSection({ settings }: { settings: AppSettings }) {
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<RagFormState>(() =>
-    buildInitialForm(settings),
+function ConfigForm({
+  settings,
+  form,
+  onChange,
+  disabled,
+}: {
+  settings: AppSettings;
+  form: FormState;
+  onChange: (patch: Partial<FormState>) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="space-y-4">
+      <ProviderSelect
+        label="Document Storage"
+        value={form.storageProvider}
+        options={settings.storage.options.map((o) => ({
+          value: o.provider,
+          label: o.label,
+          available: o.available,
+        }))}
+        onChange={(v) => onChange({ storageProvider: v })}
+        disabled={disabled}
+      />
+      <ProviderSelect
+        label="RAG Embedding"
+        value={form.embeddingProvider}
+        options={settings.embedding.options.map((o) => ({
+          value: o.provider,
+          label: o.label,
+          available: o.available,
+        }))}
+        onChange={(v) => onChange({ embeddingProvider: v })}
+        disabled={disabled}
+      />
+    </div>
   );
+}
+
+// ─── RAG Config Section ───────────────────────────────────────────────────────
+
+function RagConfigSection({
+  settings,
+  readonly,
+}: {
+  settings: AppSettings;
+  readonly: boolean;
+}) {
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState<FormState>(() => buildForm(settings));
   const [toast, setToast] = useState<string | null>(null);
 
   const mutation = useMutation({
     mutationFn: () => {
       const patch: AppSettingsPatch = {
-        storage: form.storage,
-        embedding: {
-          provider: form.embedding.provider,
-          model: form.embedding.model,
-          ...(form.embedding.apiKey ? { apiKey: form.embedding.apiKey } : {}),
-        },
-        llm: {
-          provider: form.llm.provider,
-          model: form.llm.model,
-          ...(form.llm.apiKey ? { apiKey: form.llm.apiKey } : {}),
-        },
+        embedding: { provider: form.embeddingProvider },
+        storage: { provider: form.storageProvider },
       };
       return api.updateSettings(patch);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
-      setToast("Configuration mise à jour");
+      setToast("Settings saved");
       setTimeout(() => setToast(null), 3000);
     },
   });
 
-  const setStorage = (key: string, value: string) =>
-    setForm((f) => ({ ...f, storage: { ...f.storage, [key]: value } }));
-  const setEmbedding = (key: string, value: string) =>
-    setForm((f) => ({ ...f, embedding: { ...f.embedding, [key]: value } }));
-  const setLlm = (key: string, value: string) =>
-    setForm((f) => ({ ...f, llm: { ...f.llm, [key]: value } }));
-
   return (
     <div>
-      <Collapsible title="Stockage">
-        <Field label="Provider">
-          <Select
-            value={form.storage.provider}
-            options={["r2", "s3", "local"]}
-            onChange={(v) => setStorage("provider", v)}
-          />
-        </Field>
-        <Field label="Bucket name">
-          <Input
-            value={form.storage.bucketName}
-            onChange={(v) => setStorage("bucketName", v)}
-          />
-        </Field>
-        <Field label="Endpoint URL">
-          <Input
-            value={form.storage.endpoint}
-            onChange={(v) => setStorage("endpoint", v)}
-          />
-        </Field>
-      </Collapsible>
-
-      <Collapsible title="Embedding">
-        <Field label="Provider">
-          <Select
-            value={form.embedding.provider}
-            options={["openai", "mistral", "voyage"]}
-            onChange={(v) => setEmbedding("provider", v)}
-          />
-        </Field>
-        <Field label="Modèle">
-          <Input
-            value={form.embedding.model}
-            onChange={(v) => setEmbedding("model", v)}
-          />
-        </Field>
-        <Field label="Clé API">
-          <Input
-            type="password"
-            value={form.embedding.apiKey}
-            onChange={(v) => setEmbedding("apiKey", v)}
-            placeholder={
-              settings.embedding.apiKeySet ? "••••••• (défini)" : "Non défini"
-            }
-          />
-        </Field>
-      </Collapsible>
-
-      <Collapsible title="LLM">
-        <Field label="Provider">
-          <Select
-            value={form.llm.provider}
-            options={["anthropic", "openai"]}
-            onChange={(v) => setLlm("provider", v)}
-          />
-        </Field>
-        <Field label="Modèle">
-          <Input value={form.llm.model} onChange={(v) => setLlm("model", v)} />
-        </Field>
-        <Field label="Clé API">
-          <Input
-            type="password"
-            value={form.llm.apiKey}
-            onChange={(v) => setLlm("apiKey", v)}
-            placeholder={
-              settings.llm.apiKeySet ? "••••••• (défini)" : "Non défini"
-            }
-          />
-        </Field>
-      </Collapsible>
-
-      {toast && (
-        <div className="mb-3 px-3 py-2 rounded-md bg-green-50 text-green-700 text-sm border border-green-200">
-          {toast}
+      {readonly && (
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-md bg-slate-50 border border-slate-200 text-slate-500 text-xs">
+          <Lock size={13} />
+          Read-only — delete all documents and conversations to edit these
+          settings.
         </div>
       )}
 
-      <button
-        onClick={() => mutation.mutate()}
-        disabled={mutation.isPending}
-        className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
-      >
-        {mutation.isPending
-          ? "Enregistrement…"
-          : "Enregistrer la configuration"}
-      </button>
+      <ConfigForm
+        settings={settings}
+        form={form}
+        onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+        disabled={readonly}
+      />
+
+      {!readonly && (
+        <div className="mt-4">
+          {toast && (
+            <div className="mb-3 px-3 py-2 rounded-md bg-green-50 text-green-700 text-sm border border-green-200">
+              {toast}
+            </div>
+          )}
+          <button
+            onClick={() => mutation.mutate()}
+            disabled={mutation.isPending}
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
+          >
+            {mutation.isPending ? "Saving…" : "Save settings"}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -283,8 +172,7 @@ function ConsistencySection() {
   const check = async () => {
     setLoading(true);
     try {
-      const result = await api.checkStorageConsistency();
-      setReport(result);
+      setReport(await api.checkStorageConsistency());
     } finally {
       setLoading(false);
     }
@@ -297,9 +185,7 @@ function ConsistencySection() {
         disabled={loading}
         className="px-4 py-2 bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
       >
-        {loading
-          ? "Vérification en cours…"
-          : "Vérifier la cohérence BDD ↔ Stockage"}
+        {loading ? "Checking…" : "Check DB ↔ Storage consistency"}
       </button>
 
       {report && (
@@ -313,18 +199,18 @@ function ConsistencySection() {
           {report.ok ? (
             <div className="flex items-center gap-2">
               <CheckCircle size={16} />
-              Base et stockage cohérents
+              Database and storage are consistent
             </div>
           ) : (
             <div className="space-y-2">
               <div className="flex items-center gap-2 font-medium">
                 <AlertTriangle size={16} />
-                Incohérences détectées
+                Inconsistencies detected
               </div>
               {report.orphanFiles.length > 0 && (
                 <div>
                   <p className="font-medium text-xs uppercase tracking-wide mb-1">
-                    Fichiers orphelins (stockage sans BDD)
+                    Orphan files (storage without DB record)
                   </p>
                   <ul className="list-disc list-inside text-xs space-y-0.5">
                     {report.orphanFiles.map((f) => (
@@ -338,7 +224,7 @@ function ConsistencySection() {
               {report.missingFiles.length > 0 && (
                 <div>
                   <p className="font-medium text-xs uppercase tracking-wide mb-1">
-                    Fichiers manquants (BDD sans stockage)
+                    Missing files (DB record without storage)
                   </p>
                   <ul className="list-disc list-inside text-xs space-y-0.5">
                     {report.missingFiles.map((f) => (
@@ -370,40 +256,20 @@ function ResetDialog({
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [changeConfig, setChangeConfig] = useState(false);
-  const [form, setForm] = useState<RagFormState>(() =>
-    buildInitialForm(currentSettings),
-  );
+  const [form, setForm] = useState<FormState>(() => buildForm(currentSettings));
   const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const setStorage = (key: string, value: string) =>
-    setForm((f) => ({ ...f, storage: { ...f.storage, [key]: value } }));
-  const setEmbedding = (key: string, value: string) =>
-    setForm((f) => ({ ...f, embedding: { ...f.embedding, [key]: value } }));
-  const setLlm = (key: string, value: string) =>
-    setForm((f) => ({ ...f, llm: { ...f.llm, [key]: value } }));
-
-  const buildNewSettings = (): AppSettingsPatch | undefined => {
-    if (!changeConfig) return undefined;
-    return {
-      storage: form.storage,
-      embedding: {
-        provider: form.embedding.provider,
-        model: form.embedding.model,
-        ...(form.embedding.apiKey ? { apiKey: form.embedding.apiKey } : {}),
-      },
-      llm: {
-        provider: form.llm.provider,
-        model: form.llm.model,
-        ...(form.llm.apiKey ? { apiKey: form.llm.apiKey } : {}),
-      },
-    };
-  };
 
   const handleReset = async () => {
     setLoading(true);
     try {
-      await api.resetAll(buildNewSettings());
+      const newSettings: AppSettingsPatch | undefined = changeConfig
+        ? {
+            embedding: { provider: form.embeddingProvider },
+            storage: { provider: form.storageProvider },
+          }
+        : undefined;
+      await api.resetAll(newSettings);
       onSuccess();
     } finally {
       setLoading(false);
@@ -416,11 +282,10 @@ function ResetDialog({
         {step === 1 && (
           <>
             <h2 className="text-lg font-semibold text-slate-800 mb-1">
-              Voulez-vous changer la configuration avant le reset ?
+              Update configuration before reset?
             </h2>
             <p className="text-sm text-slate-500 mb-4">
-              Optionnel — vous pouvez réinitialiser sans changer la
-              configuration.
+              Optional — you can reset without changing the configuration.
             </p>
 
             <label className="flex items-center gap-2 mb-4 cursor-pointer">
@@ -431,87 +296,17 @@ function ResetDialog({
                 className="accent-amber-500"
               />
               <span className="text-sm text-slate-700">
-                Modifier la configuration RAG
+                Change configuration
               </span>
             </label>
 
             {changeConfig && (
-              <div className="mb-4 max-h-64 overflow-y-auto">
-                <Collapsible title="Stockage">
-                  <Field label="Provider">
-                    <Select
-                      value={form.storage.provider}
-                      options={["r2", "s3", "local"]}
-                      onChange={(v) => setStorage("provider", v)}
-                    />
-                  </Field>
-                  <Field label="Bucket name">
-                    <Input
-                      value={form.storage.bucketName}
-                      onChange={(v) => setStorage("bucketName", v)}
-                    />
-                  </Field>
-                  <Field label="Endpoint URL">
-                    <Input
-                      value={form.storage.endpoint}
-                      onChange={(v) => setStorage("endpoint", v)}
-                    />
-                  </Field>
-                </Collapsible>
-                <Collapsible title="Embedding">
-                  <Field label="Provider">
-                    <Select
-                      value={form.embedding.provider}
-                      options={["openai", "mistral", "voyage"]}
-                      onChange={(v) => setEmbedding("provider", v)}
-                    />
-                  </Field>
-                  <Field label="Modèle">
-                    <Input
-                      value={form.embedding.model}
-                      onChange={(v) => setEmbedding("model", v)}
-                    />
-                  </Field>
-                  <Field label="Clé API">
-                    <Input
-                      type="password"
-                      value={form.embedding.apiKey}
-                      onChange={(v) => setEmbedding("apiKey", v)}
-                      placeholder={
-                        currentSettings.embedding.apiKeySet
-                          ? "••••••• (défini)"
-                          : "Non défini"
-                      }
-                    />
-                  </Field>
-                </Collapsible>
-                <Collapsible title="LLM">
-                  <Field label="Provider">
-                    <Select
-                      value={form.llm.provider}
-                      options={["anthropic", "openai"]}
-                      onChange={(v) => setLlm("provider", v)}
-                    />
-                  </Field>
-                  <Field label="Modèle">
-                    <Input
-                      value={form.llm.model}
-                      onChange={(v) => setLlm("model", v)}
-                    />
-                  </Field>
-                  <Field label="Clé API">
-                    <Input
-                      type="password"
-                      value={form.llm.apiKey}
-                      onChange={(v) => setLlm("apiKey", v)}
-                      placeholder={
-                        currentSettings.llm.apiKeySet
-                          ? "••••••• (défini)"
-                          : "Non défini"
-                      }
-                    />
-                  </Field>
-                </Collapsible>
+              <div className="mb-4">
+                <ConfigForm
+                  settings={currentSettings}
+                  form={form}
+                  onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+                />
               </div>
             )}
 
@@ -520,13 +315,13 @@ function ResetDialog({
                 onClick={onClose}
                 className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
               >
-                Annuler
+                Cancel
               </button>
               <button
                 onClick={() => setStep(2)}
                 className="px-4 py-2 text-sm bg-slate-700 text-white hover:bg-slate-800 rounded-md transition-colors"
               >
-                Suivant
+                Next
               </button>
             </div>
           </>
@@ -540,21 +335,21 @@ function ResetDialog({
                 size={18}
               />
               <p className="text-sm text-red-700">
-                Cette action est irréversible. Toutes les données (documents,
-                conversations, fichiers) seront supprimées définitivement.
+                This action is irreversible. All data (documents, conversations,
+                files) will be permanently deleted.
               </p>
             </div>
 
             {changeConfig && (
               <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
-                La configuration sera également mise à jour.
+                The configuration will also be updated.
               </div>
             )}
 
             <div className="mb-4">
               <label className="text-sm text-slate-600 mb-1.5 block">
-                Saisissez <span className="font-mono font-semibold">RESET</span>{" "}
-                pour confirmer
+                Type <span className="font-mono font-semibold">RESET</span> to
+                confirm
               </label>
               <input
                 type="text"
@@ -570,7 +365,7 @@ function ResetDialog({
                 onClick={() => setStep(1)}
                 className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
               >
-                Retour
+                Back
               </button>
               <button
                 onClick={handleReset}
@@ -580,7 +375,7 @@ function ResetDialog({
                 {loading && (
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 )}
-                Confirmer la réinitialisation
+                Confirm reset
               </button>
             </div>
           </>
@@ -627,6 +422,13 @@ export default function AdminSettingsPage({
     queryFn: () => api.getSettings(),
   });
 
+  const { data: documents } = useDocuments();
+  const { data: conversations } = useConversations();
+
+  const hasData =
+    (documents && documents.length > 0) ||
+    (conversations && conversations.length > 0);
+
   const handleResetSuccess = () => {
     setShowReset(false);
     queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
@@ -639,7 +441,7 @@ export default function AdminSettingsPage({
         <PageHeader
           icon={<Settings className="text-amber-500" size={28} />}
           title="Document Ingestion Settings"
-          info="Configuration RAG, vérification de cohérence et actions d'administration."
+          info="RAG configuration, storage consistency check, and admin actions."
         />
         {onClose && (
           <button
@@ -651,34 +453,32 @@ export default function AdminSettingsPage({
         )}
       </div>
 
-      {isLoading && <p className="text-slate-400 text-sm">Chargement…</p>}
+      {isLoading && <p className="text-slate-400 text-sm">Loading…</p>}
       {isError && (
-        <p className="text-red-500 text-sm">
-          Impossible de charger la configuration.
-        </p>
+        <p className="text-red-500 text-sm">Failed to load configuration.</p>
       )}
 
       {settings && (
         <>
-          <SectionCard title="Configuration RAG">
-            <RagConfigSection settings={settings} />
+          <SectionCard title="RAG Configuration">
+            <RagConfigSection settings={settings} readonly={!!hasData} />
           </SectionCard>
 
-          <SectionCard title="Vérification de cohérence">
+          <SectionCard title="Storage Consistency">
             <ConsistencySection />
           </SectionCard>
 
           <SectionCard title="Danger Zone">
             <div className="border border-red-200 rounded-lg p-4 bg-red-50">
               <p className="text-sm text-red-700 mb-3">
-                Supprime toutes les données (documents, chunks, conversations,
-                fichiers stockés) de manière irréversible.
+                Permanently deletes all data — documents, chunks, conversations,
+                and stored files.
               </p>
               <button
                 onClick={() => setShowReset(true)}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
               >
-                Réinitialiser toutes les données
+                Reset all data and change settings
               </button>
             </div>
           </SectionCard>
