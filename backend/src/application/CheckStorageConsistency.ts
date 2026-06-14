@@ -1,9 +1,17 @@
+import path from "path";
 import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { FileStoragePort } from "../domain/ports/FileStoragePort";
 
 export interface StorageConsistencyResult {
   orphanFiles: string[];
   missingFiles: string[];
+}
+
+// Extracts just the filename from a path that may be absolute or relative.
+// Handles legacy DB records that stored full paths like /app/uploads/uuid.pdf
+// while storage returns relative keys like uuid.pdf.
+function toKey(filePath: string): string {
+  return path.basename(filePath);
 }
 
 export class CheckStorageConsistency {
@@ -19,12 +27,12 @@ export class CheckStorageConsistency {
     ]);
 
     const dbKeys = new Set(
-      docs.filter((d) => d.filePath).map((d) => d.filePath!),
+      docs.filter((d) => d.filePath).map((d) => toKey(d.filePath!)),
     );
-    const storageSet = new Set(storageKeys);
+    const storageSet = new Set(storageKeys.map(toKey));
 
     return {
-      orphanFiles: storageKeys.filter((k) => !dbKeys.has(k)),
+      orphanFiles: storageKeys.filter((k) => !dbKeys.has(toKey(k))),
       missingFiles: [...dbKeys].filter((k) => !storageSet.has(k)),
     };
   }
