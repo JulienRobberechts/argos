@@ -24,7 +24,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
-      STORAGE_BACKEND: local
+      STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
       UPLOAD_DIR: /app/uploads
     ports:
       - "3205:3205"
