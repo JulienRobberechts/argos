@@ -368,7 +368,7 @@ function ResetDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6 max-h-[90vh] overflow-y-auto">
         {step === 1 && (
           <>
             <h2 className="text-lg font-semibold text-slate-800 mb-1">

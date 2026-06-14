@@ -50,7 +50,8 @@ import { PgDocumentSummaryRepository } from "./infrastructure/db/PgDocumentSumma
 import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
-import { createFileStorage } from "./infrastructure/storage/createFileStorage";
+import { createStorageBackends } from "./infrastructure/storage/createFileStorage";
+import { DynamicFileStorage } from "./infrastructure/storage/DynamicFileStorage";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
@@ -71,9 +72,13 @@ const conversationRepo = new PgConversationRepository();
 const embeddingAdapter = new VoyageEmbeddingAdapter();
 const llmAdapter = new AnthropicLLMAdapter();
 const fileParser = new MultiFileParser();
-const fileStorage = createFileStorage();
 const appSettingsRepo = new PgAppSettingsRepository();
 const appSettingsService = new AppSettingsService(appSettingsRepo);
+const storageBackends = createStorageBackends();
+const fileStorage = new DynamicFileStorage(
+  () => appSettingsService.getSettings().then((s) => s.storage.provider),
+  storageBackends,
+);
 const ingestDocument = new IngestDocument(
   documentRepo,
   chunkRepo,

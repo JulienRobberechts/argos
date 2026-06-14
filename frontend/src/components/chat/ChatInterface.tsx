@@ -121,7 +121,7 @@ export default function ChatInterface() {
           </div>
         </div>
         {showParams && (
-          <aside className="w-72 border-l border-slate-200 shrink-0 flex flex-col">
+          <aside className="w-72 border-l border-slate-200 shrink-0 flex flex-col overflow-hidden">
             <ParamsPanel
               params={pendingParams}
               onChange={setPendingParams}

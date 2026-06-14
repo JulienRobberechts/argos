@@ -4,23 +4,24 @@ import { FileStoragePort } from "../../domain/ports/FileStoragePort";
 import { LocalFileStorage } from "./LocalFileStorage";
 import { R2FileStorage } from "./R2FileStorage";
 
-export function createFileStorage(): FileStoragePort {
-  const backend = config.storage.backend;
+export interface StorageBackends {
+  local: FileStoragePort;
+  r2: FileStoragePort | null;
+}
 
-  if (backend === "local") {
-    return new LocalFileStorage(config.api.uploadDir);
-  }
+export function createStorageBackends(): StorageBackends {
+  const local = new LocalFileStorage(config.api.uploadDir);
 
-  if (backend === "r2") {
-    const { accountId, accessKeyId, secretAccessKey, bucketName } =
-      config.storage.r2;
+  const { accountId, accessKeyId, secretAccessKey, bucketName } =
+    config.storage.r2;
+  if (accountId && accessKeyId && secretAccessKey && bucketName) {
     const client = new S3Client({
       region: "auto",
       endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
       credentials: { accessKeyId, secretAccessKey },
     });
-    return new R2FileStorage(client, bucketName);
+    return { local, r2: new R2FileStorage(client, bucketName) };
   }
 
-  throw new Error(`Unsupported STORAGE_BACKEND: "${backend}"`);
+  return { local, r2: null };
 }

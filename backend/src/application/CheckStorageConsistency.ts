@@ -5,6 +5,8 @@ import { FileStoragePort } from "../domain/ports/FileStoragePort";
 export interface StorageConsistencyResult {
   orphanFiles: string[];
   missingFiles: string[];
+  totalDocuments: number;
+  totalStorageFiles: number;
 }
 
 // Extracts just the filename from a path that may be absolute or relative.
@@ -34,6 +36,8 @@ export class CheckStorageConsistency {
     return {
       orphanFiles: storageKeys.filter((k) => !dbKeys.has(toKey(k))),
       missingFiles: [...dbKeys].filter((k) => !storageSet.has(k)),
+      totalDocuments: docs.length,
+      totalStorageFiles: storageKeys.length,
     };
   }
 }
