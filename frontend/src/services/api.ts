@@ -1,5 +1,8 @@
 import type {
   AppConfig,
+  AppSettings,
+  AppSettingsPatch,
+  ConsistencyReport,
   Conversation,
   ConversationParams,
   Document,
@@ -95,5 +98,24 @@ export const api = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ documentIds, questionCount }),
+    }),
+
+  checkStorageConsistency: () =>
+    request<ConsistencyReport>("/admin/storage/consistency"),
+
+  getSettings: () => request<AppSettings>("/admin/settings"),
+
+  updateSettings: (patch: AppSettingsPatch) =>
+    request<AppSettings>("/admin/settings", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    }),
+
+  resetAll: (newSettings?: AppSettingsPatch) =>
+    request<void>("/admin/reset", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ newSettings }),
     }),
 };

@@ -57,10 +57,14 @@ import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
 import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
 import { CheckStorageConsistency } from "./application/CheckStorageConsistency";
+import { AppSettingsService } from "./application/AppSettingsService";
+import { ResetAll } from "./application/ResetAll";
+import { PgAppSettingsRepository } from "./infrastructure/db/PgAppSettingsRepository";
 import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { SummarizeDocument } from "./application/SummarizeDocument";
 import { quizzesRouter } from "./api/routes/quizzes";
+import pool from "./infrastructure/db/pool";
 
 const documentRepo = new PgDocumentRepository();
 const chunkRepo = new PgVectorChunkRepository();
@@ -107,6 +111,9 @@ const checkStorageConsistency = new CheckStorageConsistency(
   documentRepo,
   fileStorage,
 );
+const appSettingsRepo = new PgAppSettingsRepository();
+const appSettingsService = new AppSettingsService(appSettingsRepo);
+const resetAll = new ResetAll(fileStorage, appSettingsService, pool);
 
 const app = express();
 const PORT = config.server.port;
@@ -119,6 +126,10 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/config", configRouter());
+app.use(
+  "/api/admin",
+  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
+);
 
 app.use("/api", apiKeyAuth);
 app.use(
@@ -138,7 +149,6 @@ app.use(
 );
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
-app.use("/api/admin", adminRouter(checkStorageConsistency));
 
 app.use(errorHandler);
 

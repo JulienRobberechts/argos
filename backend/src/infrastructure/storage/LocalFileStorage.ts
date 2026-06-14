@@ -28,6 +28,11 @@ export class LocalFileStorage implements FileStoragePort {
     return this.listDir(this.uploadDir, this.uploadDir);
   }
 
+  async deleteAll(): Promise<void> {
+    const keys = await this.list();
+    await Promise.all(keys.map((k) => this.delete(k)));
+  }
+
   private async listDir(dir: string, base: string): Promise<string[]> {
     let entries: fs.Dirent[];
     try {

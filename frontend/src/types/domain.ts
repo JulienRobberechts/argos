@@ -87,6 +87,24 @@ export interface DocumentSummary {
   updatedAt: string;
 }
 
+export interface ConsistencyReport {
+  ok: boolean;
+  orphanFiles: string[];
+  missingFiles: string[];
+}
+
+export interface AppSettings {
+  storage: { provider: string; bucketName: string; endpoint: string };
+  embedding: { provider: string; model: string; apiKeySet: boolean };
+  llm: { provider: string; model: string; apiKeySet: boolean };
+}
+
+export interface AppSettingsPatch {
+  storage?: Partial<{ provider: string; bucketName: string; endpoint: string }>;
+  embedding?: Partial<{ provider: string; model: string; apiKey: string }>;
+  llm?: Partial<{ provider: string; model: string; apiKey: string }>;
+}
+
 export interface AppConfig {
   version: string;
   logLevel: string;

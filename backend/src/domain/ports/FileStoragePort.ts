@@ -3,4 +3,5 @@ export interface FileStoragePort {
   download(key: string): Promise<Buffer>;
   delete(key: string): Promise<void>;
   list(): Promise<string[]>;
+  deleteAll(): Promise<void>;
 }

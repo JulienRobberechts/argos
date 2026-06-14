@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import IconNav from "./IconNav";
 import Sidebar from "./Sidebar";
 import DocumentsSidebar from "../documents/DocumentsSidebar";
-import SettingsPage from "../pages/SettingsPage";
+import AdminSettingsPage from "../../features/settings/SettingsPage";
 
 const MIN_WIDTH = 200;
 const DEFAULT_WIDTH = 288;
@@ -116,7 +116,7 @@ export default function AppLayout() {
       )}
       <main ref={mainRef} className="flex-1 overflow-y-auto overflow-x-hidden">
         {onDocuments && showSettings ? (
-          <SettingsPage onClose={() => setShowSettings(false)} />
+          <AdminSettingsPage onClose={() => setShowSettings(false)} />
         ) : (
           <Outlet />
         )}

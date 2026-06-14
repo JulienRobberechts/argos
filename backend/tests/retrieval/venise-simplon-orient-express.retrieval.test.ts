@@ -15,6 +15,7 @@ const diskFileStorage = {
   download: async (key: string) => fs.promises.readFile(key),
   delete: async () => {},
   list: async () => [] as string[],
+  deleteAll: async () => {},
 };
 import { RETRIEVAL_CASES } from "./venise-simplon-orient-express.retrieval.cases";
 

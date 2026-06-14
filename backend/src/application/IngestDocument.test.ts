@@ -27,6 +27,7 @@ function makeFileStorage(content = Buffer.from("dummy")) {
     download: vi.fn().mockResolvedValue(content),
     delete: vi.fn().mockResolvedValue(undefined),
     list: vi.fn().mockResolvedValue([]),
+    deleteAll: vi.fn().mockResolvedValue(undefined),
   };
 }
 
