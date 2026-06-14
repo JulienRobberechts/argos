@@ -1,9 +1,10 @@
 import pino from "pino";
+import config from "../../config";
 
 const isDev = process.env.NODE_ENV !== "production";
 
 const rootLogger = pino({
-  level: process.env.LOG_LEVEL ?? "info",
+  level: config.server.logLevel,
   ...(isDev
     ? {
         transport: {
