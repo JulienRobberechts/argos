@@ -1,17 +1,16 @@
 import { randomUUID } from "crypto";
-import fs from "fs";
 import { Router, Request, Response, NextFunction } from "express";
 import multer from "multer";
 import path from "path";
-import config from "../../config";
-import { createDocumentSchema } from "../dto/document.dto";
 import { DocumentRepository } from "../../domain/ports/DocumentRepository";
 import { ChunkRepository } from "../../domain/ports/ChunkRepository";
 import { DocumentSummaryRepository } from "../../domain/ports/DocumentSummaryRepository";
+import { FileStoragePort } from "../../domain/ports/FileStoragePort";
 import { IngestDocument } from "../../application/IngestDocument";
 import { SummarizeDocument } from "../../application/SummarizeDocument";
+import { createDocumentSchema } from "../dto/document.dto";
 
-const upload = multer({ dest: config.api.uploadDir });
+const upload = multer({ storage: multer.memoryStorage() });
 
 function sourceTypeFromMime(
   mimetype: string,
@@ -26,6 +25,7 @@ function sourceTypeFromMime(
 export function documentsRouter(
   documentRepo: DocumentRepository,
   chunkRepo: ChunkRepository,
+  fileStorage: FileStoragePort,
   ingestDocument: IngestDocument,
   summaryRepo: DocumentSummaryRepository,
   summarizeDocument: SummarizeDocument,
@@ -50,16 +50,17 @@ export function documentsRouter(
         const title = body.title ?? path.basename(originalName);
         const sourceType = sourceTypeFromMime(req.file.mimetype, originalName);
 
+        const id = randomUUID();
         const ext = path.extname(originalName).toLowerCase();
-        const filePath = req.file.path + ext;
-        await fs.promises.rename(req.file.path, filePath);
+        const key = `${id}${ext}`;
+        await fileStorage.upload(key, req.file.buffer, req.file.mimetype);
 
         const document = {
-          id: randomUUID(),
+          id,
           title,
           sourceType,
           status: "pending" as const,
-          filePath,
+          filePath: key,
           createdAt: new Date(),
         };
 
@@ -162,14 +163,9 @@ export function documentsRouter(
           res.status(404).json({ error: "Raw file not available" });
           return;
         }
-        try {
-          await fs.promises.access(doc.filePath);
-        } catch {
-          res.status(404).json({ error: "File no longer available" });
-          return;
-        }
+        const buffer = await fileStorage.download(doc.filePath);
         res.setHeader("Content-Type", "application/pdf");
-        res.sendFile(doc.filePath, { root: "/" });
+        res.send(buffer);
       } catch (err) {
         next(err);
       }
@@ -228,6 +224,9 @@ export function documentsRouter(
         if (!doc) {
           res.status(404).json({ error: "Document not found" });
           return;
+        }
+        if (doc.filePath) {
+          await fileStorage.delete(doc.filePath).catch(() => {});
         }
         await chunkRepo.deleteByDocumentId(String(req.params.id));
         await documentRepo.delete(String(req.params.id));

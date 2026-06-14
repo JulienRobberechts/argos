@@ -13,15 +13,25 @@ function makeDoc(overrides?: Partial<Document>): Document {
     title: "Test",
     sourceType: "text",
     status: "ready",
-    filePath: "/tmp/test.txt",
+    filePath: "test.txt",
     createdAt: new Date(),
     ...overrides,
+  };
+}
+
+function makeFileStorage() {
+  return {
+    upload: vi.fn().mockResolvedValue("test.txt"),
+    download: vi.fn().mockResolvedValue(Buffer.from("content")),
+    delete: vi.fn().mockResolvedValue(undefined),
+    list: vi.fn().mockResolvedValue([]),
   };
 }
 
 function makeApp(
   docRepo: InMemoryDocumentRepository,
   chunkRepo: InMemoryChunkRepository,
+  fileStorage = makeFileStorage(),
   ingest = { execute: vi.fn().mockResolvedValue(undefined) },
 ) {
   const fakeSummaryRepo = {
@@ -36,6 +46,7 @@ function makeApp(
     documentsRouter(
       docRepo,
       chunkRepo,
+      fileStorage as never,
       ingest as never,
       fakeSummaryRepo as never,
       fakeSummarize as never,
@@ -96,14 +107,38 @@ describe("documentsRouter", () => {
     expect(res.status).toBe(404);
   });
 
-  it("DELETE /documents/:id removes document", async () => {
-    const doc = makeDoc();
+  it("GET /documents/:id/raw returns PDF buffer for pdf doc", async () => {
+    const fileStorage = makeFileStorage();
+    fileStorage.download.mockResolvedValue(Buffer.from("%PDF-fake"));
+    const doc = makeDoc({ sourceType: "pdf", filePath: "test.pdf" });
     await docRepo.save(doc);
-    const res = await request(makeApp(docRepo, chunkRepo)).delete(
+    const res = await request(makeApp(docRepo, chunkRepo, fileStorage)).get(
+      `/documents/${doc.id}/raw`,
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers["content-type"]).toContain("application/pdf");
+    expect(fileStorage.download).toHaveBeenCalledWith("test.pdf");
+  });
+
+  it("GET /documents/:id/raw returns 404 for non-pdf doc", async () => {
+    const doc = makeDoc({ sourceType: "text", filePath: "test.txt" });
+    await docRepo.save(doc);
+    const res = await request(makeApp(docRepo, chunkRepo)).get(
+      `/documents/${doc.id}/raw`,
+    );
+    expect(res.status).toBe(404);
+  });
+
+  it("DELETE /documents/:id removes document and deletes file", async () => {
+    const fileStorage = makeFileStorage();
+    const doc = makeDoc({ filePath: "test.txt" });
+    await docRepo.save(doc);
+    const res = await request(makeApp(docRepo, chunkRepo, fileStorage)).delete(
       `/documents/${doc.id}`,
     );
     expect(res.status).toBe(204);
     expect(await docRepo.findById(doc.id)).toBeNull();
+    expect(fileStorage.delete).toHaveBeenCalledWith("test.txt");
   });
 
   it("DELETE /documents/:id returns 404 for unknown id", async () => {
@@ -122,8 +157,9 @@ describe("documentsRouter", () => {
   });
 
   it("POST /documents accepts a text file and returns 202", async () => {
+    const fileStorage = makeFileStorage();
     const ingest = { execute: vi.fn().mockResolvedValue(undefined) };
-    const res = await request(makeApp(docRepo, chunkRepo, ingest))
+    const res = await request(makeApp(docRepo, chunkRepo, fileStorage, ingest))
       .post("/documents")
       .attach("file", Buffer.from("hello world"), {
         filename: "test.txt",
@@ -133,11 +169,12 @@ describe("documentsRouter", () => {
     expect(res.status).toBe(202);
     expect(res.body.status).toBe("pending");
     expect(typeof res.body.id).toBe("string");
+    expect(fileStorage.upload).toHaveBeenCalledOnce();
   });
 
   it("POST /documents uses filename as title when title omitted", async () => {
     const ingest = { execute: vi.fn().mockResolvedValue(undefined) };
-    const res = await request(makeApp(docRepo, chunkRepo, ingest))
+    const res = await request(makeApp(docRepo, chunkRepo, undefined, ingest))
       .post("/documents")
       .attach("file", Buffer.from("content"), {
         filename: "myfile.txt",

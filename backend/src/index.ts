@@ -42,6 +42,7 @@ import { configRouter } from "./api/routes/config";
 import { documentsRouter } from "./api/routes/documents";
 import { conversationsRouter } from "./api/routes/conversations";
 import { searchRouter } from "./api/routes/search";
+import { adminRouter } from "./api/routes/admin";
 import { PgDocumentRepository } from "./infrastructure/db/PgDocumentRepository";
 import { PgVectorChunkRepository } from "./infrastructure/db/PgVectorChunkRepository";
 import { PgConversationRepository } from "./infrastructure/db/PgConversationRepository";
@@ -50,10 +51,12 @@ import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbedd
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
 import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
+import { createFileStorage } from "./infrastructure/storage/createFileStorage";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { AskQuestion } from "./application/AskQuestion";
 import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
+import { CheckStorageConsistency } from "./application/CheckStorageConsistency";
 import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { SummarizeDocument } from "./application/SummarizeDocument";
@@ -65,11 +68,13 @@ const conversationRepo = new PgConversationRepository();
 const embeddingAdapter = new VoyageEmbeddingAdapter();
 const llmAdapter = new AnthropicLLMAdapter();
 const fileParser = new MultiFileParser();
+const fileStorage = createFileStorage();
 const chunkingStrategy = createChunkingStrategy(config.rag.chunkingStrategy);
 const ingestDocument = new IngestDocument(
   documentRepo,
   chunkRepo,
   embeddingAdapter,
+  fileStorage,
   fileParser,
   chunkingStrategy,
   { chunkSize: config.rag.chunkSize, chunkOverlap: config.rag.chunkOverlap },
@@ -98,6 +103,10 @@ const summarizeDocument = new SummarizeDocument(
   summaryRepo,
   llmAdapter,
 );
+const checkStorageConsistency = new CheckStorageConsistency(
+  documentRepo,
+  fileStorage,
+);
 
 const app = express();
 const PORT = config.server.port;
@@ -117,6 +126,7 @@ app.use(
   documentsRouter(
     documentRepo,
     chunkRepo,
+    fileStorage,
     ingestDocument,
     summaryRepo,
     summarizeDocument,
@@ -128,6 +138,7 @@ app.use(
 );
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
+app.use("/api/admin", adminRouter(checkStorageConsistency));
 
 app.use(errorHandler);
 

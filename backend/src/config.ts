@@ -29,6 +29,16 @@ const config = {
     key: process.env.API_KEY,
     uploadDir: process.env.UPLOAD_DIR ?? "/app/uploads",
   },
+  storage: {
+    backend: (process.env.STORAGE_BACKEND ?? "local") as "local" | "r2",
+    r2: {
+      accountId: process.env.R2_ACCOUNT_ID ?? "",
+      accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
+      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
+      bucketName: process.env.R2_BUCKET_NAME ?? "",
+      publicUrl: process.env.R2_PUBLIC_URL,
+    },
+  },
   rag: {
     chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as
       | "recursive"

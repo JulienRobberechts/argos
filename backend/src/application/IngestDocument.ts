@@ -1,8 +1,12 @@
+import fs from "fs";
+import os from "os";
+import path from "path";
 import { randomUUID } from "crypto";
 import { ChunkRepository } from "../domain/ports/ChunkRepository";
 import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
 import { FileParserPort } from "../domain/ports/FileParserPort";
+import { FileStoragePort } from "../domain/ports/FileStoragePort";
 import type { IChunkingStrategy } from "../domain/services/ChunkingTypes";
 import { Logger } from "../infrastructure/logger/Logger";
 
@@ -22,6 +26,7 @@ export class IngestDocument {
     private readonly documentRepo: DocumentRepository,
     private readonly chunkRepo: ChunkRepository,
     private readonly embeddingAdapter: EmbeddingPort,
+    private readonly fileStorage: FileStoragePort,
     private readonly fileParser: FileParserPort,
     private readonly chunkingStrategy: IChunkingStrategy,
     config: IngestConfig = {},
@@ -45,10 +50,22 @@ export class IngestDocument {
     await this.documentRepo.updateStatus(documentId, "processing");
 
     try {
-      const { text: rawText } = await this.fileParser.parse(
-        document.filePath ?? "",
-      );
-      // PostgreSQL UTF8 rejects null bytes — strip them
+      const key = document.filePath;
+      if (!key) throw new Error(`Document ${documentId} has no file`);
+
+      const buffer = await this.fileStorage.download(key);
+      const ext = path.extname(key);
+      const tempPath = path.join(os.tmpdir(), `ingest-${documentId}${ext}`);
+      await fs.promises.writeFile(tempPath, buffer);
+
+      let rawText: string;
+      try {
+        const parsed = await this.fileParser.parse(tempPath);
+        rawText = parsed.text;
+      } finally {
+        await fs.promises.unlink(tempPath).catch(() => {});
+      }
+
       const text = rawText.replace(/\x00/g, "");
       const chunkResults = this.chunkingStrategy.chunk(text, {
         chunkSize: this.chunkSize,
@@ -58,10 +75,6 @@ export class IngestDocument {
       this.logger.info("Chunking complete", {
         documentId,
         chunks: chunkResults.length,
-      });
-
-      chunkResults.forEach((r, i) => {
-        this.logger.info(`Chunk ${i}`, { content: r.content });
       });
 
       const contents = chunkResults.map((r) => r.content);
@@ -90,7 +103,6 @@ export class IngestDocument {
         documentId,
         chunks: chunks.length,
       });
-      this.logger.info("Ending ingestion", { documentId });
     } catch (err) {
       this.logger.error(
         "Ingestion failed",

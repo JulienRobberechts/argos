@@ -1,3 +1,4 @@
+import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -8,6 +9,13 @@ import { IngestDocument } from "../../src/application/IngestDocument";
 import { SearchKnowledge } from "../../src/application/SearchKnowledge";
 import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository";
+
+const diskFileStorage = {
+  upload: async (key: string) => key,
+  download: async (key: string) => fs.promises.readFile(key),
+  delete: async () => {},
+  list: async () => [] as string[],
+};
 import { RETRIEVAL_CASES } from "./venise-simplon-orient-express.retrieval.cases";
 
 const CHUNK_SIZE = 512;
@@ -47,9 +55,9 @@ describe.skipIf(!VOYAGE_API_KEY)(
         docRepo,
         chunkRepo,
         embeddingAdapter,
+        diskFileStorage,
         parser,
         chunkingStrategy,
-        // Small chunks to split the paragraph into distinct retrievable sections.
         { chunkSize: CHUNK_SIZE, chunkOverlap: CHUNK_OVERLAP },
       );
 

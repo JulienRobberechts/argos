@@ -15,9 +15,18 @@ function makeDocument(overrides?: Partial<Document>): Document {
     title: "Test Doc",
     sourceType: "text",
     status: "pending",
-    filePath: "/tmp/test.txt",
+    filePath: "test.txt",
     createdAt: new Date(),
     ...overrides,
+  };
+}
+
+function makeFileStorage(content = Buffer.from("dummy")) {
+  return {
+    upload: vi.fn().mockResolvedValue("test.txt"),
+    download: vi.fn().mockResolvedValue(content),
+    delete: vi.fn().mockResolvedValue(undefined),
+    list: vi.fn().mockResolvedValue([]),
   };
 }
 
@@ -44,6 +53,7 @@ describe("IngestDocument", () => {
   let docRepo: InMemoryDocumentRepository;
   let chunkRepo: InMemoryChunkRepository;
   let embeddingAdapter: ReturnType<typeof makeEmbeddingAdapter>;
+  let fileStorage: ReturnType<typeof makeFileStorage>;
   let fileParser: ReturnType<typeof makeFileParser>;
   let chunkingStrategy: IChunkingStrategy;
 
@@ -51,22 +61,29 @@ describe("IngestDocument", () => {
     docRepo = new InMemoryDocumentRepository();
     chunkRepo = new InMemoryChunkRepository();
     embeddingAdapter = makeEmbeddingAdapter();
+    fileStorage = makeFileStorage();
     fileParser = makeFileParser();
     chunkingStrategy = createChunkingStrategy("recursive");
   });
 
-  it("should parse the file content using the correct parser by sourceType", async () => {
-    const doc = makeDocument({ filePath: "/tmp/test.txt" });
-    await docRepo.save(doc);
-    const ingest = new IngestDocument(
+  function makeIngest(config?: { chunkSize?: number; chunkOverlap?: number }) {
+    return new IngestDocument(
       docRepo,
       chunkRepo,
       embeddingAdapter,
+      fileStorage,
       fileParser,
       chunkingStrategy,
+      config,
     );
-    await ingest.execute(doc.id);
-    expect(fileParser.parse).toHaveBeenCalledWith(doc.filePath);
+  }
+
+  it("should download the file from storage then parse it", async () => {
+    const doc = makeDocument({ filePath: "test.txt" });
+    await docRepo.save(doc);
+    await makeIngest().execute(doc.id);
+    expect(fileStorage.download).toHaveBeenCalledWith("test.txt");
+    expect(fileParser.parse).toHaveBeenCalledOnce();
   });
 
   it("should split content into chunks using ChunkingStrategy", async () => {
@@ -74,18 +91,10 @@ describe("IngestDocument", () => {
       .fill("word")
       .map((w, i) => `${w}${i}`)
       .join(" ");
-    const parser = makeFileParser(text);
+    fileParser = makeFileParser(text);
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      embeddingAdapter,
-      parser,
-      chunkingStrategy,
-      { chunkSize: 3, chunkOverlap: 0 },
-    );
-    await ingest.execute(doc.id);
+    await makeIngest({ chunkSize: 3, chunkOverlap: 0 }).execute(doc.id);
     const results = await chunkRepo.search(Array(1024).fill(0.1), 100, 0);
     expect(results.length).toBeGreaterThan(1);
   });
@@ -95,18 +104,10 @@ describe("IngestDocument", () => {
       .fill("word")
       .map((w, i) => `${w}${i}`)
       .join(" ");
-    const parser = makeFileParser(text);
+    fileParser = makeFileParser(text);
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      embeddingAdapter,
-      parser,
-      chunkingStrategy,
-      { chunkSize: 1, chunkOverlap: 0 },
-    );
-    await ingest.execute(doc.id);
+    await makeIngest({ chunkSize: 1, chunkOverlap: 0 }).execute(doc.id);
     expect(embeddingAdapter.embedMany).toHaveBeenCalledTimes(2);
     expect(embeddingAdapter.embedMany.mock.calls[0][0]).toHaveLength(20);
     expect(embeddingAdapter.embedMany.mock.calls[1][0]).toHaveLength(5);
@@ -115,14 +116,7 @@ describe("IngestDocument", () => {
   it("should save all chunks to the chunk repository", async () => {
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      embeddingAdapter,
-      fileParser,
-      chunkingStrategy,
-    );
-    await ingest.execute(doc.id);
+    await makeIngest().execute(doc.id);
     const results = await chunkRepo.search(Array(1024).fill(0.1), 100, 0);
     expect(results.length).toBeGreaterThan(0);
   });
@@ -130,14 +124,7 @@ describe("IngestDocument", () => {
   it('should mark document status as "ready" after successful ingestion', async () => {
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      embeddingAdapter,
-      fileParser,
-      chunkingStrategy,
-    );
-    await ingest.execute(doc.id);
+    await makeIngest().execute(doc.id);
     const updated = await docRepo.findById(doc.id);
     expect(updated!.status).toBe("ready");
   });
@@ -153,6 +140,7 @@ describe("IngestDocument", () => {
       docRepo,
       chunkRepo,
       errorAdapter,
+      fileStorage,
       fileParser,
       chunkingStrategy,
     );
@@ -161,24 +149,26 @@ describe("IngestDocument", () => {
     expect(updated!.status).toBe("error");
   });
 
+  it('should mark document status as "error" if storage download fails', async () => {
+    fileStorage.download.mockRejectedValue(new Error("Storage error"));
+    const doc = makeDocument();
+    await docRepo.save(doc);
+    await makeIngest().execute(doc.id);
+    const updated = await docRepo.findById(doc.id);
+    expect(updated!.status).toBe("error");
+  });
+
   it("should delete existing chunks before reingest (idempotency)", async () => {
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      embeddingAdapter,
-      fileParser,
-      chunkingStrategy,
-    );
-
-    await ingest.execute(doc.id);
-    const firstResults = await chunkRepo.search(Array(1024).fill(0.1), 100, 0);
-    const firstCount = firstResults.length;
+    await makeIngest().execute(doc.id);
+    const firstCount = (await chunkRepo.search(Array(1024).fill(0.1), 100, 0))
+      .length;
 
     await docRepo.updateStatus(doc.id, "pending");
-    await ingest.execute(doc.id);
-    const secondResults = await chunkRepo.search(Array(1024).fill(0.1), 100, 0);
-    expect(secondResults.length).toBe(firstCount);
+    await makeIngest().execute(doc.id);
+    const secondCount = (await chunkRepo.search(Array(1024).fill(0.1), 100, 0))
+      .length;
+    expect(secondCount).toBe(firstCount);
   });
 });
