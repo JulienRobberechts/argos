@@ -26,7 +26,7 @@ const config = {
     },
   },
   api: {
-    key: process.env.API_KEY,
+    key: process.env.APP_PASSWORD,
     uploadDir: process.env.UPLOAD_DIR ?? "/app/uploads",
   },
   storage: {

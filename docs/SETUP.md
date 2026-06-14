@@ -19,7 +19,7 @@ Renseigner dans `.env` :
 | `ANTHROPIC_API_KEY` | Clé API Anthropic (génération de réponses) |
 | `VOYAGE_API_KEY` | Clé API Voyage AI (embeddings) |
 | `POSTGRES_PASSWORD` | Mot de passe PostgreSQL (libre choix en dev) |
-| `API_KEY` | Clé d'authentification de l'API HTTP |
+| `APP_PASSWORD` | Mot de passe de l'écran de login |
 
 Les autres variables ont des valeurs par défaut adaptées au développement.
 
@@ -75,7 +75,7 @@ docker compose exec api npm run migrate
 **Vérification**
 
 ```bash
-curl -H "x-api-key: <API_KEY>" http://localhost:3205/api/documents
+curl -H "x-api-key: <APP_PASSWORD>" http://localhost:3205/api/documents
 # doit retourner []
 ```
 
@@ -146,9 +146,9 @@ La CLI demande de saisir les variables :
 ```env
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 DATABASE_PUBLIC_URL=${{Postgres.DATABASE_PUBLIC_URL}}
-ANTHROPIC_API_KEY=<>
-VOYAGE_API_KEY=<>
-API_KEY=<>
+ANTHROPIC_APP_PASSWORD=<>
+VOYAGE_APP_PASSWORD=<>
+APP_PASSWORD=<>
 PORT=3001
 NODE_ENV=production
 LOG_LEVEL=debug
