@@ -22,6 +22,17 @@ export interface AppSettings {
 export interface AppSettingsPatch {
   embedding?: { provider: string };
   storage?: { provider: string };
+  chunking?: {
+    strategy?: "recursive" | "sentence";
+    chunkSize?: number;
+    chunkOverlap?: number;
+  };
+}
+
+export interface ChunkingConfig {
+  strategy: "recursive" | "sentence";
+  chunkSize: number;
+  chunkOverlap: number;
 }
 
 const EMBEDDING_PRESETS: Omit<ProviderOption, "available">[] = [
@@ -91,12 +102,33 @@ export class AppSettingsService {
     };
   }
 
+  async getChunkingConfig(): Promise<ChunkingConfig> {
+    const stored = await this.repo.getAll();
+    return {
+      strategy: (stored["rag.strategy"] ?? config.rag.chunkingStrategy) as
+        | "recursive"
+        | "sentence",
+      chunkSize: stored["rag.chunkSize"]
+        ? parseInt(stored["rag.chunkSize"], 10)
+        : config.rag.chunkSize,
+      chunkOverlap: stored["rag.chunkOverlap"]
+        ? parseInt(stored["rag.chunkOverlap"], 10)
+        : config.rag.chunkOverlap,
+    };
+  }
+
   async updateSettings(patch: AppSettingsPatch): Promise<AppSettings> {
     const entries: Record<string, string> = {};
     if (patch.embedding?.provider)
       entries["embedding.provider"] = patch.embedding.provider;
     if (patch.storage?.provider)
       entries["storage.provider"] = patch.storage.provider;
+    if (patch.chunking?.strategy)
+      entries["rag.strategy"] = patch.chunking.strategy;
+    if (patch.chunking?.chunkSize != null)
+      entries["rag.chunkSize"] = String(patch.chunking.chunkSize);
+    if (patch.chunking?.chunkOverlap != null)
+      entries["rag.chunkOverlap"] = String(patch.chunking.chunkOverlap);
     if (Object.keys(entries).length > 0) await this.repo.setMany(entries);
     return this.getSettings();
   }

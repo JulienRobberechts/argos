@@ -114,6 +114,11 @@ export interface AppSettings {
 export interface AppSettingsPatch {
   embedding?: { provider: string };
   storage?: { provider: string };
+  chunking?: {
+    strategy?: "recursive" | "sentence";
+    chunkSize?: number;
+    chunkOverlap?: number;
+  };
 }
 
 export interface AppConfig {

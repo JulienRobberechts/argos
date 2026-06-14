@@ -50,7 +50,6 @@ import { PgDocumentSummaryRepository } from "./infrastructure/db/PgDocumentSumma
 import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
-import { createChunkingStrategy } from "./domain/services/ChunkingStrategy";
 import { createFileStorage } from "./infrastructure/storage/createFileStorage";
 import { IngestDocument } from "./application/IngestDocument";
 import { SearchKnowledge } from "./application/SearchKnowledge";
@@ -73,15 +72,15 @@ const embeddingAdapter = new VoyageEmbeddingAdapter();
 const llmAdapter = new AnthropicLLMAdapter();
 const fileParser = new MultiFileParser();
 const fileStorage = createFileStorage();
-const chunkingStrategy = createChunkingStrategy(config.rag.chunkingStrategy);
+const appSettingsRepo = new PgAppSettingsRepository();
+const appSettingsService = new AppSettingsService(appSettingsRepo);
 const ingestDocument = new IngestDocument(
   documentRepo,
   chunkRepo,
   embeddingAdapter,
   fileStorage,
   fileParser,
-  chunkingStrategy,
-  { chunkSize: config.rag.chunkSize, chunkOverlap: config.rag.chunkOverlap },
+  () => appSettingsService.getChunkingConfig(),
 );
 const reranker = config.rerank.enabled ? new VoyageRerankAdapter() : null;
 const searchKnowledge = new SearchKnowledge(
@@ -111,8 +110,6 @@ const checkStorageConsistency = new CheckStorageConsistency(
   documentRepo,
   fileStorage,
 );
-const appSettingsRepo = new PgAppSettingsRepository();
-const appSettingsService = new AppSettingsService(appSettingsRepo);
 const resetAll = new ResetAll(fileStorage, appSettingsService, pool);
 
 const app = express();
@@ -125,7 +122,7 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/api/config", configRouter());
+app.use("/api/config", configRouter(appSettingsService));
 app.use(
   "/api/admin",
   adminRouter(checkStorageConsistency, appSettingsService, resetAll),

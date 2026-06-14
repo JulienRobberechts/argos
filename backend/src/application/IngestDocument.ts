@@ -7,19 +7,16 @@ import { DocumentRepository } from "../domain/ports/DocumentRepository";
 import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
 import { FileParserPort } from "../domain/ports/FileParserPort";
 import { FileStoragePort } from "../domain/ports/FileStoragePort";
-import type { IChunkingStrategy } from "../domain/services/ChunkingTypes";
+import {
+  createChunkingStrategy,
+  type ChunkingStrategyName,
+} from "../domain/services/ChunkingStrategy";
 import { Logger } from "../infrastructure/logger/Logger";
+import type { ChunkingConfig } from "./AppSettingsService";
 
 const BATCH_SIZE = 20;
 
-interface IngestConfig {
-  chunkSize?: number;
-  chunkOverlap?: number;
-}
-
 export class IngestDocument {
-  private readonly chunkSize: number;
-  private readonly chunkOverlap: number;
   private readonly logger = new Logger("IngestDocument");
 
   constructor(
@@ -28,22 +25,24 @@ export class IngestDocument {
     private readonly embeddingAdapter: EmbeddingPort,
     private readonly fileStorage: FileStoragePort,
     private readonly fileParser: FileParserPort,
-    private readonly chunkingStrategy: IChunkingStrategy,
-    config: IngestConfig = {},
-  ) {
-    this.chunkSize = config.chunkSize ?? 512;
-    this.chunkOverlap = config.chunkOverlap ?? 128;
-  }
+    private readonly getChunkingConfig: () => Promise<ChunkingConfig>,
+  ) {}
 
   async execute(documentId: string): Promise<void> {
     const document = await this.documentRepo.findById(documentId);
     if (!document) throw new Error(`Document ${documentId} not found`);
 
+    const { strategy, chunkSize, chunkOverlap } =
+      await this.getChunkingConfig();
+    const chunkingStrategy = createChunkingStrategy(
+      strategy as ChunkingStrategyName,
+    );
+
     this.logger.info("Starting ingestion", {
       documentId,
       file: document.filePath,
-      chunkSize: this.chunkSize,
-      chunkOverlap: this.chunkOverlap,
+      chunkSize,
+      chunkOverlap,
     });
 
     await this.chunkRepo.deleteByDocumentId(documentId);
@@ -67,9 +66,9 @@ export class IngestDocument {
       }
 
       const text = rawText.replace(/\x00/g, "");
-      const chunkResults = this.chunkingStrategy.chunk(text, {
-        chunkSize: this.chunkSize,
-        chunkOverlap: this.chunkOverlap,
+      const chunkResults = chunkingStrategy.chunk(text, {
+        chunkSize,
+        chunkOverlap,
       });
 
       this.logger.info("Chunking complete", {

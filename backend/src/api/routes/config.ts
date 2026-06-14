@@ -1,40 +1,46 @@
 import { Router } from "express";
 import config from "../../config";
+import { AppSettingsService } from "../../application/AppSettingsService";
 import pkg from "../../../package.json";
 
-export function configRouter(): Router {
+export function configRouter(settingsService: AppSettingsService): Router {
   const router = Router();
 
-  router.get("/", (_req, res) => {
-    res.json({
-      version: pkg.version,
-      logLevel: config.server.logLevel,
-      rag: {
-        chunkingStrategy: config.rag.chunkingStrategy,
-        chunkSize: config.rag.chunkSize,
-        chunkOverlap: config.rag.chunkOverlap,
-        retrievalLimit: config.rag.retrievalLimit,
-        retrievalMinScore: config.rag.retrievalMinScore,
-        searchMode: config.rag.searchMode,
-        reranking: {
-          enabled: config.rerank.enabled,
-          model: config.rerank.model,
+  router.get("/", async (_req, res, next) => {
+    try {
+      const chunking = await settingsService.getChunkingConfig();
+      res.json({
+        version: pkg.version,
+        logLevel: config.server.logLevel,
+        rag: {
+          chunkingStrategy: chunking.strategy,
+          chunkSize: chunking.chunkSize,
+          chunkOverlap: chunking.chunkOverlap,
+          retrievalLimit: config.rag.retrievalLimit,
+          retrievalMinScore: config.rag.retrievalMinScore,
+          searchMode: config.rag.searchMode,
+          reranking: {
+            enabled: config.rerank.enabled,
+            model: config.rerank.model,
+          },
         },
-      },
-      llm: {
-        provider: "anthropic",
-        model: config.llm.anthropic.model,
-        maxTokens: config.llm.anthropic.maxTokens,
-        temperature: config.llm.anthropic.temperature,
-      },
-      embeddings: {
-        provider: "voyage",
-        model: config.embeddings.voyage.model,
-      },
-      storage: {
-        backend: config.storage.backend,
-      },
-    });
+        llm: {
+          provider: "anthropic",
+          model: config.llm.anthropic.model,
+          maxTokens: config.llm.anthropic.maxTokens,
+          temperature: config.llm.anthropic.temperature,
+        },
+        embeddings: {
+          provider: "voyage",
+          model: config.embeddings.voyage.model,
+        },
+        storage: {
+          backend: config.storage.backend,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 
   return router;

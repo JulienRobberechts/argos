@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import IconNav from "./IconNav";
 import Sidebar from "./Sidebar";
 import DocumentsSidebar from "../documents/DocumentsSidebar";
-import AdminSettingsPage from "../../features/settings/SettingsPage";
+import AdminSettingsPage from "../../features/settings/IngestionSettingsPage";
 
 const MIN_WIDTH = 200;
 const DEFAULT_WIDTH = 288;

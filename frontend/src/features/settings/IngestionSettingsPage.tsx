@@ -1,31 +1,61 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Settings, AlertTriangle, CheckCircle, X, Lock } from "lucide-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Settings,
+  AlertTriangle,
+  CheckCircle,
+  X,
+  ChevronDown,
+  DatabaseZap,
+  Trash2,
+} from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "../../services/api";
 import type {
   AppSettings,
   AppSettingsPatch,
+  AppConfig,
   ConsistencyReport,
 } from "../../types/domain";
-import { useDocuments } from "../../hooks/useDocuments";
-import { useConversations } from "../../hooks/useConversation";
 import PageHeader from "../../components/ui/PageHeader";
 
-// ─── Config Form ──────────────────────────────────────────────────────────────
+// ─── Read-only primitives ─────────────────────────────────────────────────────
+
+function SettingRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
+  return (
+    <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
+      <span className="text-sm text-slate-500">{label}</span>
+      <span className="text-sm font-medium text-slate-800">{value}</span>
+    </div>
+  );
+}
+
+function SettingGroup({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-4">
+      {children}
+    </div>
+  );
+}
+
+// ─── Config form (used only in ResetDialog) ───────────────────────────────────
 
 function ProviderSelect({
   label,
   value,
   options,
   onChange,
-  disabled,
 }: {
   label: string;
   value: string;
   options: { value: string; label: string; available: boolean }[];
   onChange: (v: string) => void;
-  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col gap-1">
@@ -33,8 +63,7 @@ function ProviderSelect({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        disabled={disabled}
-        className="text-sm border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400 disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed"
+        className="text-sm border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value} disabled={!o.available}>
@@ -50,116 +79,167 @@ function ProviderSelect({
 interface FormState {
   embeddingProvider: string;
   storageProvider: string;
+  chunkingStrategy: "recursive" | "sentence";
+  chunkSize: number;
+  chunkOverlap: number;
 }
 
-function buildForm(settings: AppSettings): FormState {
+function buildForm(settings: AppSettings, config: AppConfig): FormState {
   return {
     embeddingProvider: settings.embedding.provider,
     storageProvider: settings.storage.provider,
+    chunkingStrategy: config.rag.chunkingStrategy,
+    chunkSize: config.rag.chunkSize,
+    chunkOverlap: config.rag.chunkOverlap,
   };
+}
+
+function NumberInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs text-slate-500">{label}</label>
+      <input
+        type="number"
+        value={value}
+        min={1}
+        onChange={(e) => onChange(parseInt(e.target.value, 10))}
+        className="text-sm border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-amber-400"
+      />
+    </div>
+  );
+}
+
+function DialogSubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+        {title}
+      </p>
+      {children}
+    </div>
+  );
 }
 
 function ConfigForm({
   settings,
   form,
   onChange,
-  disabled,
 }: {
   settings: AppSettings;
   form: FormState;
   onChange: (patch: Partial<FormState>) => void;
-  disabled?: boolean;
 }) {
   return (
-    <div className="space-y-4">
-      <ProviderSelect
-        label="Document Storage"
-        value={form.storageProvider}
-        options={settings.storage.options.map((o) => ({
-          value: o.provider,
-          label: o.label,
-          available: o.available,
-        }))}
-        onChange={(v) => onChange({ storageProvider: v })}
-        disabled={disabled}
-      />
-      <ProviderSelect
-        label="RAG Embedding"
-        value={form.embeddingProvider}
-        options={settings.embedding.options.map((o) => ({
-          value: o.provider,
-          label: o.label,
-          available: o.available,
-        }))}
-        onChange={(v) => onChange({ embeddingProvider: v })}
-        disabled={disabled}
-      />
+    <div className="space-y-5">
+      <DialogSubSection title="Storage">
+        <ProviderSelect
+          label="Backend"
+          value={form.storageProvider}
+          options={settings.storage.options.map((o) => ({
+            value: o.provider,
+            label: o.label,
+            available: o.available,
+          }))}
+          onChange={(v) => onChange({ storageProvider: v })}
+        />
+      </DialogSubSection>
+
+      <DialogSubSection title="Chunking">
+        <div className="space-y-4">
+          <ProviderSelect
+            label="Strategy"
+            value={form.chunkingStrategy}
+            options={[
+              { value: "recursive", label: "Recursive", available: true },
+              { value: "sentence", label: "Sentence", available: true },
+            ]}
+            onChange={(v) =>
+              onChange({ chunkingStrategy: v as "recursive" | "sentence" })
+            }
+          />
+          <NumberInput
+            label="Chunk Size (tokens)"
+            value={form.chunkSize}
+            onChange={(v) => onChange({ chunkSize: v })}
+          />
+          <NumberInput
+            label="Chunk Overlap (tokens)"
+            value={form.chunkOverlap}
+            onChange={(v) => onChange({ chunkOverlap: v })}
+          />
+        </div>
+      </DialogSubSection>
+
+      <DialogSubSection title="Embedding">
+        <ProviderSelect
+          label="Provider"
+          value={form.embeddingProvider}
+          options={settings.embedding.options.map((o) => ({
+            value: o.provider,
+            label: o.label,
+            available: o.available,
+          }))}
+          onChange={(v) => onChange({ embeddingProvider: v })}
+        />
+      </DialogSubSection>
     </div>
   );
 }
 
-// ─── RAG Config Section ───────────────────────────────────────────────────────
+// ─── Storage & Embedding Sections ────────────────────────────────────────────
 
-function RagConfigSection({
-  settings,
-  readonly,
-}: {
-  settings: AppSettings;
-  readonly: boolean;
-}) {
-  const queryClient = useQueryClient();
-  const [form, setForm] = useState<FormState>(() => buildForm(settings));
-  const [toast, setToast] = useState<string | null>(null);
-
-  const mutation = useMutation({
-    mutationFn: () => {
-      const patch: AppSettingsPatch = {
-        embedding: { provider: form.embeddingProvider },
-        storage: { provider: form.storageProvider },
-      };
-      return api.updateSettings(patch);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-settings"] });
-      setToast("Settings saved");
-      setTimeout(() => setToast(null), 3000);
-    },
-  });
+function StorageSection({ settings }: { settings: AppSettings }) {
+  const label =
+    settings.storage.options.find(
+      (o) => o.provider === settings.storage.provider,
+    )?.label ?? settings.storage.provider;
 
   return (
-    <div>
-      {readonly && (
-        <div className="flex items-center gap-2 mb-4 px-3 py-2 rounded-md bg-slate-50 border border-slate-200 text-slate-500 text-xs">
-          <Lock size={13} />
-          Read-only — delete all documents and conversations to edit these
-          settings.
-        </div>
-      )}
+    <SettingGroup>
+      <SettingRow label="Backend" value={label} />
+    </SettingGroup>
+  );
+}
 
-      <ConfigForm
-        settings={settings}
-        form={form}
-        onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
-        disabled={readonly}
+function EmbeddingSection({ settings }: { settings: AppSettings }) {
+  const label =
+    settings.embedding.options.find(
+      (o) => o.provider === settings.embedding.provider,
+    )?.label ?? settings.embedding.provider;
+
+  return (
+    <SettingGroup>
+      <SettingRow label="Provider" value={label} />
+    </SettingGroup>
+  );
+}
+
+// ─── Chunking Section ─────────────────────────────────────────────────────────
+
+function ChunkingSection({ config }: { config: AppConfig }) {
+  return (
+    <SettingGroup>
+      <SettingRow label="Strategy" value={config.rag.chunkingStrategy} />
+      <SettingRow label="Chunk Size (tokens)" value={config.rag.chunkSize} />
+      <SettingRow
+        label="Chunk Overlap (tokens)"
+        value={config.rag.chunkOverlap}
       />
-
-      {!readonly && (
-        <div className="mt-4">
-          {toast && (
-            <div className="mb-3 px-3 py-2 rounded-md bg-green-50 text-green-700 text-sm border border-green-200">
-              {toast}
-            </div>
-          )}
-          <button
-            onClick={() => mutation.mutate()}
-            disabled={mutation.isPending}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
-          >
-            {mutation.isPending ? "Saving…" : "Save settings"}
-          </button>
-        </div>
-      )}
-    </div>
+    </SettingGroup>
   );
 }
 
@@ -183,8 +263,9 @@ function ConsistencySection() {
       <button
         onClick={check}
         disabled={loading}
-        className="px-4 py-2 bg-slate-700 hover:bg-slate-800 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
+        className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
       >
+        <DatabaseZap size={15} />
         {loading ? "Checking…" : "Check DB ↔ Storage consistency"}
       </button>
 
@@ -247,16 +328,20 @@ function ConsistencySection() {
 
 function ResetDialog({
   currentSettings,
+  config,
   onClose,
   onSuccess,
 }: {
   currentSettings: AppSettings;
+  config: AppConfig;
   onClose: () => void;
   onSuccess: () => void;
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [changeConfig, setChangeConfig] = useState(false);
-  const [form, setForm] = useState<FormState>(() => buildForm(currentSettings));
+  const [form, setForm] = useState<FormState>(() =>
+    buildForm(currentSettings, config),
+  );
   const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -267,6 +352,11 @@ function ResetDialog({
         ? {
             embedding: { provider: form.embeddingProvider },
             storage: { provider: form.storageProvider },
+            chunking: {
+              strategy: form.chunkingStrategy,
+              chunkSize: form.chunkSize,
+              chunkOverlap: form.chunkOverlap,
+            },
           }
         : undefined;
       await api.resetAll(newSettings);
@@ -288,27 +378,28 @@ function ResetDialog({
               Optional — you can reset without changing the configuration.
             </p>
 
-            <label className="flex items-center gap-2 mb-4 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={changeConfig}
-                onChange={(e) => setChangeConfig(e.target.checked)}
-                className="accent-amber-500"
-              />
-              <span className="text-sm text-slate-700">
-                Change configuration
-              </span>
-            </label>
-
-            {changeConfig && (
-              <div className="mb-4">
-                <ConfigForm
-                  settings={currentSettings}
-                  form={form}
-                  onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+            <div className="mb-4 border border-slate-200 rounded-lg overflow-hidden">
+              <button
+                type="button"
+                onClick={() => setChangeConfig((v) => !v)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <span className="font-medium">Change configuration</span>
+                <ChevronDown
+                  size={15}
+                  className={`text-slate-400 transition-transform ${changeConfig ? "rotate-180" : ""}`}
                 />
-              </div>
-            )}
+              </button>
+              {changeConfig && (
+                <div className="px-4 pb-4 pt-1 border-t border-slate-100">
+                  <ConfigForm
+                    settings={currentSettings}
+                    form={form}
+                    onChange={(patch) => setForm((f) => ({ ...f, ...patch }))}
+                  />
+                </div>
+              )}
+            </div>
 
             <div className="flex justify-end gap-2">
               <button
@@ -422,12 +513,10 @@ export default function AdminSettingsPage({
     queryFn: () => api.getSettings(),
   });
 
-  const { data: documents } = useDocuments();
-  const { data: conversations } = useConversations();
-
-  const hasData =
-    (documents && documents.length > 0) ||
-    (conversations && conversations.length > 0);
+  const { data: config } = useQuery({
+    queryKey: ["app-config"],
+    queryFn: () => api.getConfig(),
+  });
 
   const handleResetSuccess = () => {
     setShowReset(false);
@@ -460,8 +549,18 @@ export default function AdminSettingsPage({
 
       {settings && (
         <>
-          <SectionCard title="RAG Configuration">
-            <RagConfigSection settings={settings} readonly={!!hasData} />
+          <SectionCard title="Storage">
+            <StorageSection settings={settings} />
+          </SectionCard>
+
+          {config && (
+            <SectionCard title="Chunking">
+              <ChunkingSection config={config} />
+            </SectionCard>
+          )}
+
+          <SectionCard title="Embedding">
+            <EmbeddingSection settings={settings} />
           </SectionCard>
 
           <SectionCard title="Storage Consistency">
@@ -476,8 +575,9 @@ export default function AdminSettingsPage({
               </p>
               <button
                 onClick={() => setShowReset(true)}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
               >
+                <Trash2 size={15} />
                 Reset all data and change settings
               </button>
             </div>
@@ -488,6 +588,7 @@ export default function AdminSettingsPage({
       {showReset && settings && (
         <ResetDialog
           currentSettings={settings}
+          config={config!}
           onClose={() => setShowReset(false)}
           onSuccess={handleResetSuccess}
         />

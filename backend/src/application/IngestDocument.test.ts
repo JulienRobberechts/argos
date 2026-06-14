@@ -2,10 +2,7 @@ import { randomUUID } from "crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Document } from "../domain/entities/Document";
 import { IngestDocument } from "./IngestDocument";
-import {
-  createChunkingStrategy,
-  IChunkingStrategy,
-} from "../domain/services/ChunkingStrategy";
+import type { ChunkingConfig } from "./AppSettingsService";
 import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../../tests/fakes/InMemoryDocumentRepository";
 
@@ -56,26 +53,26 @@ describe("IngestDocument", () => {
   let embeddingAdapter: ReturnType<typeof makeEmbeddingAdapter>;
   let fileStorage: ReturnType<typeof makeFileStorage>;
   let fileParser: ReturnType<typeof makeFileParser>;
-  let chunkingStrategy: IChunkingStrategy;
-
   beforeEach(() => {
     docRepo = new InMemoryDocumentRepository();
     chunkRepo = new InMemoryChunkRepository();
     embeddingAdapter = makeEmbeddingAdapter();
     fileStorage = makeFileStorage();
     fileParser = makeFileParser();
-    chunkingStrategy = createChunkingStrategy("recursive");
   });
 
-  function makeIngest(config?: { chunkSize?: number; chunkOverlap?: number }) {
+  function makeIngest(config?: Partial<ChunkingConfig>) {
     return new IngestDocument(
       docRepo,
       chunkRepo,
       embeddingAdapter,
       fileStorage,
       fileParser,
-      chunkingStrategy,
-      config,
+      async () => ({
+        strategy: config?.strategy ?? "recursive",
+        chunkSize: config?.chunkSize ?? 512,
+        chunkOverlap: config?.chunkOverlap ?? 128,
+      }),
     );
   }
 
@@ -143,7 +140,11 @@ describe("IngestDocument", () => {
       errorAdapter,
       fileStorage,
       fileParser,
-      chunkingStrategy,
+      async () => ({
+        strategy: "recursive",
+        chunkSize: 512,
+        chunkOverlap: 128,
+      }),
     );
     await ingest.execute(doc.id);
     const updated = await docRepo.findById(doc.id);
