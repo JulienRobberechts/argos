@@ -77,7 +77,7 @@ export default function SettingsPage({ onClose }: { onClose?: () => void }) {
       <div className="flex items-start justify-between mb-6">
         <PageHeader
           icon={<Settings className="text-[#d97706]" size={28} />}
-          title="Settings"
+          title="Knowledge Base Ingestion Settings"
           info="Argos system configuration. These values are set server-side via environment variables and displayed here as read-only."
         />
         {onClose && (
