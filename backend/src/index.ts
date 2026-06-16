@@ -15,7 +15,7 @@ process.on("unhandledRejection", (reason) => {
   process.exit(1);
 });
 process.on("SIGTERM", () => {
-  console.log("[SIGTERM] received — Railway is stopping the container");
+  console.log("[SIGTERM] received — Stopping the container");
   process.exit(0);
 });
 
