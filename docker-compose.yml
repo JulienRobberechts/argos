@@ -26,6 +26,7 @@ services:
     environment:
       STORAGE_BACKEND: ${STORAGE_BACKEND:-local}
       UPLOAD_DIR: /app/uploads
+      ALLOWED_ORIGIN: ${ALLOWED_ORIGIN:-http://localhost:5173}
     ports:
       - "3205:3205"
     volumes:
