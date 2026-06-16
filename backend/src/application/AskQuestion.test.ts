@@ -5,7 +5,7 @@ import { Conversation } from "../domain/entities/Conversation";
 import { Message } from "../domain/entities/Message";
 import { AskQuestion } from "./AskQuestion";
 import { SearchKnowledge } from "./SearchKnowledge";
-import { ChunkSearchResult } from "../domain/ports/ChunkRepository";
+import { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import { InMemoryConversationRepository } from "../../tests/fakes/InMemoryConversationRepository";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {

@@ -9,7 +9,7 @@ import {
   MessageRole,
   SourceCitation,
 } from "../../domain/entities/Message";
-import { ConversationRepository } from "../../domain/ports/ConversationRepository";
+import { IConversationRepository } from "../../domain/ports/IConversationRepository";
 import pool from "./pool";
 
 function toMessage(row: Record<string, unknown>): Message {
@@ -42,7 +42,7 @@ async function fetchMessages(
   return map;
 }
 
-export class PgConversationRepository implements ConversationRepository {
+export class PgConversationRepository implements IConversationRepository {
   constructor(private readonly defaults: ConversationParams) {}
 
   private toParams(raw: unknown): ConversationParams {

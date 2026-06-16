@@ -1,11 +1,11 @@
 import { Chunk } from "../../domain/entities/Chunk";
 import {
-  ChunkRepository,
+  IChunkRepository,
   ChunkSearchResult,
-} from "../../domain/ports/ChunkRepository";
+} from "../../domain/ports/IChunkRepository";
 import pool from "./pool";
 
-export class PgVectorChunkRepository implements ChunkRepository {
+export class PgVectorChunkRepository implements IChunkRepository {
   async save(chunk: Chunk): Promise<void> {
     await pool.query(
       `INSERT INTO chunks (id, document_id, content, embedding, metadata)

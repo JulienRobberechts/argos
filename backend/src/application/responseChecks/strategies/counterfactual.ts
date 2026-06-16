@@ -1,9 +1,9 @@
-import { LLMPort } from "../../../domain/ports/LLMPort";
+import { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { KnowledgeCheckResult } from "../../../domain/entities/Message";
 import { extractJSON } from "./extractJSON";
 
 export async function checkCounterfactual(
-  llm: LLMPort,
+  llm: ILLMPort,
   query: string,
   answerWithContext: string,
 ): Promise<KnowledgeCheckResult> {

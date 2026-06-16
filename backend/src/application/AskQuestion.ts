@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto";
 import { Message, SourceCitation } from "../domain/entities/Message";
-import { ChunkSearchResult } from "../domain/ports/ChunkRepository";
-import { ConversationRepository } from "../domain/ports/ConversationRepository";
-import { DocumentRepository } from "../domain/ports/DocumentRepository";
-import { LLMPort } from "../domain/ports/LLMPort";
+import { ChunkSearchResult } from "../domain/ports/IChunkRepository";
+import { IConversationRepository } from "../domain/ports/IConversationRepository";
+import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 import { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
 import {
@@ -22,9 +22,9 @@ export class AskQuestion {
 
   constructor(
     private readonly searchKnowledge: SearchKnowledge,
-    private readonly llmAdapter: LLMPort,
-    private readonly conversationRepo: ConversationRepository,
-    private readonly documentRepo: DocumentRepository,
+    private readonly llmAdapter: ILLMPort,
+    private readonly conversationRepo: IConversationRepository,
+    private readonly documentRepo: IDocumentRepository,
     private readonly knowledgeChecker?: CheckContextualKnowledge,
   ) {}
 

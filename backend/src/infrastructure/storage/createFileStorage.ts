@@ -1,12 +1,12 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import config from "../../config";
-import { FileStoragePort } from "../../domain/ports/FileStoragePort";
+import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 import { LocalFileStorage } from "./LocalFileStorage";
 import { R2FileStorage } from "./R2FileStorage";
 
 export interface StorageBackends {
-  local: FileStoragePort;
-  r2: FileStoragePort | null;
+  local: IFileStoragePort;
+  r2: IFileStoragePort | null;
 }
 
 export function createStorageBackends(): StorageBackends {

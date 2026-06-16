@@ -1,4 +1,4 @@
-import { RerankPort } from "../../domain/ports/RerankPort";
+import { IRerankPort } from "../../domain/ports/IRerankPort";
 import config from "../../config";
 import { Logger } from "../logger/Logger";
 
@@ -13,7 +13,7 @@ interface VoyageRerankResponse {
   data: VoyageRerankItem[];
 }
 
-export class VoyageRerankAdapter implements RerankPort {
+export class VoyageRerankAdapter implements IRerankPort {
   private readonly apiUrl = "https://api.voyageai.com/v1/rerank";
 
   constructor(

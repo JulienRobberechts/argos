@@ -7,9 +7,9 @@ import {
   S3Client,
 } from "@aws-sdk/client-s3";
 import { Readable } from "stream";
-import { FileStoragePort } from "../../domain/ports/FileStoragePort";
+import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 
-export class R2FileStorage implements FileStoragePort {
+export class R2FileStorage implements IFileStoragePort {
   constructor(
     private readonly client: S3Client,
     private readonly bucket: string,

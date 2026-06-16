@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { FileStoragePort } from "../../domain/ports/FileStoragePort";
+import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 
-export class LocalFileStorage implements FileStoragePort {
+export class LocalFileStorage implements IFileStoragePort {
   constructor(private readonly uploadDir: string) {}
 
   async upload(

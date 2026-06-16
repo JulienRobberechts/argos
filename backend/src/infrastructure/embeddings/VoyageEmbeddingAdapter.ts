@@ -1,7 +1,7 @@
 import {
   EmbeddingInputType,
-  EmbeddingPort,
-} from "../../domain/ports/EmbeddingPort";
+  IEmbeddingPort,
+} from "../../domain/ports/IEmbeddingPort";
 import config from "../../config";
 import { Logger } from "../logger/Logger";
 
@@ -39,7 +39,7 @@ async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
 const BATCH_SIZE = 20;
 const BATCH_DELAY_MS = 200;
 
-export class VoyageEmbeddingAdapter implements EmbeddingPort {
+export class VoyageEmbeddingAdapter implements IEmbeddingPort {
   private readonly apiKey: string;
 
   // See https://docs.voyageai.com/docs/embeddings

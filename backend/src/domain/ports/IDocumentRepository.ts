@@ -1,6 +1,6 @@
 import { Document, DocumentStatus } from "../entities/Document";
 
-export interface DocumentRepository {
+export interface IDocumentRepository {
   save(document: Document): Promise<void>;
   findById(id: string): Promise<Document | null>;
   findAll(): Promise<Document[]>;

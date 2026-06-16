@@ -1,13 +1,13 @@
-import { FileStoragePort } from "../../domain/ports/FileStoragePort";
+import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 import { StorageBackends } from "./createFileStorage";
 
-export class DynamicFileStorage implements FileStoragePort {
+export class DynamicFileStorage implements IFileStoragePort {
   constructor(
     private readonly getProvider: () => Promise<string>,
     private readonly backends: StorageBackends,
   ) {}
 
-  private async resolve(): Promise<FileStoragePort> {
+  private async resolve(): Promise<IFileStoragePort> {
     const provider = await this.getProvider();
     if (provider === "r2" && this.backends.r2) return this.backends.r2;
     return this.backends.local;

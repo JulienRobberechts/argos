@@ -1,18 +1,18 @@
 import {
-  ChunkRepository,
+  IChunkRepository,
   ChunkSearchResult,
-} from "../domain/ports/ChunkRepository";
-import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
-import { RerankPort } from "../domain/ports/RerankPort";
+} from "../domain/ports/IChunkRepository";
+import { IEmbeddingPort } from "../domain/ports/IEmbeddingPort";
+import { IRerankPort } from "../domain/ports/IRerankPort";
 import { Logger } from "../infrastructure/logger/Logger";
 
 export class SearchKnowledge {
   private readonly logger = new Logger("SearchKnowledge");
 
   constructor(
-    private readonly chunkRepo: ChunkRepository,
-    private readonly embeddingAdapter: EmbeddingPort,
-    private readonly reranker: RerankPort | null = null,
+    private readonly chunkRepo: IChunkRepository,
+    private readonly embeddingAdapter: IEmbeddingPort,
+    private readonly reranker: IRerankPort | null = null,
     private readonly candidateMultiplier = 3,
     private readonly searchMode: "vector" | "hybrid" = "vector",
   ) {}

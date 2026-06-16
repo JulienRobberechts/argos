@@ -1,8 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
+import {
+  IFileParserPort,
+  ParseResult,
+} from "../../domain/ports/IFileParserPort";
 
-export class MarkdownParser implements FileParserPort {
+export class MarkdownParser implements IFileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
     const { marked } = await import("marked");
     const content = await fs.promises.readFile(filePath, "utf-8");

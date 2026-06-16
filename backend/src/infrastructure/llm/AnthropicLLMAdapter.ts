@@ -1,11 +1,11 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { LLMPort, LLMStreamOptions } from "../../domain/ports/LLMPort";
+import { ILLMPort, LLMStreamOptions } from "../../domain/ports/ILLMPort";
 import config from "../../config";
 import { Logger } from "../logger/Logger";
 
 const logger = new Logger("AnthropicLLMAdapter");
 
-export class AnthropicLLMAdapter implements LLMPort {
+export class AnthropicLLMAdapter implements ILLMPort {
   private readonly client: Anthropic;
 
   constructor(apiKey: string = config.llm.anthropic.apiKey) {

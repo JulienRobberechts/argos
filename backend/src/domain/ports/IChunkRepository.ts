@@ -5,7 +5,7 @@ export interface ChunkSearchResult {
   score: number;
 }
 
-export interface ChunkRepository {
+export interface IChunkRepository {
   save(chunk: Chunk): Promise<void>;
   saveMany(chunks: Chunk[]): Promise<void>;
   search(

@@ -1,5 +1,5 @@
 import { Document, DocumentStatus } from "../../domain/entities/Document";
-import { DocumentRepository } from "../../domain/ports/DocumentRepository";
+import { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
 import pool from "./pool";
 
 function toDocument(row: Record<string, unknown>): Document {
@@ -13,7 +13,7 @@ function toDocument(row: Record<string, unknown>): Document {
   };
 }
 
-export class PgDocumentRepository implements DocumentRepository {
+export class PgDocumentRepository implements IDocumentRepository {
   async save(document: Document): Promise<void> {
     await pool.query(
       `INSERT INTO documents (id, title, source_type, status, file_path, created_at)

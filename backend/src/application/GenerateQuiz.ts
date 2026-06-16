@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { ChunkRepository } from "../domain/ports/ChunkRepository";
-import { LLMPort } from "../domain/ports/LLMPort";
+import { IChunkRepository } from "../domain/ports/IChunkRepository";
+import { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CHUNKS = 15;
@@ -22,8 +22,8 @@ export class GenerateQuiz {
   private readonly logger = new Logger("GenerateQuiz");
 
   constructor(
-    private readonly chunkRepo: ChunkRepository,
-    private readonly llmAdapter: LLMPort,
+    private readonly chunkRepo: IChunkRepository,
+    private readonly llmAdapter: ILLMPort,
   ) {}
 
   async execute(

@@ -1,6 +1,6 @@
 import path from "path";
-import { DocumentRepository } from "../domain/ports/DocumentRepository";
-import { FileStoragePort } from "../domain/ports/FileStoragePort";
+import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 
 export interface StorageConsistencyResult {
   orphanFiles: string[];
@@ -18,8 +18,8 @@ function toKey(filePath: string): string {
 
 export class CheckStorageConsistency {
   constructor(
-    private readonly documentRepo: DocumentRepository,
-    private readonly fileStorage: FileStoragePort,
+    private readonly documentRepo: IDocumentRepository,
+    private readonly fileStorage: IFileStoragePort,
   ) {}
 
   async execute(): Promise<StorageConsistencyResult> {

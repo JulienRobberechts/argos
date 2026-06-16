@@ -1,7 +1,7 @@
 import { Document, DocumentStatus } from "../../src/domain/entities/Document";
-import { DocumentRepository } from "../../src/domain/ports/DocumentRepository";
+import { IDocumentRepository } from "../../src/domain/ports/IDocumentRepository";
 
-export class InMemoryDocumentRepository implements DocumentRepository {
+export class InMemoryDocumentRepository implements IDocumentRepository {
   private documents: Map<string, Document> = new Map();
 
   async save(document: Document): Promise<void> {

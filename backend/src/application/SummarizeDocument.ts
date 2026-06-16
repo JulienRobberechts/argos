@@ -1,17 +1,17 @@
-import { ChunkRepository } from "../domain/ports/ChunkRepository";
-import { DocumentRepository } from "../domain/ports/DocumentRepository";
-import { DocumentSummaryRepository } from "../domain/ports/DocumentSummaryRepository";
-import { LLMPort } from "../domain/ports/LLMPort";
+import { IChunkRepository } from "../domain/ports/IChunkRepository";
+import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
+import { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CONTENT_CHARS = 12000;
 
 export class SummarizeDocument {
   constructor(
-    private readonly documentRepo: DocumentRepository,
-    private readonly chunkRepo: ChunkRepository,
-    private readonly summaryRepo: DocumentSummaryRepository,
-    private readonly llmAdapter: LLMPort,
+    private readonly documentRepo: IDocumentRepository,
+    private readonly chunkRepo: IChunkRepository,
+    private readonly summaryRepo: IDocumentSummaryRepository,
+    private readonly llmAdapter: ILLMPort,
   ) {}
 
   private readonly logger = new Logger("SummarizeDocument");

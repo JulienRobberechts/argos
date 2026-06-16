@@ -1,5 +1,5 @@
-import { ChunkSearchResult } from "../../domain/ports/ChunkRepository";
-import { LLMPort } from "../../domain/ports/LLMPort";
+import { ChunkSearchResult } from "../../domain/ports/IChunkRepository";
+import { ILLMPort } from "../../domain/ports/ILLMPort";
 import {
   KnowledgeCheckResult,
   KnowledgeCheckStrategy,
@@ -12,7 +12,7 @@ import { checkCitationForcing } from "./strategies/citationForcing";
 export class CheckContextualKnowledge {
   private readonly logger = new Logger("CheckContextualKnowledge");
 
-  constructor(private readonly llm: LLMPort) {}
+  constructor(private readonly llm: ILLMPort) {}
 
   async run(
     query: string,

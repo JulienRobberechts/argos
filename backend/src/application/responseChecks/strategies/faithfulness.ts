@@ -1,5 +1,5 @@
-import { ChunkSearchResult } from "../../../domain/ports/ChunkRepository";
-import { LLMPort } from "../../../domain/ports/LLMPort";
+import { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
+import { ILLMPort } from "../../../domain/ports/ILLMPort";
 import {
   KnowledgeClaim,
   KnowledgeCheckResult,
@@ -10,7 +10,7 @@ import { Logger } from "../../../infrastructure/logger/Logger";
 const logger = new Logger("faithfulness");
 
 export async function checkFaithfulness(
-  llm: LLMPort,
+  llm: ILLMPort,
   query: string,
   answer: string,
   chunks: ChunkSearchResult[],

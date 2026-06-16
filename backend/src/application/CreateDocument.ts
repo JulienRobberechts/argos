@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
 import path from "path";
 import { Document } from "../domain/entities/Document";
-import { DocumentRepository } from "../domain/ports/DocumentRepository";
-import { FileStoragePort } from "../domain/ports/FileStoragePort";
+import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 
 export interface CreateDocumentInput {
   buffer: Buffer;
@@ -23,8 +23,8 @@ function sourceTypeFromMime(
 
 export class CreateDocument {
   constructor(
-    private readonly documentRepo: DocumentRepository,
-    private readonly fileStorage: FileStoragePort,
+    private readonly documentRepo: IDocumentRepository,
+    private readonly fileStorage: IFileStoragePort,
   ) {}
 
   async execute(input: CreateDocumentInput): Promise<Document> {

@@ -1,5 +1,8 @@
 import path from "path";
-import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
+import {
+  IFileParserPort,
+  ParseResult,
+} from "../../domain/ports/IFileParserPort";
 import { MarkdownParser } from "./MarkdownParser";
 import { PdfParser } from "./PdfParser";
 import { TextParser } from "./TextParser";
@@ -8,7 +11,7 @@ const markdownParser = new MarkdownParser();
 const pdfParser = new PdfParser();
 const textParser = new TextParser();
 
-export class MultiFileParser implements FileParserPort {
+export class MultiFileParser implements IFileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
     const ext = path.extname(filePath).toLowerCase();
     switch (ext) {

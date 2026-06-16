@@ -1,8 +1,8 @@
 import { Chunk } from "../../src/domain/entities/Chunk";
 import {
-  ChunkRepository,
+  IChunkRepository,
   ChunkSearchResult,
-} from "../../src/domain/ports/ChunkRepository";
+} from "../../src/domain/ports/IChunkRepository";
 
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) return 0;
@@ -18,7 +18,7 @@ function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-export class InMemoryChunkRepository implements ChunkRepository {
+export class InMemoryChunkRepository implements IChunkRepository {
   private chunks: Map<string, Chunk> = new Map();
 
   async save(chunk: Chunk): Promise<void> {

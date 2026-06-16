@@ -1,6 +1,6 @@
-import { RerankPort } from "../../domain/ports/RerankPort";
+import { IRerankPort } from "../../domain/ports/IRerankPort";
 
-export class NoopRerankAdapter implements RerankPort {
+export class NoopRerankAdapter implements IRerankPort {
   async rerank(
     _query: string,
     documents: string[],

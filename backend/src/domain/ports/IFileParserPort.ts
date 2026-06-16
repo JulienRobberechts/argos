@@ -3,6 +3,6 @@ export interface ParseResult {
   metadata: Record<string, unknown>;
 }
 
-export interface FileParserPort {
+export interface IFileParserPort {
   parse(filePath: string): Promise<ParseResult>;
 }

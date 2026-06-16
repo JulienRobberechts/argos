@@ -1,6 +1,6 @@
-import { EmbeddingPort } from "../../src/domain/ports/EmbeddingPort";
+import { IEmbeddingPort } from "../../src/domain/ports/IEmbeddingPort";
 
-export class InMemoryEmbeddingAdapter implements EmbeddingPort {
+export class InMemoryEmbeddingAdapter implements IEmbeddingPort {
   private readonly dimension = 1024;
 
   async embed(_text: string): Promise<number[]> {

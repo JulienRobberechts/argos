@@ -5,7 +5,7 @@ export interface LLMStreamOptions {
   systemPrompt?: string;
 }
 
-export interface LLMPort {
+export interface ILLMPort {
   stream(
     prompt: string,
     onToken: (token: string) => void,

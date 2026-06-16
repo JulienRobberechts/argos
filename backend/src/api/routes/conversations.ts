@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { Router, Request, Response, NextFunction } from "express";
 import { z } from "zod";
-import { ConversationRepository } from "../../domain/ports/ConversationRepository";
+import { IConversationRepository } from "../../domain/ports/IConversationRepository";
 import { AskQuestion } from "../../application/AskQuestion";
 import config from "../../config";
 import { Logger } from "../../infrastructure/logger/Logger";
@@ -43,7 +43,7 @@ const sendMessageSchema = z.object({
 const PING_INTERVAL_MS = 15_000;
 
 export function conversationsRouter(
-  conversationRepo: ConversationRepository,
+  conversationRepo: IConversationRepository,
   askQuestion: AskQuestion,
 ): Router {
   const router = Router();

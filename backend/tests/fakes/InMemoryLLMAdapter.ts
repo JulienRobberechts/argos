@@ -1,6 +1,6 @@
-import { LLMPort } from "../../src/domain/ports/LLMPort";
+import { ILLMPort } from "../../src/domain/ports/ILLMPort";
 
-export class InMemoryLLMAdapter implements LLMPort {
+export class InMemoryLLMAdapter implements ILLMPort {
   private response: string;
 
   constructor(response = "This is a test response from the LLM.") {

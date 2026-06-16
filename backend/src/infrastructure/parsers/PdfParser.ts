@@ -1,9 +1,12 @@
 import fs from "fs";
 import path from "path";
 import { PDFParse } from "pdf-parse";
-import { FileParserPort, ParseResult } from "../../domain/ports/FileParserPort";
+import {
+  IFileParserPort,
+  ParseResult,
+} from "../../domain/ports/IFileParserPort";
 
-export class PdfParser implements FileParserPort {
+export class PdfParser implements IFileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
     const stats = await fs.promises.stat(filePath);
     const url = `file://${filePath}`;

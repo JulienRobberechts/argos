@@ -4,10 +4,10 @@ import path from "path";
 import { Logger } from "../../infrastructure/logger/Logger";
 
 const logger = new Logger("documents");
-import { DocumentRepository } from "../../domain/ports/DocumentRepository";
-import { ChunkRepository } from "../../domain/ports/ChunkRepository";
-import { DocumentSummaryRepository } from "../../domain/ports/DocumentSummaryRepository";
-import { FileStoragePort } from "../../domain/ports/FileStoragePort";
+import { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
+import { IChunkRepository } from "../../domain/ports/IChunkRepository";
+import { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
+import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 import { CreateDocument } from "../../application/CreateDocument";
 import { IngestDocument } from "../../application/IngestDocument";
 import { SummarizeDocument } from "../../application/SummarizeDocument";
@@ -38,12 +38,12 @@ const upload = multer({
 });
 
 export function documentsRouter(
-  documentRepo: DocumentRepository,
-  chunkRepo: ChunkRepository,
-  fileStorage: FileStoragePort,
+  documentRepo: IDocumentRepository,
+  chunkRepo: IChunkRepository,
+  fileStorage: IFileStoragePort,
   createDocument: CreateDocument,
   ingestDocument: IngestDocument,
-  summaryRepo: DocumentSummaryRepository,
+  summaryRepo: IDocumentSummaryRepository,
   summarizeDocument: SummarizeDocument,
 ): Router {
   const router = Router();

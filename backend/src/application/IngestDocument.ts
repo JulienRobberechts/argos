@@ -2,11 +2,11 @@ import fs from "fs";
 import os from "os";
 import path from "path";
 import { randomUUID } from "crypto";
-import { ChunkRepository } from "../domain/ports/ChunkRepository";
-import { DocumentRepository } from "../domain/ports/DocumentRepository";
-import { EmbeddingPort } from "../domain/ports/EmbeddingPort";
-import { FileParserPort } from "../domain/ports/FileParserPort";
-import { FileStoragePort } from "../domain/ports/FileStoragePort";
+import { IChunkRepository } from "../domain/ports/IChunkRepository";
+import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import { IEmbeddingPort } from "../domain/ports/IEmbeddingPort";
+import { IFileParserPort } from "../domain/ports/IFileParserPort";
+import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 import {
   createChunkingStrategy,
   type ChunkingStrategyName,
@@ -20,11 +20,11 @@ export class IngestDocument {
   private readonly logger = new Logger("IngestDocument");
 
   constructor(
-    private readonly documentRepo: DocumentRepository,
-    private readonly chunkRepo: ChunkRepository,
-    private readonly embeddingAdapter: EmbeddingPort,
-    private readonly fileStorage: FileStoragePort,
-    private readonly fileParser: FileParserPort,
+    private readonly documentRepo: IDocumentRepository,
+    private readonly chunkRepo: IChunkRepository,
+    private readonly embeddingAdapter: IEmbeddingPort,
+    private readonly fileStorage: IFileStoragePort,
+    private readonly fileParser: IFileParserPort,
     private readonly getChunkingConfig: () => Promise<ChunkingConfig>,
   ) {}
 

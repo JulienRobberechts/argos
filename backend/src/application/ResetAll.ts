@@ -1,12 +1,12 @@
 import { Pool } from "pg";
-import { FileStoragePort } from "../domain/ports/FileStoragePort";
+import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 import { AppSettingsService, AppSettingsPatch } from "./AppSettingsService";
 
 const logger = console;
 
 export class ResetAll {
   constructor(
-    private readonly fileStorage: FileStoragePort,
+    private readonly fileStorage: IFileStoragePort,
     private readonly settingsService: AppSettingsService,
     private readonly pool: Pool,
   ) {}

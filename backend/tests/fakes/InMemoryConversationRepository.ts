@@ -3,9 +3,9 @@ import {
   ConversationSummary,
 } from "../../src/domain/entities/Conversation";
 import { Message } from "../../src/domain/entities/Message";
-import { ConversationRepository } from "../../src/domain/ports/ConversationRepository";
+import { IConversationRepository } from "../../src/domain/ports/IConversationRepository";
 
-export class InMemoryConversationRepository implements ConversationRepository {
+export class InMemoryConversationRepository implements IConversationRepository {
   private conversations: Map<string, Conversation> = new Map();
 
   async save(conversation: Conversation): Promise<void> {

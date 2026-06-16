@@ -1,5 +1,5 @@
 import { DocumentSummary } from "../../domain/entities/DocumentSummary";
-import { DocumentSummaryRepository } from "../../domain/ports/DocumentSummaryRepository";
+import { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
 import pool from "./pool";
 
 function toSummary(row: Record<string, unknown>): DocumentSummary {
@@ -12,7 +12,7 @@ function toSummary(row: Record<string, unknown>): DocumentSummary {
   };
 }
 
-export class PgDocumentSummaryRepository implements DocumentSummaryRepository {
+export class PgDocumentSummaryRepository implements IDocumentSummaryRepository {
   async findByDocumentId(documentId: string): Promise<DocumentSummary | null> {
     const result = await pool.query(
       "SELECT * FROM document_summaries WHERE document_id = $1",
