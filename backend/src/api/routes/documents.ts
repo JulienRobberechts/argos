@@ -1,16 +1,17 @@
-import { Router, Request, Response, NextFunction } from "express";
+import path from "node:path";
+import { type NextFunction, type Request, type Response, Router } from "express";
 import multer from "multer";
-import path from "path";
 import { Logger } from "../../infrastructure/logger/Logger";
 
 const logger = new Logger("documents");
-import { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
-import { IChunkRepository } from "../../domain/ports/IChunkRepository";
-import { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
-import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
-import { CreateDocument } from "../../application/CreateDocument";
-import { IngestDocument } from "../../application/IngestDocument";
-import { SummarizeDocument } from "../../application/SummarizeDocument";
+
+import type { CreateDocument } from "../../application/CreateDocument";
+import type { IngestDocument } from "../../application/IngestDocument";
+import type { SummarizeDocument } from "../../application/SummarizeDocument";
+import type { IChunkRepository } from "../../domain/ports/IChunkRepository";
+import type { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
+import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 import { createDocumentSchema } from "../dto/document.dto";
 
 const ALLOWED_MIMETYPES = new Set([
@@ -25,11 +26,7 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (
-      ALLOWED_MIMETYPES.has(file.mimetype) ||
-      ext === ".md" ||
-      ext === ".markdown"
-    ) {
+    if (ALLOWED_MIMETYPES.has(file.mimetype) || ext === ".md" || ext === ".markdown") {
       cb(null, true);
     } else {
       cb(new Error(`Unsupported file type: ${file.mimetype}`));
@@ -59,10 +56,7 @@ export function documentsRouter(
         }
 
         const body = createDocumentSchema.parse(req.body);
-        const originalName = Buffer.from(
-          req.file.originalname,
-          "latin1",
-        ).toString("utf8");
+        const originalName = Buffer.from(req.file.originalname, "latin1").toString("utf8");
 
         const document = await createDocument.execute({
           buffer: req.file.buffer,
@@ -85,33 +79,27 @@ export function documentsRouter(
     },
   );
 
-  router.get(
-    "/",
-    async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const docs = await documentRepo.findAll();
-        res.json(docs);
-      } catch (err) {
-        next(err);
-      }
-    },
-  );
+  router.get("/", async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const docs = await documentRepo.findAll();
+      res.json(docs);
+    } catch (err) {
+      next(err);
+    }
+  });
 
-  router.get(
-    "/:id",
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const doc = await documentRepo.findById(String(req.params.id));
-        if (!doc) {
-          res.status(404).json({ error: "Document not found" });
-          return;
-        }
-        res.json(doc);
-      } catch (err) {
-        next(err);
+  router.get("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const doc = await documentRepo.findById(String(req.params.id));
+      if (!doc) {
+        res.status(404).json({ error: "Document not found" });
+        return;
       }
-    },
-  );
+      res.json(doc);
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.get(
     "/:id/chunks",
@@ -158,27 +146,24 @@ export function documentsRouter(
     },
   );
 
-  router.get(
-    "/:id/raw",
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const doc = await documentRepo.findById(String(req.params.id));
-        if (!doc) {
-          res.status(404).json({ error: "Document not found" });
-          return;
-        }
-        if (doc.sourceType !== "pdf" || !doc.filePath) {
-          res.status(404).json({ error: "Raw file not available" });
-          return;
-        }
-        const buffer = await fileStorage.download(doc.filePath);
-        res.setHeader("Content-Type", "application/pdf");
-        res.send(buffer);
-      } catch (err) {
-        next(err);
+  router.get("/:id/raw", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const doc = await documentRepo.findById(String(req.params.id));
+      if (!doc) {
+        res.status(404).json({ error: "Document not found" });
+        return;
       }
-    },
-  );
+      if (doc.sourceType !== "pdf" || !doc.filePath) {
+        res.status(404).json({ error: "Raw file not available" });
+        return;
+      }
+      const buffer = await fileStorage.download(doc.filePath);
+      res.setHeader("Content-Type", "application/pdf");
+      res.send(buffer);
+    } catch (err) {
+      next(err);
+    }
+  });
 
   router.get(
     "/:id/summary",
@@ -189,9 +174,7 @@ export function documentsRouter(
           res.status(404).json({ error: "Document not found" });
           return;
         }
-        const summary = await summaryRepo.findByDocumentId(
-          String(req.params.id),
-        );
+        const summary = await summaryRepo.findByDocumentId(String(req.params.id));
         if (!summary) {
           res.status(404).json({ error: "Summary not found" });
           return;
@@ -224,26 +207,23 @@ export function documentsRouter(
     },
   );
 
-  router.delete(
-    "/:id",
-    async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-      try {
-        const doc = await documentRepo.findById(String(req.params.id));
-        if (!doc) {
-          res.status(404).json({ error: "Document not found" });
-          return;
-        }
-        if (doc.filePath) {
-          await fileStorage.delete(doc.filePath).catch(() => {});
-        }
-        await chunkRepo.deleteByDocumentId(String(req.params.id));
-        await documentRepo.delete(String(req.params.id));
-        res.status(204).send();
-      } catch (err) {
-        next(err);
+  router.delete("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const doc = await documentRepo.findById(String(req.params.id));
+      if (!doc) {
+        res.status(404).json({ error: "Document not found" });
+        return;
       }
-    },
-  );
+      if (doc.filePath) {
+        await fileStorage.delete(doc.filePath).catch(() => {});
+      }
+      await chunkRepo.deleteByDocumentId(String(req.params.id));
+      await documentRepo.delete(String(req.params.id));
+      res.status(204).send();
+    } catch (err) {
+      next(err);
+    }
+  });
 
   return router;
 }

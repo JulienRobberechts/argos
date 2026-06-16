@@ -1,9 +1,9 @@
-import { Layers, Code2, ArrowRight } from "lucide-react";
-import Card from "../../../components/ui/Card";
-import SectionTitle from "../../../components/ui/SectionTitle";
-import CodeBlock from "../../../components/ui/CodeBlock";
+import { ArrowRight, Code2, Layers } from "lucide-react";
 import Callout from "../../../components/ui/Callout";
+import Card from "../../../components/ui/Card";
+import CodeBlock from "../../../components/ui/CodeBlock";
 import ParamRow from "../../../components/ui/ParamRow";
+import SectionTitle from "../../../components/ui/SectionTitle";
 
 type FlowBoxColor = "yellow" | "amber" | "green" | "slate";
 
@@ -49,11 +49,7 @@ export default function ImplementationTab() {
         />
 
         <div className="flex flex-col gap-1 mb-6">
-          <FlowBox
-            label="dataset.json"
-            sub="14 labeled Q/A pairs"
-            color="yellow"
-          />
+          <FlowBox label="dataset.json" sub="14 labeled Q/A pairs" color="yellow" />
           <Arrow />
           <FlowBox
             label="SearchKnowledge.execute(question)"
@@ -81,10 +77,9 @@ export default function ImplementationTab() {
         </div>
 
         <Callout type="info">
-          Use <code>SearchKnowledge</code> directly — not{" "}
-          <code>AskQuestion</code>. The latter writes to the conversation
-          database and generates titles, neither of which is needed for offline
-          eval.
+          Use <code>SearchKnowledge</code> directly — not <code>AskQuestion</code>. The latter
+          writes to the conversation database and generates titles, neither of which is needed for
+          offline eval.
         </Callout>
       </Card>
 
@@ -124,10 +119,7 @@ export default function ImplementationTab() {
               color: "border-slate-200 bg-slate-50 text-slate-600",
             },
           ].map(({ label, count, color }) => (
-            <div
-              key={label}
-              className={`border rounded-lg p-3 text-center ${color}`}
-            >
+            <div key={label} className={`border rounded-lg p-3 text-center ${color}`}>
               <p className="text-2xl font-bold">{count}</p>
               <p className="text-xs font-medium mt-0.5">{label}</p>
             </div>
@@ -136,9 +128,9 @@ export default function ImplementationTab() {
 
         <div className="mt-4">
           <Callout type="warning">
-            <code>document_ids</code> currently contain relative file paths, not
-            vector database IDs. Mapping to real IDs is required after ingesting
-            the demo documents into the knowledge base.
+            <code>document_ids</code> currently contain relative file paths, not vector database
+            IDs. Mapping to real IDs is required after ingesting the demo documents into the
+            knowledge base.
           </Callout>
         </div>
       </Card>
@@ -164,9 +156,7 @@ export default function ImplementationTab() {
         </p>
         <CodeBlock code={`"eval": "tsx tests/eval/run.ts"`} />
 
-        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
-          Expected stdout output
-        </p>
+        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">Expected stdout output</p>
         <CodeBlock
           code={`ID        Dataset          Diff    Faith  Relev  Recall
 oe-01     orient-express   easy    1.00   0.92   0.88

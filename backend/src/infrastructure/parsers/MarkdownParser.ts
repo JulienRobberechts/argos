@@ -1,9 +1,6 @@
-import fs from "fs";
-import path from "path";
-import {
-  IFileParserPort,
-  ParseResult,
-} from "../../domain/ports/IFileParserPort";
+import fs from "node:fs";
+import path from "node:path";
+import type { IFileParserPort, ParseResult } from "../../domain/ports/IFileParserPort";
 
 export class MarkdownParser implements IFileParserPort {
   async parse(filePath: string): Promise<ParseResult> {

@@ -1,12 +1,12 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import express from "express";
 import request from "supertest";
-import { documentsRouter } from "./documents";
-import { CreateDocument } from "../../application/CreateDocument";
-import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
-import { Document } from "../../domain/entities/Document";
+import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
+import { CreateDocument } from "../../application/CreateDocument";
+import type { Document } from "../../domain/entities/Document";
+import { documentsRouter } from "./documents";
 
 function makeDoc(overrides?: Partial<Document>): Document {
   return {
@@ -79,34 +79,26 @@ describe("documentsRouter", () => {
   it("GET /documents/:id returns a document", async () => {
     const doc = makeDoc();
     await docRepo.save(doc);
-    const res = await request(makeApp(docRepo, chunkRepo)).get(
-      `/documents/${doc.id}`,
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).get(`/documents/${doc.id}`);
     expect(res.status).toBe(200);
     expect(res.body.id).toBe(doc.id);
   });
 
   it("GET /documents/:id returns 404 for unknown id", async () => {
-    const res = await request(makeApp(docRepo, chunkRepo)).get(
-      "/documents/unknown-id",
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).get("/documents/unknown-id");
     expect(res.status).toBe(404);
   });
 
   it("GET /documents/:id/chunks returns chunks for document", async () => {
     const doc = makeDoc();
     await docRepo.save(doc);
-    const res = await request(makeApp(docRepo, chunkRepo)).get(
-      `/documents/${doc.id}/chunks`,
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).get(`/documents/${doc.id}/chunks`);
     expect(res.status).toBe(200);
     expect(Array.isArray(res.body)).toBe(true);
   });
 
   it("GET /documents/:id/chunks returns 404 for unknown document", async () => {
-    const res = await request(makeApp(docRepo, chunkRepo)).get(
-      "/documents/no-such-id/chunks",
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).get("/documents/no-such-id/chunks");
     expect(res.status).toBe(404);
   });
 
@@ -126,9 +118,7 @@ describe("documentsRouter", () => {
   it("GET /documents/:id/raw returns 404 for non-pdf doc", async () => {
     const doc = makeDoc({ sourceType: "text", filePath: "test.txt" });
     await docRepo.save(doc);
-    const res = await request(makeApp(docRepo, chunkRepo)).get(
-      `/documents/${doc.id}/raw`,
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).get(`/documents/${doc.id}/raw`);
     expect(res.status).toBe(404);
   });
 
@@ -145,16 +135,12 @@ describe("documentsRouter", () => {
   });
 
   it("DELETE /documents/:id returns 404 for unknown id", async () => {
-    const res = await request(makeApp(docRepo, chunkRepo)).delete(
-      "/documents/unknown-id",
-    );
+    const res = await request(makeApp(docRepo, chunkRepo)).delete("/documents/unknown-id");
     expect(res.status).toBe(404);
   });
 
   it("POST /documents returns 400 when no file is uploaded", async () => {
-    const res = await request(makeApp(docRepo, chunkRepo))
-      .post("/documents")
-      .send({});
+    const res = await request(makeApp(docRepo, chunkRepo)).post("/documents").send({});
     expect(res.status).toBe(400);
     expect(res.body.error).toBe("No file uploaded");
   });

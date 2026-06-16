@@ -16,11 +16,9 @@ const SENTENCE_BOUNDARY = /(?<=[.!?])\s+(?=[A-ZÀ-ÖØ-Ý«"'])|(?:\n\n+)/g;
 function splitIntoSentences(text: string): Sentence[] {
   const sentences: Sentence[] = [];
   let lastStart = 0;
-  let match: RegExpExecArray | null;
-
   const regex = new RegExp(SENTENCE_BOUNDARY.source, SENTENCE_BOUNDARY.flags);
 
-  while ((match = regex.exec(text)) !== null) {
+  for (const match of text.matchAll(regex)) {
     const splitAt = match.index;
     const sentence = text.slice(lastStart, splitAt).trim();
     if (sentence.length > 0) {

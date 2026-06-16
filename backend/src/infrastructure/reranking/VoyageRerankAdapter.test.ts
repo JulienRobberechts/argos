@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { VoyageRerankAdapter } from "./VoyageRerankAdapter";
 
 const mockFetch = vi.fn();
@@ -35,9 +35,7 @@ describe("VoyageRerankAdapter", () => {
 
     const [url, options] = mockFetch.mock.calls[0] as [string, RequestInit];
     expect(url).toBe("https://api.voyageai.com/v1/rerank");
-    expect((options.headers as Record<string, string>)["Authorization"]).toBe(
-      "Bearer my-key",
-    );
+    expect((options.headers as Record<string, string>).Authorization).toBe("Bearer my-key");
     const body = JSON.parse(options.body as string) as {
       model: string;
       query: string;
@@ -55,9 +53,7 @@ describe("VoyageRerankAdapter", () => {
       text: vi.fn().mockResolvedValue("unauthorized"),
     });
     const adapter = new VoyageRerankAdapter("bad-key", "rerank-2.5");
-    await expect(adapter.rerank("q", ["doc"])).rejects.toThrow(
-      "Voyage rerank API error: 401",
-    );
+    await expect(adapter.rerank("q", ["doc"])).rejects.toThrow("Voyage rerank API error: 401");
   });
 
   it("handles response with unordered relevance scores", async () => {

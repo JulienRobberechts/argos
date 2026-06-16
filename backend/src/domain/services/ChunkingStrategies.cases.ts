@@ -89,10 +89,7 @@ export const sentenceCases: ChunkCase[] = [
     text: "Le train fut créé en 1883. Il reliait Paris. Le service cessa en 1977.",
     size: 8,
     overlap: 3,
-    expected: [
-      "Le train fut créé en 1883.",
-      "Il reliait Paris. Le service cessa en 1977.",
-    ],
+    expected: ["Le train fut créé en 1883.", "Il reliait Paris. Le service cessa en 1977."],
   },
 ];
 

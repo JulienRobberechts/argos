@@ -9,10 +9,7 @@ export interface SourceCitation {
 
 export type MessageRole = "user" | "assistant";
 
-export type KnowledgeCheckStrategy =
-  | "faithfulness"
-  | "counterfactual"
-  | "citation_forcing";
+export type KnowledgeCheckStrategy = "faithfulness" | "counterfactual" | "citation_forcing";
 
 export interface KnowledgeClaim {
   claim: string;

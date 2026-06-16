@@ -1,9 +1,9 @@
-import {
-  IChunkRepository,
+import type {
   ChunkSearchResult,
+  IChunkRepository,
 } from "../domain/ports/IChunkRepository";
-import { ITextEncoder } from "../domain/ports/ITextEncoder";
-import { IRerankPort } from "../domain/ports/IRerankPort";
+import type { IRerankPort } from "../domain/ports/IRerankPort";
+import type { ITextEncoder } from "../domain/ports/ITextEncoder";
 import { Logger } from "../infrastructure/logger/Logger";
 
 export class SearchKnowledge {
@@ -86,12 +86,13 @@ export class SearchKnowledge {
       return [];
     }
 
-    const rankedIndices = await this.reranker!.rerank(
+    const rankedIndices = await this.reranker?.rerank(
       query,
       candidates.map((c) => c.chunk.content),
       model,
     );
 
+    if (!rankedIndices) return candidates.slice(0, limit);
     return rankedIndices.slice(0, limit).map((i) => candidates[i]);
   }
 }

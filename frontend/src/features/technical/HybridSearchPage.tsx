@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Combine } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
+import ImplementationTab from "./hybrid-search/ImplementationTab";
 import OverviewTab from "./hybrid-search/OverviewTab";
 import PipelineTab from "./hybrid-search/PipelineTab";
-import ImplementationTab from "./hybrid-search/ImplementationTab";
 import TradeOffsTab from "./hybrid-search/TradeOffsTab";
 
 const TABS = ["Overview", "Pipeline", "Implementation", "Trade-offs"] as const;
@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function HybridSearchPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Overview",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

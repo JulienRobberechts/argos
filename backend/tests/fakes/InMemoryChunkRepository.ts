@@ -1,8 +1,5 @@
-import { Chunk } from "../../src/domain/entities/Chunk";
-import {
-  IChunkRepository,
-  ChunkSearchResult,
-} from "../../src/domain/ports/IChunkRepository";
+import type { Chunk } from "../../src/domain/entities/Chunk";
+import type { ChunkSearchResult, IChunkRepository } from "../../src/domain/ports/IChunkRepository";
 
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) return 0;
@@ -69,9 +66,7 @@ export class InMemoryChunkRepository implements IChunkRepository {
     const textResults = Array.from(this.chunks.values())
       .map((chunk) => ({
         chunk,
-        matches: queryTerms.filter((t) =>
-          chunk.content.toLowerCase().includes(t),
-        ).length,
+        matches: queryTerms.filter((t) => chunk.content.toLowerCase().includes(t)).length,
       }))
       .filter((r) => r.matches > 0)
       .sort((a, b) => b.matches - a.matches)

@@ -1,18 +1,18 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Settings2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useConfig } from "../../hooks/useConfig";
 import {
   useConversation,
   useCreateConversation,
 } from "../../hooks/useConversation";
 import { useSSEStream } from "../../hooks/useSSEStream";
-import { useConfig } from "../../hooks/useConfig";
+import type { ConversationParams } from "../../types/domain";
+import ChatInputForm from "./ChatInputForm";
+import EditableTitle from "./EditableTitle";
 import MessageList from "./MessageList";
 import ParamsPanel from "./ParamsPanel";
-import EditableTitle from "./EditableTitle";
-import ChatInputForm from "./ChatInputForm";
-import { useState, useRef, useEffect } from "react";
-import { Settings2 } from "lucide-react";
-import type { ConversationParams } from "../../types/domain";
 
 export default function ChatInterface() {
   const { id } = useParams<{ id: string }>();
@@ -45,7 +45,7 @@ export default function ChatInterface() {
         searchMode: appConfig.rag.searchMode,
       });
     }
-  }, [appConfig]);
+  }, [appConfig, pendingParams]);
 
   useEffect(() => {
     const pending = (location.state as { pendingMessage?: string } | null)
@@ -57,7 +57,14 @@ export default function ChatInterface() {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     });
-  }, [id]);
+  }, [
+    id,
+    stream.send,
+    queryClient.invalidateQueries,
+    navigate,
+    location.pathname,
+    (location.state as { pendingMessage?: string } | null)?.pendingMessage,
+  ]);
 
   async function submitNew(content: string) {
     const conv = await createConversation.mutateAsync(pendingParams);
@@ -83,6 +90,7 @@ export default function ChatInterface() {
 
   const settingsButton = (
     <button
+      type="button"
       onClick={() => setShowParams((v) => !v)}
       title={showParams ? "Hide settings" : "Show settings"}
       className={`flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg border transition-colors ${

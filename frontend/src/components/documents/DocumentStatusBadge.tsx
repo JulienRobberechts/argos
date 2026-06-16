@@ -1,10 +1,7 @@
 import { Loader2 } from "lucide-react";
 import type { DocumentStatus } from "../../types/domain";
 
-const statusConfig: Record<
-  DocumentStatus,
-  { label: string; className: string }
-> = {
+const statusConfig: Record<DocumentStatus, { label: string; className: string }> = {
   pending: { label: "Pending", className: "bg-slate-100 text-slate-600" },
   processing: {
     label: "Processing",
@@ -14,11 +11,7 @@ const statusConfig: Record<
   error: { label: "Error", className: "bg-red-100 text-red-700" },
 };
 
-export default function DocumentStatusBadge({
-  status,
-}: {
-  status: DocumentStatus;
-}) {
+export default function DocumentStatusBadge({ status }: { status: DocumentStatus }) {
   const { label, className } = statusConfig[status];
   return (
     <span

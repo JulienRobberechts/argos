@@ -1,6 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
 import dotenv from "dotenv";
-import path from "path";
-import fs from "fs";
 
 dotenv.config({ path: path.join(__dirname, "../../../../.env") });
 

@@ -1,7 +1,7 @@
-import { IChunkRepository } from "../domain/ports/IChunkRepository";
-import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
-import { ILLMPort } from "../domain/ports/ILLMPort";
+import type { IChunkRepository } from "../domain/ports/IChunkRepository";
+import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
+import type { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CONTENT_CHARS = 12000;
@@ -33,9 +33,7 @@ export class SummarizeDocument {
     this.logger.info(
       `Summarizing document ${documentId} with content length ${content.length} chars, max summary length ${maxChars} chars`,
     );
-    this.logger.debug(
-      `Summarizing document ${documentId} with content : ${content}`,
-    );
+    this.logger.debug(`Summarizing document ${documentId} with content : ${content}`);
 
     const prompt = [
       `Write a concise summary of the document titled "${doc.title}".`,

@@ -1,12 +1,6 @@
-import {
-  CheckCircle,
-  Clock,
-  AlertCircle,
-  Loader2,
-  MessageSquare,
-} from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, Loader2, MessageSquare } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Document, ConversationSummary } from "../../types/domain";
+import type { ConversationSummary, Document } from "../../types/domain";
 
 export function StatCard({
   label,
@@ -24,9 +18,7 @@ export function StatCard({
   sub?: string;
 }) {
   return (
-    <div
-      className={`bg-white rounded-xl border ${border} shadow-sm p-5 flex items-center gap-4`}
-    >
+    <div className={`bg-white rounded-xl border ${border} shadow-sm p-5 flex items-center gap-4`}>
       <div className={`p-3 rounded-lg ${color}`}>{icon}</div>
       <div>
         <p className="text-2xl font-bold text-slate-900">{value}</p>
@@ -62,17 +54,9 @@ export function DocumentStatusBar({ documents }: { documents: Document[] }) {
           />
         )}
         {pending > 0 && (
-          <div
-            className="bg-[#fcd34d]"
-            style={{ width: `${(pending / total) * 100}%` }}
-          />
+          <div className="bg-[#fcd34d]" style={{ width: `${(pending / total) * 100}%` }} />
         )}
-        {error > 0 && (
-          <div
-            className="bg-red-400"
-            style={{ width: `${(error / total) * 100}%` }}
-          />
-        )}
+        {error > 0 && <div className="bg-red-400" style={{ width: `${(error / total) * 100}%` }} />}
       </div>
       <div className="flex gap-4 text-xs text-slate-500">
         {ready > 0 && (
@@ -106,17 +90,12 @@ export function DocumentStatusBar({ documents }: { documents: Document[] }) {
 
 export function RecentDocuments({ documents }: { documents: Document[] }) {
   const recent = [...documents]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
   const statusIcon = {
     ready: <CheckCircle size={14} className="text-green-500 shrink-0" />,
-    processing: (
-      <Loader2 size={14} className="text-[#d97706] animate-spin shrink-0" />
-    ),
+    processing: <Loader2 size={14} className="text-[#d97706] animate-spin shrink-0" />,
     pending: <Clock size={14} className="text-[#fcd34d] shrink-0" />,
     error: <AlertCircle size={14} className="text-red-500 shrink-0" />,
   };
@@ -134,9 +113,7 @@ export function RecentDocuments({ documents }: { documents: Document[] }) {
           className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-amber-50 transition-colors"
         >
           {statusIcon[doc.status]}
-          <span className="flex-1 text-sm text-slate-700 truncate">
-            {doc.title}
-          </span>
+          <span className="flex-1 text-sm text-slate-700 truncate">{doc.title}</span>
           <span className="text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded font-mono">
             {typeLabel[doc.sourceType] ?? doc.sourceType}
           </span>
@@ -146,16 +123,9 @@ export function RecentDocuments({ documents }: { documents: Document[] }) {
   );
 }
 
-export function RecentConversations({
-  conversations,
-}: {
-  conversations: ConversationSummary[];
-}) {
+export function RecentConversations({ conversations }: { conversations: ConversationSummary[] }) {
   const recent = [...conversations]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 5);
 
   return (
@@ -168,10 +138,7 @@ export function RecentConversations({
             to={`/conversations/${conv.id}`}
             className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-amber-50 transition-colors group"
           >
-            <MessageSquare
-              size={14}
-              className="text-[#d97706] shrink-0 opacity-70"
-            />
+            <MessageSquare size={14} className="text-[#d97706] shrink-0 opacity-70" />
             <span className="flex-1 text-sm text-slate-700 truncate group-hover:text-[#92400e]">
               {conv.title}
             </span>
@@ -207,10 +174,7 @@ export function RagConfigCard({
     <div className="space-y-3">
       <div className="grid grid-cols-2 gap-3">
         {items.map(({ label, value }) => (
-          <div
-            key={label}
-            className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2"
-          >
+          <div key={label} className="bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
             <p className="text-xs text-slate-500">{label}</p>
             <p className="text-sm font-semibold text-slate-800">{value}</p>
           </div>

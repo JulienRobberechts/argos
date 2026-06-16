@@ -1,9 +1,6 @@
-import { Link, useMatch, useNavigate } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
-import {
-  useConversations,
-  useDeleteConversation,
-} from "../../hooks/useConversation";
+import { Link, useMatch, useNavigate } from "react-router-dom";
+import { useConversations, useDeleteConversation } from "../../hooks/useConversation";
 import PageHeader from "../ui/PageHeader";
 
 export default function Sidebar() {

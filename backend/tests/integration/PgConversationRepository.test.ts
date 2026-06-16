@@ -1,7 +1,7 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
-import { Conversation } from "../../src/domain/entities/Conversation";
-import { Message } from "../../src/domain/entities/Message";
+import type { Conversation } from "../../src/domain/entities/Conversation";
+import type { Message } from "../../src/domain/entities/Message";
 import { PgConversationRepository } from "../../src/infrastructure/db/PgConversationRepository";
 import pool from "../../src/infrastructure/db/pool";
 
@@ -31,10 +31,7 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
   };
 }
 
-function makeMessage(
-  conversationId: string,
-  overrides?: Partial<Message>,
-): Message {
+function makeMessage(conversationId: string, overrides?: Partial<Message>): Message {
   return {
     id: randomUUID(),
     conversationId,
@@ -59,9 +56,9 @@ describe("PgConversationRepository", () => {
     await repo.save(conv);
     const found = await repo.findById(conv.id);
     expect(found).not.toBeNull();
-    expect(found!.id).toBe(conv.id);
-    expect(found!.title).toBe(conv.title);
-    expect(found!.messages).toHaveLength(0);
+    expect(found?.id).toBe(conv.id);
+    expect(found?.title).toBe(conv.title);
+    expect(found?.messages).toHaveLength(0);
   });
 
   it("findById returns null for unknown id", async () => {
@@ -81,10 +78,10 @@ describe("PgConversationRepository", () => {
     const msg = makeMessage(conv.id);
     await repo.addMessage(conv.id, msg);
     const found = await repo.findById(conv.id);
-    expect(found!.messages).toHaveLength(1);
-    expect(found!.messages[0].id).toBe(msg.id);
-    expect(found!.messages[0].role).toBe("user");
-    expect(found!.messages[0].content).toBe("Hello");
+    expect(found?.messages).toHaveLength(1);
+    expect(found?.messages[0].id).toBe(msg.id);
+    expect(found?.messages[0].role).toBe("user");
+    expect(found?.messages[0].content).toBe("Hello");
   });
 
   it("messages are returned in chronological order", async () => {
@@ -102,8 +99,8 @@ describe("PgConversationRepository", () => {
     await repo.addMessage(conv.id, msg1);
     await repo.addMessage(conv.id, msg2);
     const found = await repo.findById(conv.id);
-    expect(found!.messages[0].content).toBe("First");
-    expect(found!.messages[1].content).toBe("Second");
+    expect(found?.messages[0].content).toBe("First");
+    expect(found?.messages[1].content).toBe("Second");
   });
 
   it("findAll includes message count for each conversation", async () => {
@@ -120,10 +117,7 @@ describe("PgConversationRepository", () => {
     await repo.addMessage(conv.id, makeMessage(conv.id));
     await repo.delete(conv.id);
     expect(await repo.findById(conv.id)).toBeNull();
-    const msgs = await pool.query(
-      "SELECT id FROM messages WHERE conversation_id = $1",
-      [conv.id],
-    );
+    const msgs = await pool.query("SELECT id FROM messages WHERE conversation_id = $1", [conv.id]);
     expect(msgs.rows).toHaveLength(0);
   });
 });

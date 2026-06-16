@@ -1,9 +1,9 @@
-import express from "express";
-import cors from "cors";
+import path from "node:path";
 import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
+import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
+import express from "express";
+import rateLimit from "express-rate-limit";
 import { z } from "zod";
 
 process.on("uncaughtException", (err) => {
@@ -30,45 +30,43 @@ const envSchema = z.object({
 
 const envResult = envSchema.safeParse(process.env);
 if (!envResult.success) {
-  const missing = envResult.error.issues
-    .map((e) => e.path.join("."))
-    .join(", ");
+  const missing = envResult.error.issues.map((e) => e.path.join(".")).join(", ");
   console.error(`Missing required environment variables: ${missing}`);
   process.exit(1);
 }
 
-import config from "./config";
 import { apiKeyAuth } from "./api/middleware/apiKeyAuth";
 import { errorHandler } from "./api/middleware/errorHandler";
+import { adminRouter } from "./api/routes/admin";
 import { authRouter } from "./api/routes/auth";
 import { configRouter } from "./api/routes/config";
-import { documentsRouter } from "./api/routes/documents";
 import { conversationsRouter } from "./api/routes/conversations";
+import { documentsRouter } from "./api/routes/documents";
+import { quizzesRouter } from "./api/routes/quizzes";
 import { searchRouter } from "./api/routes/search";
-import { adminRouter } from "./api/routes/admin";
-import { PgDocumentRepository } from "./infrastructure/db/PgDocumentRepository";
-import { PgVectorChunkRepository } from "./infrastructure/db/PgVectorChunkRepository";
+import { AppSettingsService } from "./application/AppSettingsService";
+import { AskQuestion } from "./application/AskQuestion";
+import { CheckStorageConsistency } from "./application/CheckStorageConsistency";
+import { CreateDocument } from "./application/CreateDocument";
+import { GenerateQuiz } from "./application/GenerateQuiz";
+import { IngestDocument } from "./application/IngestDocument";
+import { ResetAll } from "./application/ResetAll";
+import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
+import { SearchKnowledge } from "./application/SearchKnowledge";
+import { SummarizeDocument } from "./application/SummarizeDocument";
+import config from "./config";
+import { PgAppSettingsRepository } from "./infrastructure/db/PgAppSettingsRepository";
 import { PgConversationRepository } from "./infrastructure/db/PgConversationRepository";
+import { PgDocumentRepository } from "./infrastructure/db/PgDocumentRepository";
 import { PgDocumentSummaryRepository } from "./infrastructure/db/PgDocumentSummaryRepository";
+import { PgVectorChunkRepository } from "./infrastructure/db/PgVectorChunkRepository";
+import pool from "./infrastructure/db/pool";
 import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
+import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
 import { createStorageBackends } from "./infrastructure/storage/createFileStorage";
 import { DynamicFileStorage } from "./infrastructure/storage/DynamicFileStorage";
-import { CreateDocument } from "./application/CreateDocument";
-import { IngestDocument } from "./application/IngestDocument";
-import { SearchKnowledge } from "./application/SearchKnowledge";
-import { AskQuestion } from "./application/AskQuestion";
-import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
-import { CheckStorageConsistency } from "./application/CheckStorageConsistency";
-import { AppSettingsService } from "./application/AppSettingsService";
-import { ResetAll } from "./application/ResetAll";
-import { PgAppSettingsRepository } from "./infrastructure/db/PgAppSettingsRepository";
-import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
-import { GenerateQuiz } from "./application/GenerateQuiz";
-import { SummarizeDocument } from "./application/SummarizeDocument";
-import { quizzesRouter } from "./api/routes/quizzes";
-import pool from "./infrastructure/db/pool";
 
 const documentRepo = new PgDocumentRepository();
 const chunkRepo = new PgVectorChunkRepository();
@@ -121,16 +119,8 @@ const askQuestion = new AskQuestion(
 );
 const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
 const summaryRepo = new PgDocumentSummaryRepository();
-const summarizeDocument = new SummarizeDocument(
-  documentRepo,
-  chunkRepo,
-  summaryRepo,
-  llmAdapter,
-);
-const checkStorageConsistency = new CheckStorageConsistency(
-  documentRepo,
-  fileStorage,
-);
+const summarizeDocument = new SummarizeDocument(documentRepo, chunkRepo, summaryRepo, llmAdapter);
+const checkStorageConsistency = new CheckStorageConsistency(documentRepo, fileStorage);
 const resetAll = new ResetAll(fileStorage, appSettingsService, pool);
 
 const app = express();
@@ -150,10 +140,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/config", configRouter(appSettingsService));
-app.use(
-  "/api/admin",
-  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
-);
+app.use("/api/admin", adminRouter(checkStorageConsistency, appSettingsService, resetAll));
 app.use("/api/auth", authRouter());
 
 const apiLimiter = rateLimit({
@@ -177,10 +164,7 @@ app.use(
     summarizeDocument,
   ),
 );
-app.use(
-  "/api/conversations",
-  conversationsRouter(conversationRepo, askQuestion),
-);
+app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 

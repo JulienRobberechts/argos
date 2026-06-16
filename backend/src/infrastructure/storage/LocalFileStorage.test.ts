@@ -1,6 +1,6 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { LocalFileStorage } from "./LocalFileStorage";
 
@@ -9,9 +9,7 @@ describe("LocalFileStorage", () => {
   let storage: LocalFileStorage;
 
   beforeEach(async () => {
-    tmpDir = await fs.promises.mkdtemp(
-      path.join(os.tmpdir(), "local-storage-test-"),
-    );
+    tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), "local-storage-test-"));
     storage = new LocalFileStorage(tmpDir);
   });
 

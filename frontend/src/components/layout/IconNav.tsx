@@ -1,10 +1,5 @@
+import { FileText, FlaskConical, MessageSquare, SquareCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import {
-  FileText,
-  MessageSquare,
-  FlaskConical,
-  SquareCheck,
-} from "lucide-react";
 import { useConfig } from "../../hooks/useConfig";
 
 const navItems = [
@@ -29,15 +24,9 @@ export default function IconNav() {
             className={`relative w-12 h-12 rounded-full bg-white border-2 border-[#d97706] shadow-2xl overflow-hidden transition-all ${
               isActive ? "" : "opacity-80 hover:opacity-100"
             }`}
-            style={
-              isActive ? { boxShadow: "0 0 40px rgba(217,119,6,0.25)" } : {}
-            }
+            style={isActive ? { boxShadow: "0 0 40px rgba(217,119,6,0.25)" } : {}}
           >
-            <img
-              src="/logo-argos-1.jpg"
-              alt="Argos"
-              className="h-full w-full object-contain"
-            />
+            <img src="/logo-argos-1.jpg" alt="Argos" className="h-full w-full object-contain" />
             <div
               className="absolute inset-0"
               style={{ background: "#374151", mixBlendMode: "color" }}

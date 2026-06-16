@@ -1,5 +1,5 @@
-import { MODELS } from "./models-data";
 import ModelCard from "./ModelCard";
+import { MODELS } from "./models-data";
 
 export default function ModelsTab() {
   return (

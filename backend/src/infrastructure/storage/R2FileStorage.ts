@@ -1,13 +1,13 @@
+import type { Readable } from "node:stream";
 import {
   DeleteObjectCommand,
   DeleteObjectsCommand,
   GetObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  S3Client,
+  type S3Client,
 } from "@aws-sdk/client-s3";
-import { Readable } from "stream";
-import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 
 export class R2FileStorage implements IFileStoragePort {
   constructor(
@@ -35,9 +35,7 @@ export class R2FileStorage implements IFileStoragePort {
   }
 
   async delete(key: string): Promise<void> {
-    await this.client.send(
-      new DeleteObjectCommand({ Bucket: this.bucket, Key: key }),
-    );
+    await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
   }
 
   async list(): Promise<string[]> {
@@ -54,9 +52,7 @@ export class R2FileStorage implements IFileStoragePort {
       for (const obj of response.Contents ?? []) {
         if (obj.Key) keys.push(obj.Key);
       }
-      continuationToken = response.IsTruncated
-        ? response.NextContinuationToken
-        : undefined;
+      continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined;
     } while (continuationToken);
 
     return keys;

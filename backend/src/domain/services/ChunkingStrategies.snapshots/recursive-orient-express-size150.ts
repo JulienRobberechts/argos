@@ -92,5 +92,4 @@ export default [
 
   // Chunk 31
   "- Montet J., 1886, *De Paris aux Karpathes*, Paris, Hachette.\n- Morand P., 1922, « La nuit turque », in : *Ouvert la nuit*, Paris, Gallimard.\n- Morand P., 1962, « Adieu à l'Orient-Express », in : *Le Voyage*, Paris, A. Fayard, 1996.\n- Nagelmackers G., 1870, *Projet d'installation de wagons-lits sur les chemins de fer du continent*, Liège, H. Vaillant-Carmanne & Cie.\n- Opper de Blowitz H., 1884, *Une course à Constantinople*, Paris, Plon/Nourrit et Cie.\n- Rémy P.-J., 1979, *Orient-Express*, Paris, A. Michel.\n- Rémy P.-J., 1984, *Orient-Express 2*, Paris, A. Michel.\n- San-Antonio, 1993, *La Matrone des sleepinges*, Paris, Éd. Fleuve noir.\n- Sherwood S., 1984, *Venise Simplon Orient-Express. Le plus célèbre train du monde reprend du service*, Paris, Payot.",
-
 ];

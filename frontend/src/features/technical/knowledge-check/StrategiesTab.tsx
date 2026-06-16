@@ -1,8 +1,8 @@
-import { BarChart2, GitCompare, Quote, Layers, ArrowRight } from "lucide-react";
-import Card from "../../../components/ui/Card";
-import SectionTitle from "../../../components/ui/SectionTitle";
-import CodeBlock from "../../../components/ui/CodeBlock";
+import { ArrowRight, BarChart2, GitCompare, Layers, Quote } from "lucide-react";
 import Callout from "../../../components/ui/Callout";
+import Card from "../../../components/ui/Card";
+import CodeBlock from "../../../components/ui/CodeBlock";
+import SectionTitle from "../../../components/ui/SectionTitle";
 import StrategyBadge from "./StrategyBadge";
 
 function FaithfulnessCard() {
@@ -17,18 +17,15 @@ function FaithfulnessCard() {
         <StrategyBadge label="faithfulness" />
       </div>
       <p className="text-sm text-slate-700 leading-relaxed mb-4">
-        A second LLM call (the <em>judge</em>) receives the original question,
-        the retrieved chunks, and the generated answer. It extracts every
-        factual claim from the answer and checks whether each claim is
-        explicitly stated in the sources.
+        A second LLM call (the <em>judge</em>) receives the original question, the retrieved chunks,
+        and the generated answer. It extracts every factual claim from the answer and checks whether
+        each claim is explicitly stated in the sources.
       </p>
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
         <p className="text-xs font-semibold text-amber-800 uppercase tracking-wide mb-2">
           Score formula
         </p>
-        <p className="text-sm font-mono text-amber-900">
-          score = supported_claims / total_claims
-        </p>
+        <p className="text-sm font-mono text-amber-900">score = supported_claims / total_claims</p>
         <p className="text-xs text-amber-700 mt-1">
           score = 1.0 → fully grounded · score = 0 → fully from training data
         </p>
@@ -56,14 +53,12 @@ Reply ONLY with valid JSON:
       />
       <div className="mt-4 space-y-3">
         <p className="text-sm text-slate-600 leading-relaxed">
-          In the example above both claims are <strong>UNSUPPORTED</strong> —
-          the bibliography chunk doesn't contain the date or the founder's name.
-          Score = 0/2 = 0.
+          In the example above both claims are <strong>UNSUPPORTED</strong> — the bibliography chunk
+          doesn't contain the date or the founder's name. Score = 0/2 = 0.
         </p>
         <Callout type="warning">
-          Faithfulness measures grounding, not correctness. A score of 0 does
-          not mean the answer is wrong — it means it isn't traceable to the
-          retrieved documents.
+          Faithfulness measures grounding, not correctness. A score of 0 does not mean the answer is
+          wrong — it means it isn't traceable to the retrieved documents.
         </Callout>
       </div>
     </Card>
@@ -82,9 +77,8 @@ function CounterfactualCard() {
         <StrategyBadge label="counterfactual" />
       </div>
       <p className="text-sm text-slate-700 leading-relaxed mb-4">
-        The strategy generates two answers to the same question — one with the
-        retrieved chunks (the RAG answer), one without any context (training
-        only). A judge then compares the two.
+        The strategy generates two answers to the same question — one with the retrieved chunks (the
+        RAG answer), one without any context (training only). A judge then compares the two.
       </p>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="border border-slate-200 rounded-lg p-4">
@@ -110,9 +104,7 @@ function CounterfactualCard() {
           </div>
         </div>
       </div>
-      <p className="text-sm font-medium text-slate-800 mb-2">
-        Comparison judge prompt
-      </p>
+      <p className="text-sm font-medium text-slate-800 mb-2">Comparison judge prompt</p>
       <CodeBlock
         code={`Question: "Quand a commencé l'Orient-Express ?"
 
@@ -130,28 +122,20 @@ Reply ONLY with valid JSON:
           </p>
           <div className="space-y-1 text-xs text-slate-700">
             <div className="flex items-center gap-2">
-              <span className="w-20 font-mono font-semibold text-amber-700">
-                similar = true
-              </span>
+              <span className="w-20 font-mono font-semibold text-amber-700">similar = true</span>
               <ArrowRight size={12} className="text-slate-400" />
-              <span>
-                score = 0 — RAG didn't add information beyond training data
-              </span>
+              <span>score = 0 — RAG didn't add information beyond training data</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-20 font-mono font-semibold text-amber-700">
-                similar = false
-              </span>
+              <span className="w-20 font-mono font-semibold text-amber-700">similar = false</span>
               <ArrowRight size={12} className="text-slate-400" />
-              <span>
-                score = 1 — the context genuinely influenced the answer
-              </span>
+              <span>score = 1 — the context genuinely influenced the answer</span>
             </div>
           </div>
         </div>
         <Callout type="info">
-          This strategy costs <strong>2× the LLM latency</strong>: one call to
-          generate answer B, one call for the comparison judge.
+          This strategy costs <strong>2× the LLM latency</strong>: one call to generate answer B,
+          one call for the comparison judge.
         </Callout>
       </div>
     </Card>
@@ -170,10 +154,9 @@ function CitationForcingCard() {
         <StrategyBadge label="citation_forcing" />
       </div>
       <p className="text-sm text-slate-700 leading-relaxed mb-4">
-        The judge is asked to map every factual claim to an <em>exact quote</em>{" "}
-        from the numbered source list. The adapter then{" "}
-        <strong>verifies</strong> each reported excerpt against the actual chunk
-        text — LLMs hallucinate citations.
+        The judge is asked to map every factual claim to an <em>exact quote</em> from the numbered
+        source list. The adapter then <strong>verifies</strong> each reported excerpt against the
+        actual chunk text — LLMs hallucinate citations.
       </p>
       <p className="text-sm font-medium text-slate-800 mb-2">Judge prompt</p>
       <CodeBlock
@@ -193,9 +176,7 @@ Reply ONLY with valid JSON:
   ]
 }`}
       />
-      <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
-        Hallucination guard
-      </p>
+      <p className="text-sm font-medium text-slate-800 mt-4 mb-2">Hallucination guard</p>
       <CodeBlock
         code={`const verified = chunkTexts.some((text) =>
   text.includes(c.sourceExcerpt.slice(0, 40))
@@ -203,8 +184,8 @@ Reply ONLY with valid JSON:
       />
       <div className="mt-4">
         <Callout type="warning">
-          Without the hallucination guard, a score of 1.0 could be meaningless —
-          the LLM may have invented plausible-looking quotes.
+          Without the hallucination guard, a score of 1.0 could be meaningless — the LLM may have
+          invented plausible-looking quotes.
         </Callout>
       </div>
     </Card>
@@ -263,9 +244,7 @@ export default function StrategiesTab() {
                 <td className="py-3 pr-4 text-xs text-slate-600">
                   Did retrieval actually change the answer?
                 </td>
-                <td className="py-3 text-xs text-slate-600">
-                  Detecting silent RAG failure
-                </td>
+                <td className="py-3 text-xs text-slate-600">Detecting silent RAG failure</td>
               </tr>
               <tr>
                 <td className="py-3 pr-4">
@@ -275,17 +254,14 @@ export default function StrategiesTab() {
                 <td className="py-3 pr-4 text-xs text-slate-600">
                   Exact source quote per claim (verified)
                 </td>
-                <td className="py-3 text-xs text-slate-600">
-                  Audit trail, explainability
-                </td>
+                <td className="py-3 text-xs text-slate-600">Audit trail, explainability</td>
               </tr>
             </tbody>
           </table>
         </div>
         <div className="mt-4">
           <Callout type="tip">
-            All three strategies can run in parallel since they are independent
-            LLM calls.
+            All three strategies can run in parallel since they are independent LLM calls.
           </Callout>
         </div>
       </Card>

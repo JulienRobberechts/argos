@@ -1,5 +1,5 @@
 import config from "../config";
-import { PgAppSettingsRepository } from "../infrastructure/db/PgAppSettingsRepository";
+import type { PgAppSettingsRepository } from "../infrastructure/db/PgAppSettingsRepository";
 
 export interface ProviderOption {
   provider: string;
@@ -54,8 +54,7 @@ const EMBEDDING_PRESETS: Omit<ProviderOption, "available">[] = [
 ];
 
 function r2Available(): boolean {
-  const { accountId, accessKeyId, secretAccessKey, bucketName } =
-    config.storage.r2;
+  const { accountId, accessKeyId, secretAccessKey, bucketName } = config.storage.r2;
   return !!(accountId && accessKeyId && secretAccessKey && bucketName);
 }
 
@@ -81,8 +80,7 @@ export class AppSettingsService {
             : false),
     }));
 
-    const currentStorageProvider =
-      stored["storage.provider"] ?? config.storage.backend;
+    const currentStorageProvider = stored["storage.provider"] ?? config.storage.backend;
 
     const storageOptions: StorageOption[] = [
       { provider: "r2", label: "Cloudflare R2", available: r2Available() },
@@ -105,9 +103,7 @@ export class AppSettingsService {
   async getChunkingConfig(): Promise<ChunkingConfig> {
     const stored = await this.repo.getAll();
     return {
-      strategy: (stored["rag.strategy"] ?? config.rag.chunkingStrategy) as
-        | "recursive"
-        | "sentence",
+      strategy: (stored["rag.strategy"] ?? config.rag.chunkingStrategy) as "recursive" | "sentence",
       chunkSize: stored["rag.chunkSize"]
         ? parseInt(stored["rag.chunkSize"], 10)
         : config.rag.chunkSize,
@@ -119,12 +115,9 @@ export class AppSettingsService {
 
   async updateSettings(patch: AppSettingsPatch): Promise<AppSettings> {
     const entries: Record<string, string> = {};
-    if (patch.embedding?.provider)
-      entries["embedding.provider"] = patch.embedding.provider;
-    if (patch.storage?.provider)
-      entries["storage.provider"] = patch.storage.provider;
-    if (patch.chunking?.strategy)
-      entries["rag.strategy"] = patch.chunking.strategy;
+    if (patch.embedding?.provider) entries["embedding.provider"] = patch.embedding.provider;
+    if (patch.storage?.provider) entries["storage.provider"] = patch.storage.provider;
+    if (patch.chunking?.strategy) entries["rag.strategy"] = patch.chunking.strategy;
     if (patch.chunking?.chunkSize != null)
       entries["rag.chunkSize"] = String(patch.chunking.chunkSize);
     if (patch.chunking?.chunkOverlap != null)

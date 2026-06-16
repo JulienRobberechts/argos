@@ -1,10 +1,7 @@
-import { Router, Request, Response, NextFunction } from "express";
-import { CheckStorageConsistency } from "../../application/CheckStorageConsistency";
-import {
-  AppSettingsService,
-  AppSettingsPatch,
-} from "../../application/AppSettingsService";
-import { ResetAll } from "../../application/ResetAll";
+import { type NextFunction, type Request, type Response, Router } from "express";
+import type { AppSettingsPatch, AppSettingsService } from "../../application/AppSettingsService";
+import type { CheckStorageConsistency } from "../../application/CheckStorageConsistency";
+import type { ResetAll } from "../../application/ResetAll";
 
 export function adminRouter(
   checkConsistency: CheckStorageConsistency,
@@ -18,8 +15,7 @@ export function adminRouter(
     async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const result = await checkConsistency.execute();
-        const ok =
-          result.orphanFiles.length === 0 && result.missingFiles.length === 0;
+        const ok = result.orphanFiles.length === 0 && result.missingFiles.length === 0;
         res.json({ ok, ...result });
       } catch (err) {
         next(err);
@@ -43,9 +39,7 @@ export function adminRouter(
     "/settings",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const updated = await settingsService.updateSettings(
-          req.body as AppSettingsPatch,
-        );
+        const updated = await settingsService.updateSettings(req.body as AppSettingsPatch);
         res.json(updated);
       } catch (err) {
         next(err);

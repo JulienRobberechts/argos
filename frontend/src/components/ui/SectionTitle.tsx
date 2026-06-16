@@ -14,9 +14,7 @@ export default function SectionTitle({
       </div>
       <div>
         <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
-        {subtitle && (
-          <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-sm text-slate-500 mt-0.5">{subtitle}</p>}
       </div>
     </div>
   );

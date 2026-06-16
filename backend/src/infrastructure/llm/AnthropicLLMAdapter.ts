@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { ILLMPort, LLMStreamOptions } from "../../domain/ports/ILLMPort";
 import config from "../../config";
+import type { ILLMPort, LLMStreamOptions } from "../../domain/ports/ILLMPort";
 import { Logger } from "../logger/Logger";
 
 const logger = new Logger("AnthropicLLMAdapter");
@@ -20,8 +20,7 @@ export class AnthropicLLMAdapter implements ILLMPort {
   ): Promise<string> {
     const model = options?.model ?? config.llm.anthropic.model;
     const maxTokens = options?.maxTokens ?? config.llm.anthropic.maxTokens;
-    const temperature =
-      options?.temperature ?? config.llm.anthropic.temperature;
+    const temperature = options?.temperature ?? config.llm.anthropic.temperature;
     let fullContent = "";
 
     logger.info("Anthropic LLM request", {
@@ -46,10 +45,7 @@ export class AnthropicLLMAdapter implements ILLMPort {
 
     for await (const chunk of stream) {
       if (signal?.aborted) break;
-      if (
-        chunk.type === "content_block_delta" &&
-        chunk.delta.type === "text_delta"
-      ) {
+      if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
         onToken(chunk.delta.text);
         fullContent += chunk.delta.text;
       }

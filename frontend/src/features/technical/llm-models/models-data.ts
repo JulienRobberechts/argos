@@ -34,10 +34,7 @@ export const MODELS: ModelSpec[] = [
       "Long-running agentic work",
       "Cases requiring the best available intelligence",
     ],
-    limitations: [
-      "Highest cost ($10/$50 per MTok)",
-      "Higher latency than Sonnet/Haiku",
-    ],
+    limitations: ["Highest cost ($10/$50 per MTok)", "Higher latency than Sonnet/Haiku"],
   },
   {
     id: "claude-opus-4-8",
@@ -56,10 +53,7 @@ export const MODELS: ModelSpec[] = [
       "Long-running agentic coding",
       "Deep analysis of long documents",
     ],
-    limitations: [
-      "High cost ($5/$25 per MTok)",
-      "Higher latency than Sonnet/Haiku",
-    ],
+    limitations: ["High cost ($5/$25 per MTok)", "Higher latency than Sonnet/Haiku"],
   },
   {
     id: "claude-sonnet-4-6",
@@ -92,11 +86,7 @@ export const MODELS: ModelSpec[] = [
     knowledgeCutoff: "Feb 2025",
     adaptiveThinking: false,
     extendedThinking: true,
-    bestFor: [
-      "Low-latency responses",
-      "High volume / reduced cost",
-      "Simple document Q&A tasks",
-    ],
+    bestFor: ["Low-latency responses", "High volume / reduced cost", "Simple document Q&A tasks"],
     limitations: [
       "Smaller context window (200k)",
       "No adaptive thinking",

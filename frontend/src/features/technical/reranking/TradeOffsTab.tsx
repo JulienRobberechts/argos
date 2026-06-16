@@ -1,4 +1,4 @@
-import { ArrowUpDown, CheckCircle, AlertTriangle } from "lucide-react";
+import { AlertTriangle, ArrowUpDown, CheckCircle } from "lucide-react";
 import Card from "../../../components/ui/Card";
 import SectionTitle from "../../../components/ui/SectionTitle";
 
@@ -17,31 +17,19 @@ export default function TradeOffsTab() {
           </p>
           <ul className="text-xs text-slate-600 space-y-1.5">
             <li className="flex gap-2">
-              <CheckCircle
-                size={12}
-                className="text-green-500 mt-0.5 flex-shrink-0"
-              />
+              <CheckCircle size={12} className="text-green-500 mt-0.5 flex-shrink-0" />
               Questions ask for specific facts (dates, names, numbers)
             </li>
             <li className="flex gap-2">
-              <CheckCircle
-                size={12}
-                className="text-green-500 mt-0.5 flex-shrink-0"
-              />
+              <CheckCircle size={12} className="text-green-500 mt-0.5 flex-shrink-0" />
               Documents are long and contain many related topics
             </li>
             <li className="flex gap-2">
-              <CheckCircle
-                size={12}
-                className="text-green-500 mt-0.5 flex-shrink-0"
-              />
+              <CheckCircle size={12} className="text-green-500 mt-0.5 flex-shrink-0" />
               The query phrasing differs from the document phrasing
             </li>
             <li className="flex gap-2">
-              <CheckCircle
-                size={12}
-                className="text-green-500 mt-0.5 flex-shrink-0"
-              />
+              <CheckCircle size={12} className="text-green-500 mt-0.5 flex-shrink-0" />
               High precision is more important than raw speed
             </li>
           </ul>
@@ -52,32 +40,19 @@ export default function TradeOffsTab() {
           </p>
           <ul className="text-xs text-slate-600 space-y-1.5">
             <li className="flex gap-2">
-              <AlertTriangle
-                size={12}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
+              <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
               The knowledge base is small (&lt; 100 chunks)
             </li>
             <li className="flex gap-2">
-              <AlertTriangle
-                size={12}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
-              Questions are broad / conceptual (vector search already works
-              well)
+              <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
+              Questions are broad / conceptual (vector search already works well)
             </li>
             <li className="flex gap-2">
-              <AlertTriangle
-                size={12}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
+              <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
               Latency is critical and &lt;100ms responses are required
             </li>
             <li className="flex gap-2">
-              <AlertTriangle
-                size={12}
-                className="text-amber-500 mt-0.5 flex-shrink-0"
-              />
+              <AlertTriangle size={12} className="text-amber-500 mt-0.5 flex-shrink-0" />
               The relevant answer is simply absent from the documents
             </li>
           </ul>

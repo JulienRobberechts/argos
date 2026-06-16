@@ -1,15 +1,11 @@
-import fs from "fs";
-import path from "path";
-import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import fs from "node:fs";
+import path from "node:path";
+import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
 
 export class LocalFileStorage implements IFileStoragePort {
   constructor(private readonly uploadDir: string) {}
 
-  async upload(
-    key: string,
-    buffer: Buffer,
-    _mimetype: string,
-  ): Promise<string> {
+  async upload(key: string, buffer: Buffer, _mimetype: string): Promise<string> {
     const filePath = path.join(this.uploadDir, key);
     await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
     await fs.promises.writeFile(filePath, buffer);

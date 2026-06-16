@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import { Logger } from "../../infrastructure/logger/Logger";
 
@@ -21,10 +21,7 @@ export function errorHandler(
     return;
   }
 
-  logger.error(
-    "Unhandled error",
-    err instanceof Error ? err : new Error(String(err)),
-  );
+  logger.error("Unhandled error", err instanceof Error ? err : new Error(String(err)));
 
   res.status(500).json({ error: "Internal server error" });
 }

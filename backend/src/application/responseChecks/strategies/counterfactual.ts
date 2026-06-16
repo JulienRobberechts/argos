@@ -1,5 +1,5 @@
-import { ILLMPort } from "../../../domain/ports/ILLMPort";
-import { KnowledgeCheckResult } from "../../../domain/entities/Message";
+import type { KnowledgeCheckResult } from "../../../domain/entities/Message";
+import type { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 export async function checkCounterfactual(

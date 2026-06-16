@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from "react";
 import { Pencil } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useUpdateConversationTitle } from "../../hooks/useConversation";
 
 export default function EditableTitle({
@@ -52,6 +52,7 @@ export default function EditableTitle({
 
   return (
     <button
+      type="button"
       className="group flex items-center gap-1.5 text-base font-semibold text-slate-800 hover:text-slate-600 transition-colors"
       onClick={() => setEditing(true)}
       title="Edit title"

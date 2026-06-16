@@ -1,4 +1,4 @@
-import { DocumentSummary } from "../entities/DocumentSummary";
+import type { DocumentSummary } from "../entities/DocumentSummary";
 
 /** Stores and retrieves AI-generated summaries for documents. */
 export interface IDocumentSummaryRepository {

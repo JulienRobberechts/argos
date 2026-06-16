@@ -14,15 +14,7 @@ const PALETTE = {
   ],
 };
 
-function Swatch({
-  hex,
-  label,
-  usage,
-}: {
-  hex: string;
-  label: string;
-  usage: string;
-}) {
+function Swatch({ hex, label, usage }: { hex: string; label: string; usage: string }) {
   return (
     <div className="flex items-center gap-3">
       <div
@@ -42,9 +34,7 @@ export default function ColorPalettePage() {
   return (
     <div className="p-8 max-w-2xl mx-auto space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800 font-audiowide">
-          {PALETTE.name}
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-800 font-audiowide">{PALETTE.name}</h1>
         <p className="text-sm text-slate-500 mt-1">{PALETTE.desc}</p>
       </div>
 
@@ -57,9 +47,7 @@ export default function ColorPalettePage() {
           className="w-16 h-16 rounded-full bg-white flex-shrink-0"
           style={{ border: `5px solid ${PALETTE.border}` }}
         />
-        <div
-          style={{ display: "inline-grid", gridTemplateColumns: "max-content" }}
-        >
+        <div style={{ display: "inline-grid", gridTemplateColumns: "max-content" }}>
           <span
             style={{
               fontFamily: "'Audiowide', sans-serif",
@@ -97,9 +85,7 @@ export default function ColorPalettePage() {
 
       {/* Nuancier */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">
-          Nuancier
-        </h2>
+        <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Nuancier</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {PALETTE.swatches.map((s) => (
             <Swatch key={s.hex} {...s} />
@@ -109,29 +95,17 @@ export default function ColorPalettePage() {
 
       {/* Dégradés */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-        <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">
-          Dégradés
-        </h2>
+        <h2 className="text-sm font-semibold text-slate-600 uppercase tracking-wider">Dégradés</h2>
         <div className="space-y-3">
           <div>
             <p className="text-xs text-slate-400 mb-1">Fond bandeau</p>
-            <div
-              className="h-10 rounded-lg"
-              style={{ background: PALETTE.banner }}
-            />
-            <p className="text-[10px] font-mono text-slate-400 mt-1">
-              {PALETTE.banner}
-            </p>
+            <div className="h-10 rounded-lg" style={{ background: PALETTE.banner }} />
+            <p className="text-[10px] font-mono text-slate-400 mt-1">{PALETTE.banner}</p>
           </div>
           <div>
             <p className="text-xs text-slate-400 mb-1">Accent texte</p>
-            <div
-              className="h-10 rounded-lg"
-              style={{ background: PALETTE.accent }}
-            />
-            <p className="text-[10px] font-mono text-slate-400 mt-1">
-              {PALETTE.accent}
-            </p>
+            <div className="h-10 rounded-lg" style={{ background: PALETTE.accent }} />
+            <p className="text-[10px] font-mono text-slate-400 mt-1">{PALETTE.accent}</p>
           </div>
         </div>
       </div>

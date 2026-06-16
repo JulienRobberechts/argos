@@ -4,18 +4,15 @@ import { SentenceChunkingStrategy } from "./SentenceChunkingStrategy";
 
 export type {
   ChunkConfig,
+  ChunkingStrategyName,
   ChunkResult,
   IChunkingStrategy,
-  ChunkingStrategyName,
 } from "./ChunkingTypes";
 
-export function createChunkingStrategy(
-  name: ChunkingStrategyName,
-): IChunkingStrategy {
+export function createChunkingStrategy(name: ChunkingStrategyName): IChunkingStrategy {
   switch (name) {
     case "sentence":
       return new SentenceChunkingStrategy();
-    case "recursive":
     default:
       return new RecursiveChunkingStrategy();
   }

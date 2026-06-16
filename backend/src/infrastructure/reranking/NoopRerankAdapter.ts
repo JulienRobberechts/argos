@@ -1,11 +1,7 @@
-import { IRerankPort } from "../../domain/ports/IRerankPort";
+import type { IRerankPort } from "../../domain/ports/IRerankPort";
 
 export class NoopRerankAdapter implements IRerankPort {
-  async rerank(
-    _query: string,
-    documents: string[],
-    _model?: string,
-  ): Promise<number[]> {
+  async rerank(_query: string, documents: string[], _model?: string): Promise<number[]> {
     return documents.map((_, i) => i);
   }
 }

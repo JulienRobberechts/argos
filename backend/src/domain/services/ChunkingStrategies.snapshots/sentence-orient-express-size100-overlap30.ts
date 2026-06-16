@@ -197,5 +197,4 @@ export default [
 
   // Chunk 66
   "Le plus célèbre train du monde reprend du service*, Paris, Payot.",
-
 ];

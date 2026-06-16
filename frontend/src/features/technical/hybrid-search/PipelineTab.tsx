@@ -1,8 +1,8 @@
-import { GitMerge, Hash, Search, Layers } from "lucide-react";
-import Card from "../../../components/ui/Card";
-import SectionTitle from "../../../components/ui/SectionTitle";
-import CodeBlock from "../../../components/ui/CodeBlock";
+import { GitMerge, Hash, Layers, Search } from "lucide-react";
 import Callout from "../../../components/ui/Callout";
+import Card from "../../../components/ui/Card";
+import CodeBlock from "../../../components/ui/CodeBlock";
+import SectionTitle from "../../../components/ui/SectionTitle";
 import PipelineStep from "../rag-core/PipelineStep";
 
 export default function PipelineTab() {
@@ -48,24 +48,20 @@ export default function PipelineTab() {
           subtitle="The formula that makes rank fusion work"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-4">
-          RRF was introduced by Cormack, Clarke & Buettcher (SIGIR 2009). The
-          idea: replace raw scores with their reciprocal rank, then sum across
-          sources. A chunk that ranks 1st in both lists scores much higher than
-          a chunk that is 1st in one and absent from the other.
+          RRF was introduced by Cormack, Clarke & Buettcher (SIGIR 2009). The idea: replace raw
+          scores with their reciprocal rank, then sum across sources. A chunk that ranks 1st in both
+          lists scores much higher than a chunk that is 1st in one and absent from the other.
         </p>
 
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4 font-mono text-sm text-center">
-          <p className="text-slate-800">
-            RRF(chunk) = 1 / (k + rank_vector) + 1 / (k + rank_bm25)
-          </p>
+          <p className="text-slate-800">RRF(chunk) = 1 / (k + rank_vector) + 1 / (k + rank_bm25)</p>
           <p className="text-xs text-slate-500 mt-1">k = 60 (constant)</p>
         </div>
 
         <p className="text-sm text-slate-700 leading-relaxed mb-3">
-          The constant <strong>k = 60</strong> is the original paper's
-          recommendation. It prevents a rank-1 result from dominating when the
-          other source gives it a very low rank: 1/(60+1) ≈ 0.016 whereas
-          1/(60+100) ≈ 0.006 — the difference is bounded, not explosive.
+          The constant <strong>k = 60</strong> is the original paper's recommendation. It prevents a
+          rank-1 result from dominating when the other source gives it a very low rank: 1/(60+1) ≈
+          0.016 whereas 1/(60+100) ≈ 0.006 — the difference is bounded, not explosive.
         </p>
 
         <CodeBlock
@@ -99,18 +95,10 @@ for (const row of textResult.rows) {
           <table className="w-full text-xs text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-200">
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  Chunk
-                </th>
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  Vector rank
-                </th>
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  BM25 rank
-                </th>
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  RRF score
-                </th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">Chunk</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">Vector rank</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">BM25 rank</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">RRF score</th>
                 <th className="py-2 font-semibold text-slate-600">Why</th>
               </tr>
             </thead>
@@ -119,9 +107,7 @@ for (const row of textResult.rows) {
                 <td className="py-2 pr-4 text-slate-800">A</td>
                 <td className="py-2 pr-4 text-slate-700">1</td>
                 <td className="py-2 pr-4 text-slate-700">1</td>
-                <td className="py-2 pr-4 font-semibold text-green-700">
-                  0.0323
-                </td>
+                <td className="py-2 pr-4 font-semibold text-green-700">0.0323</td>
                 <td className="py-2 text-slate-500">Top of both lists</td>
               </tr>
               <tr>
@@ -136,9 +122,7 @@ for (const row of textResult.rows) {
                 <td className="py-2 pr-4 text-slate-500">—</td>
                 <td className="py-2 pr-4 text-slate-700">2</td>
                 <td className="py-2 pr-4 text-slate-700">0.0161</td>
-                <td className="py-2 text-slate-500">
-                  BM25 only — exact token match
-                </td>
+                <td className="py-2 text-slate-500">BM25 only — exact token match</td>
               </tr>
               <tr>
                 <td className="py-2 pr-4 text-slate-800">D</td>
@@ -151,9 +135,9 @@ for (const row of textResult.rows) {
           </table>
         </div>
         <Callout type="info">
-          Chunk C (BM25-only) beats chunk D (present in both but ranked lower).
-          This is the key property: a strong exact match can outrank a mediocre
-          semantic match even with no vector signal.
+          Chunk C (BM25-only) beats chunk D (present in both but ranked lower). This is the key
+          property: a strong exact match can outrank a mediocre semantic match even with no vector
+          signal.
         </Callout>
       </Card>
     </>

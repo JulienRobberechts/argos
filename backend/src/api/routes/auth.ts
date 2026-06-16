@@ -1,5 +1,5 @@
-import { Router, Request, Response } from "express";
-import { timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "node:crypto";
+import { type Request, type Response, Router } from "express";
 import config from "../../config";
 
 export function authRouter(): Router {
@@ -21,10 +21,7 @@ export function authRouter(): Router {
 
     const provided = Buffer.from(password);
     const expected = Buffer.from(expectedKey);
-    if (
-      provided.length !== expected.length ||
-      !timingSafeEqual(provided, expected)
-    ) {
+    if (provided.length !== expected.length || !timingSafeEqual(provided, expected)) {
       res.status(401).json({ error: "Unauthorized" });
       return;
     }
@@ -43,8 +40,7 @@ export function authRouter(): Router {
   });
 
   router.get("/me", (req: Request, res: Response): void => {
-    const fromCookie = (req.cookies as Record<string, string> | undefined)
-      ?.session;
+    const fromCookie = (req.cookies as Record<string, string> | undefined)?.session;
     const fromHeader = req.headers["x-api-key"];
     const key = fromCookie ?? fromHeader;
     const expectedKey = config.api.key;

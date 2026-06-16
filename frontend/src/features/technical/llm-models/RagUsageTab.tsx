@@ -1,4 +1,4 @@
-import { Zap, CheckCircle } from "lucide-react";
+import { CheckCircle, Zap } from "lucide-react";
 import Card from "../../../components/ui/Card";
 import SectionTitle from "../../../components/ui/SectionTitle";
 
@@ -15,12 +15,11 @@ export default function RagUsageTab() {
           <CheckCircle size={16} className="text-green-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-slate-900">
-              Production —{" "}
-              <code className="text-amber-700">claude-sonnet-4-6</code>
+              Production — <code className="text-amber-700">claude-sonnet-4-6</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              Best balance for a RAG pipeline: 1M token context, 64k output,
-              fast speed and reasonable cost ($3/$15).
+              Best balance for a RAG pipeline: 1M token context, 64k output, fast speed and
+              reasonable cost ($3/$15).
             </p>
           </div>
         </div>
@@ -33,8 +32,7 @@ export default function RagUsageTab() {
               <code className="text-amber-700">claude-fable-5</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              For complex queries, synthesis over very long contexts, or
-              response comparison.
+              For complex queries, synthesis over very long contexts, or response comparison.
             </p>
           </div>
         </div>
@@ -46,8 +44,8 @@ export default function RagUsageTab() {
               <code className="text-amber-700">claude-haiku-4-5-20251001</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              Ideal for simple document Q&A with high throughput requirements.
-              Context window limited to 200k tokens.
+              Ideal for simple document Q&A with high throughput requirements. Context window
+              limited to 200k tokens.
             </p>
           </div>
         </div>

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { FlaskConical } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
-import OverviewTab from "./rag-core/OverviewTab";
-import IngestionTab from "./rag-core/IngestionTab";
-import QueryTab from "./rag-core/QueryTab";
 import ConfigTab from "./rag-core/ConfigTab";
+import IngestionTab from "./rag-core/IngestionTab";
+import OverviewTab from "./rag-core/OverviewTab";
+import QueryTab from "./rag-core/QueryTab";
 
 const TABS = ["Overview", "Ingestion", "Query", "Config"] as const;
 type Tab = (typeof TABS)[number];
@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function TechnicalPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Overview",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

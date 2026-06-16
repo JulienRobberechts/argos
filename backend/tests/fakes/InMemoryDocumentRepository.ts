@@ -1,5 +1,5 @@
-import { Document, DocumentStatus } from "../../src/domain/entities/Document";
-import { IDocumentRepository } from "../../src/domain/ports/IDocumentRepository";
+import type { Document, DocumentStatus } from "../../src/domain/entities/Document";
+import type { IDocumentRepository } from "../../src/domain/ports/IDocumentRepository";
 
 export class InMemoryDocumentRepository implements IDocumentRepository {
   private documents: Map<string, Document> = new Map();

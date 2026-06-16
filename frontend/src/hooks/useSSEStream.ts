@@ -5,9 +5,9 @@ import type { KnowledgeCheckResult, SourceCitation } from "../types/domain";
 export function useSSEStream(conversationId: string) {
   const [text, setText] = useState("");
   const [sources, setSources] = useState<SourceCitation[]>([]);
-  const [knowledgeCheck, setKnowledgeCheck] = useState<
-    KnowledgeCheckResult[] | undefined
-  >(undefined);
+  const [knowledgeCheck, setKnowledgeCheck] = useState<KnowledgeCheckResult[] | undefined>(
+    undefined,
+  );
   const [isStreaming, setIsStreaming] = useState(false);
   const closeRef = useRef<(() => void) | null>(null);
 
@@ -20,7 +20,7 @@ export function useSSEStream(conversationId: string) {
       closeRef.current?.();
       closeRef.current = null;
     };
-  }, [conversationId]);
+  }, []);
 
   const send = useCallback(
     (content: string, onComplete?: () => void) => {

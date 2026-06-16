@@ -1,6 +1,6 @@
+import { BookOpen, Info } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Info, BookOpen } from "lucide-react";
 
 export const RERANK_MODELS = [
   { value: "rerank-2.5", label: "rerank-2.5" },
@@ -39,6 +39,7 @@ export function Field({
           <span className="text-xs text-slate-500 leading-tight">{label}</span>
           {info && (
             <button
+              type="button"
               onClick={() => setOpen((v) => !v)}
               className="text-slate-300 hover:text-[#d97706] transition-colors"
               aria-label={`About: ${label}`}

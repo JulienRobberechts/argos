@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { Request, Response, NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ZodError, ZodIssueCode } from "zod";
 
 vi.mock("../../config", () => ({
@@ -41,9 +41,7 @@ describe("errorHandler", () => {
     const res = makeRes();
     errorHandler(zodErr, fakeReq, res, fakeNext);
     expect(res.status).toHaveBeenCalledWith(400);
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ error: "Validation error" }),
-    );
+    expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ error: "Validation error" }));
   });
 
   it("returns 500 for generic errors", () => {

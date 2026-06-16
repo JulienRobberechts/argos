@@ -1,9 +1,9 @@
-import { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
-import { ILLMPort } from "../../../domain/ports/ILLMPort";
-import {
-  KnowledgeClaim,
+import type {
   KnowledgeCheckResult,
+  KnowledgeClaim,
 } from "../../../domain/entities/Message";
+import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
+import type { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 export function buildCitationForcingInstruction(): string {
@@ -24,8 +24,7 @@ export function parseCitationForcingResult(
   const claims: KnowledgeClaim[] = [];
 
   const sourceRegex = /([^.!?\n]*?)\s*\[SOURCE\s+(\d+)\]/g;
-  let match;
-  while ((match = sourceRegex.exec(raw)) !== null) {
+  for (const match of raw.matchAll(sourceRegex)) {
     const claim = match[1].trim();
     const sourceIndex = parseInt(match[2], 10) - 1;
     if (claim.length > 0) {
@@ -45,7 +44,7 @@ export function parseCitationForcingResult(
   }
 
   const ownKnowledgeRegex = /([^.!?\n]*?)\s*\[OWN KNOWLEDGE\]/g;
-  while ((match = ownKnowledgeRegex.exec(raw)) !== null) {
+  for (const match of raw.matchAll(ownKnowledgeRegex)) {
     const claim = match[1].trim();
     if (claim.length > 0) {
       claims.push({ claim, status: "UNSUPPORTED" });

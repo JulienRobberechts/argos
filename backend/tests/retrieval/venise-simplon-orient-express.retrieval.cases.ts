@@ -38,13 +38,11 @@ export const RETRIEVAL_CASES: {
     topK: 5,
   },
   {
-    question:
-      "Quel décorateur a travaillé sur la voiture-restaurant Côte d'Azur ?",
+    question: "Quel décorateur a travaillé sur la voiture-restaurant Côte d'Azur ?",
     expectedKeyword: "Lalique",
   },
   {
-    question:
-      "Pourquoi la desserte de Londres a-t-elle été abandonnée en 2023 ?",
+    question: "Pourquoi la desserte de Londres a-t-elle été abandonnée en 2023 ?",
     expectedKeyword: "Brexit",
     topK: 2,
   },

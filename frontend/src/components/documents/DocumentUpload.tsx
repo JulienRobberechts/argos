@@ -49,15 +49,11 @@ export default function DocumentUpload({
       {uploading ? (
         <div className="text-sm text-[#d97706] font-medium">Uploading...</div>
       ) : isDragActive ? (
-        <div className="text-sm text-[#92400e] font-medium">
-          Drop files here...
-        </div>
+        <div className="text-sm text-[#92400e] font-medium">Drop files here...</div>
       ) : (
         <div className="text-sm text-slate-500">
           Drag & drop files here, or click to select
-          <div className="text-xs text-slate-400 mt-1">
-            PDF, Markdown, or Text files
-          </div>
+          <div className="text-xs text-slate-400 mt-1">PDF, Markdown, or Text files</div>
         </div>
       )}
     </div>

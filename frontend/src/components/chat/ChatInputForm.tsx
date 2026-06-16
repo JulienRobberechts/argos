@@ -1,5 +1,5 @@
-import { useRef, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export default function ChatInputForm({
   input,
@@ -19,7 +19,7 @@ export default function ChatInputForm({
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
-  }, [input]);
+  }, []);
 
   return (
     <form

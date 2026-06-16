@@ -12,8 +12,7 @@ interface Token {
 function tokenize(text: string): Token[] {
   const tokens: Token[] = [];
   const regex = /\S+/g;
-  let match: RegExpExecArray | null;
-  while ((match = regex.exec(text)) !== null) {
+  for (const match of text.matchAll(regex)) {
     tokens.push({ start: match.index, end: match.index + match[0].length });
   }
   return tokens;

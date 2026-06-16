@@ -5,9 +5,9 @@ import type {
 } from "../../types/domain";
 import {
   Field,
-  Toggle,
-  RERANK_MODELS,
   LLM_MODELS,
+  RERANK_MODELS,
+  Toggle,
 } from "./ParamsPanelControls";
 
 export default function ParamsPanel({
@@ -44,6 +44,7 @@ export default function ParamsPanel({
         </div>
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
             className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors mt-0.5"
           >

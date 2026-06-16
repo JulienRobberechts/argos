@@ -1,8 +1,5 @@
-import {
-  EmbeddingInputType,
-  ITextEncoder,
-} from "../../domain/ports/ITextEncoder";
 import config from "../../config";
+import type { EmbeddingInputType, ITextEncoder } from "../../domain/ports/ITextEncoder";
 import { Logger } from "../logger/Logger";
 
 const logger = new Logger("VoyageEmbeddingAdapter");
@@ -55,10 +52,7 @@ export class VoyageEmbeddingAdapter implements ITextEncoder {
     return results[0];
   }
 
-  async embedMany(
-    texts: string[],
-    inputType?: EmbeddingInputType,
-  ): Promise<number[][]> {
+  async embedMany(texts: string[], inputType?: EmbeddingInputType): Promise<number[][]> {
     const results: number[][] = [];
     for (let i = 0; i < texts.length; i += BATCH_SIZE) {
       if (i > 0) {
@@ -71,10 +65,7 @@ export class VoyageEmbeddingAdapter implements ITextEncoder {
     return results;
   }
 
-  private async embedBatch(
-    texts: string[],
-    inputType?: EmbeddingInputType,
-  ): Promise<number[][]> {
+  private async embedBatch(texts: string[], inputType?: EmbeddingInputType): Promise<number[][]> {
     return withRetry(async () => {
       logger.info("Voyage API request", {
         model: this.model,
@@ -109,9 +100,7 @@ export class VoyageEmbeddingAdapter implements ITextEncoder {
         texts: texts,
         durationMs: Date.now() - start,
       });
-      return data.data
-        .sort((a, b) => a.index - b.index)
-        .map((d) => d.embedding);
+      return data.data.sort((a, b) => a.index - b.index).map((d) => d.embedding);
     });
   }
 }

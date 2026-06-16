@@ -1,12 +1,12 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Chunk } from "../domain/entities/Chunk";
-import { Conversation } from "../domain/entities/Conversation";
-import { Message } from "../domain/entities/Message";
-import { AskQuestion } from "./AskQuestion";
-import { SearchKnowledge } from "./SearchKnowledge";
-import { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import { InMemoryConversationRepository } from "../../tests/fakes/InMemoryConversationRepository";
+import type { Chunk } from "../domain/entities/Chunk";
+import type { Conversation } from "../domain/entities/Conversation";
+import type { Message } from "../domain/entities/Message";
+import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
+import { AskQuestion } from "./AskQuestion";
+import type { SearchKnowledge } from "./SearchKnowledge";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {
@@ -30,11 +30,7 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
   };
 }
 
-function makeMessage(
-  conversationId: string,
-  role: "user" | "assistant",
-  content: string,
-): Message {
+function makeMessage(conversationId: string, role: "user" | "assistant", content: string): Message {
   return {
     id: randomUUID(),
     conversationId,
@@ -58,14 +54,10 @@ function makeChunkResult(content = "Relevant content"): ChunkSearchResult {
 
 function makeLLMAdapter(response = "Test LLM response") {
   return {
-    stream: vi
-      .fn()
-      .mockImplementation(
-        async (_prompt: string, onToken: (t: string) => void) => {
-          onToken(response);
-          return response;
-        },
-      ),
+    stream: vi.fn().mockImplementation(async (_prompt: string, onToken: (t: string) => void) => {
+      onToken(response);
+      return response;
+    }),
   };
 }
 
@@ -132,14 +124,8 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     for (let i = 0; i < 5; i++) {
-      await convRepo.addMessage(
-        conv.id,
-        makeMessage(conv.id, "user", `User msg ${i}`),
-      );
-      await convRepo.addMessage(
-        conv.id,
-        makeMessage(conv.id, "assistant", `Assistant msg ${i}`),
-      );
+      await convRepo.addMessage(conv.id, makeMessage(conv.id, "user", `User msg ${i}`));
+      await convRepo.addMessage(conv.id, makeMessage(conv.id, "assistant", `Assistant msg ${i}`));
     }
     const ask = new AskQuestion(
       mockSearchKnowledge as unknown as SearchKnowledge,
@@ -161,13 +147,11 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     const onToken = vi.fn();
-    llmAdapter.stream.mockImplementation(
-      async (_p: string, cb: (t: string) => void) => {
-        cb("token1");
-        cb("token2");
-        return "token1token2";
-      },
-    );
+    llmAdapter.stream.mockImplementation(async (_p: string, cb: (t: string) => void) => {
+      cb("token1");
+      cb("token2");
+      return "token1token2";
+    });
     const ask = new AskQuestion(
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
@@ -192,10 +176,10 @@ describe("AskQuestion", () => {
     );
     await ask.execute(conv.id, "My question", vi.fn());
     const updated = await convRepo.findById(conv.id);
-    expect(updated!.messages).toHaveLength(2);
-    expect(updated!.messages[0].role).toBe("user");
-    expect(updated!.messages[0].content).toBe("My question");
-    expect(updated!.messages[1].role).toBe("assistant");
+    expect(updated?.messages).toHaveLength(2);
+    expect(updated?.messages[0].role).toBe("user");
+    expect(updated?.messages[0].content).toBe("My question");
+    expect(updated?.messages[1].role).toBe("assistant");
   });
 
   it("should attach source citations to the saved assistant message", async () => {
@@ -212,7 +196,7 @@ describe("AskQuestion", () => {
     );
     await ask.execute(conv.id, "Question?", vi.fn());
     const updated = await convRepo.findById(conv.id);
-    const assistantMsg = updated!.messages[1];
+    const assistantMsg = updated?.messages[1];
     expect(assistantMsg.sources).toHaveLength(1);
     expect(assistantMsg.sources[0].chunkId).toBe(chunkResult.chunk.id);
     expect(assistantMsg.sources[0].score).toBe(chunkResult.score);
@@ -229,13 +213,11 @@ describe("AskQuestion", () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       mockDocumentRepo as any,
     );
-    await expect(
-      ask.execute(conv.id, "Question?", vi.fn()),
-    ).resolves.toBeDefined();
+    await expect(ask.execute(conv.id, "Question?", vi.fn())).resolves.toBeDefined();
     const updated = await convRepo.findById(conv.id);
-    expect(updated!.messages).toHaveLength(2);
-    expect(updated!.messages[1].role).toBe("assistant");
-    expect(updated!.messages[1].content).toBeTruthy();
+    expect(updated?.messages).toHaveLength(2);
+    expect(updated?.messages[1].role).toBe("assistant");
+    expect(updated?.messages[1].content).toBeTruthy();
   });
 
   it('should return "no information found" response when no chunks above threshold', async () => {
@@ -254,6 +236,6 @@ describe("AskQuestion", () => {
     expect(result.role).toBe("assistant");
     expect(result.sources).toHaveLength(0);
     const saved = await convRepo.findById(conv.id);
-    expect(saved!.messages).toHaveLength(2);
+    expect(saved?.messages).toHaveLength(2);
   });
 });

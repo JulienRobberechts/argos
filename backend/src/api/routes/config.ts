@@ -1,7 +1,7 @@
 import { Router } from "express";
-import config from "../../config";
-import { AppSettingsService } from "../../application/AppSettingsService";
 import pkg from "../../../package.json";
+import type { AppSettingsService } from "../../application/AppSettingsService";
+import config from "../../config";
 
 export function configRouter(settingsService: AppSettingsService): Router {
   const router = Router();

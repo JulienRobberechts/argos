@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Chunk } from "../domain/entities/Chunk";
-import { SearchKnowledge } from "./SearchKnowledge";
 import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
+import type { Chunk } from "../domain/entities/Chunk";
+import { SearchKnowledge } from "./SearchKnowledge";
 
 function makeChunk(embedding: number[], overrides?: Partial<Chunk>): Chunk {
   return {
@@ -40,9 +40,7 @@ describe("SearchKnowledge", () => {
     const queryVec = unitVec(1024, 0);
     const chunk1 = makeChunk(unitVec(1024, 0), { content: "best match" });
     const chunk2 = makeChunk(
-      Array.from({ length: 1024 }, (_, i) =>
-        i === 0 ? 0.6 : i === 1 ? 0.8 : 0,
-      ),
+      Array.from({ length: 1024 }, (_, i) => (i === 0 ? 0.6 : i === 1 ? 0.8 : 0)),
       { content: "partial match" },
     );
     const chunk3 = makeChunk(unitVec(1024, 1), { content: "poor match" });

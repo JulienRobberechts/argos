@@ -1,31 +1,25 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { MessageSquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import AppLayout from "./components/layout/AppLayout";
+import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import LoginScreen from "./components/auth/LoginScreen";
 import ChatInterface from "./components/chat/ChatInterface";
 import DocumentDetail from "./components/documents/DocumentDetail";
 import DocumentUpload from "./components/documents/DocumentUpload";
-import DashboardPage from "./components/pages/DashboardPage";
-import QuizPage from "./components/pages/QuizPage";
-import TechnicalPage from "./features/technical/TechnicalPage";
-import TechnicalLayout from "./features/technical/TechnicalLayout";
-import RerankingPage from "./features/technical/RerankingPage";
-import LLMModelsPage from "./features/technical/LLMModelsPage";
-import KnowledgeCheckPage from "./features/technical/KnowledgeCheckPage";
-import HybridSearchPage from "./features/technical/HybridSearchPage";
-import EvaluationPage from "./features/technical/EvaluationPage";
-import FontPreviewPage from "./components/pages/FontPreviewPage";
+import AppLayout from "./components/layout/AppLayout";
 import ColorPalettePage from "./components/pages/ColorPalettePage";
-import { useConversations } from "./hooks/useConversation";
-import { MessageSquare } from "lucide-react";
+import DashboardPage from "./components/pages/DashboardPage";
+import FontPreviewPage from "./components/pages/FontPreviewPage";
+import QuizPage from "./components/pages/QuizPage";
 import PageHeader from "./components/ui/PageHeader";
-import LoginScreen from "./components/auth/LoginScreen";
+import EvaluationPage from "./features/technical/EvaluationPage";
+import HybridSearchPage from "./features/technical/HybridSearchPage";
+import KnowledgeCheckPage from "./features/technical/KnowledgeCheckPage";
+import LLMModelsPage from "./features/technical/LLMModelsPage";
+import RerankingPage from "./features/technical/RerankingPage";
+import TechnicalLayout from "./features/technical/TechnicalLayout";
+import TechnicalPage from "./features/technical/TechnicalPage";
+import { useConversations } from "./hooks/useConversation";
 import { api, setOnUnauthorized } from "./services/api";
 
 const queryClient = new QueryClient();
@@ -51,7 +45,7 @@ function ConversationsPage() {
     } else if (conversations) {
       navigate("/conversations/new", { replace: true });
     }
-  }, [isLoading]);
+  }, [isLoading, navigate, conversations[0].id, conversations.length, conversations]);
 
   return (
     <div className="p-8">
@@ -73,9 +67,7 @@ export default function App() {
   }, []);
 
   if (isAuthenticated === null) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50" />
-    );
+    return <div className="flex items-center justify-center min-h-screen bg-gray-50" />;
   }
 
   if (!isAuthenticated) {

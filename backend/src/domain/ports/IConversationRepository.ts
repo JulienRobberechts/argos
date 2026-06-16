@@ -1,5 +1,5 @@
-import { Conversation, ConversationSummary } from "../entities/Conversation";
-import { Message } from "../entities/Message";
+import type { Conversation, ConversationSummary } from "../entities/Conversation";
+import type { Message } from "../entities/Message";
 
 /** Persists and retrieves conversations and their messages. */
 export interface IConversationRepository {

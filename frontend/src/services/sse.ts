@@ -1,5 +1,5 @@
 import type { KnowledgeCheckResult, SourceCitation } from "../types/domain";
-import { UnauthorizedError, setOnUnauthorized } from "./api";
+import { setOnUnauthorized, UnauthorizedError } from "./api";
 
 export { setOnUnauthorized };
 
@@ -58,14 +58,11 @@ export function streamMessage(
         } else if (line.startsWith("data: ") && currentEvent) {
           const data = JSON.parse(line.slice(6)) as Record<string, unknown>;
           if (currentEvent === "delta") handlers.onDelta(data.token as string);
-          else if (currentEvent === "sources")
-            handlers.onSources(data.sources as SourceCitation[]);
+          else if (currentEvent === "sources") handlers.onSources(data.sources as SourceCitation[]);
           else if (currentEvent === "knowledge_check")
             handlers.onKnowledgeCheck(data.results as KnowledgeCheckResult[]);
-          else if (currentEvent === "done")
-            handlers.onDone(data.messageId as string);
-          else if (currentEvent === "error")
-            handlers.onError(data.error as string);
+          else if (currentEvent === "done") handlers.onDone(data.messageId as string);
+          else if (currentEvent === "error") handlers.onError(data.error as string);
           currentEvent = "";
         }
       }

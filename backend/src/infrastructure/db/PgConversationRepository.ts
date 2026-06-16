@@ -1,15 +1,15 @@
-import {
+import type {
   Conversation,
   ConversationParams,
   ConversationSummary,
 } from "../../domain/entities/Conversation";
-import {
+import type {
   KnowledgeCheckResult,
   Message,
   MessageRole,
   SourceCitation,
 } from "../../domain/entities/Message";
-import { IConversationRepository } from "../../domain/ports/IConversationRepository";
+import type { IConversationRepository } from "../../domain/ports/IConversationRepository";
 import pool from "./pool";
 
 function toMessage(row: Record<string, unknown>): Message {
@@ -24,9 +24,7 @@ function toMessage(row: Record<string, unknown>): Message {
   };
 }
 
-async function fetchMessages(
-  conversationIds: string[],
-): Promise<Map<string, Message[]>> {
+async function fetchMessages(conversationIds: string[]): Promise<Map<string, Message[]>> {
   if (conversationIds.length === 0) return new Map();
   const result = await pool.query(
     "SELECT * FROM messages WHERE conversation_id = ANY($1) ORDER BY created_at ASC",
@@ -79,10 +77,7 @@ export class PgConversationRepository implements IConversationRepository {
   }
 
   async findById(id: string): Promise<Conversation | null> {
-    const result = await pool.query(
-      "SELECT * FROM conversations WHERE id = $1",
-      [id],
-    );
+    const result = await pool.query("SELECT * FROM conversations WHERE id = $1", [id]);
     if (!result.rows[0]) return null;
     const row = result.rows[0];
     const messagesByConv = await fetchMessages([id]);
@@ -129,10 +124,7 @@ export class PgConversationRepository implements IConversationRepository {
   }
 
   async updateTitle(id: string, title: string): Promise<void> {
-    await pool.query("UPDATE conversations SET title = $1 WHERE id = $2", [
-      title,
-      id,
-    ]);
+    await pool.query("UPDATE conversations SET title = $1 WHERE id = $2", [title, id]);
   }
 
   async delete(id: string): Promise<void> {

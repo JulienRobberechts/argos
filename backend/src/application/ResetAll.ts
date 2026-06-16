@@ -1,6 +1,6 @@
-import { Pool } from "pg";
-import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
-import { AppSettingsService, AppSettingsPatch } from "./AppSettingsService";
+import type { Pool } from "pg";
+import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import type { AppSettingsPatch, AppSettingsService } from "./AppSettingsService";
 
 const logger = console;
 

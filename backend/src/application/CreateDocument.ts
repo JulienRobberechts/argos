@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
-import path from "path";
-import { Document } from "../domain/entities/Document";
-import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import { randomUUID } from "node:crypto";
+import path from "node:path";
+import type { Document } from "../domain/entities/Document";
+import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 
 export interface CreateDocumentInput {
   buffer: Buffer;
@@ -11,10 +11,7 @@ export interface CreateDocumentInput {
   title?: string;
 }
 
-function sourceTypeFromMime(
-  mimetype: string,
-  originalname: string,
-): "pdf" | "markdown" | "text" {
+function sourceTypeFromMime(mimetype: string, originalname: string): "pdf" | "markdown" | "text" {
   if (mimetype === "application/pdf") return "pdf";
   const ext = path.extname(originalname).toLowerCase();
   if (ext === ".md" || ext === ".markdown") return "markdown";

@@ -1,4 +1,4 @@
-import { Message, KnowledgeCheckStrategy } from "./Message";
+import type { KnowledgeCheckStrategy, Message } from "./Message";
 
 export interface ConversationParams {
   retrievalLimit: number;

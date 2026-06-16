@@ -1,7 +1,7 @@
-import { Zap, Target, TrendingUp } from "lucide-react";
+import { Target, TrendingUp, Zap } from "lucide-react";
+import Callout from "../../../components/ui/Callout";
 import Card from "../../../components/ui/Card";
 import SectionTitle from "../../../components/ui/SectionTitle";
-import Callout from "../../../components/ui/Callout";
 
 export default function TradeOffsTab() {
   return (
@@ -37,9 +37,7 @@ export default function TradeOffsTab() {
           ].map(({ type, example, why }) => (
             <div key={type} className="border border-slate-100 rounded-lg p-3">
               <p className="text-xs font-semibold text-slate-700">{type}</p>
-              <p className="text-xs text-amber-700 mt-0.5 font-mono">
-                {example}
-              </p>
+              <p className="text-xs text-amber-700 mt-0.5 font-mono">{example}</p>
               <p className="text-xs text-slate-500 mt-1">{why}</p>
             </div>
           ))}
@@ -56,8 +54,7 @@ export default function TradeOffsTab() {
           {[
             {
               type: "Paraphrased questions",
-              example:
-                '"How does the caching layer work?" → chunks say "memoisation"',
+              example: '"How does the caching layer work?" → chunks say "memoisation"',
               why: "Semantic proximity bridges the vocabulary gap. BM25 adds no signal.",
             },
             {
@@ -79,9 +76,9 @@ export default function TradeOffsTab() {
           ))}
         </div>
         <Callout type="info">
-          In practice, mixed corpora (technical docs + conceptual notes) benefit
-          from hybrid mode by default. Switch to vector-only only if you measure
-          a latency impact that matters for your use case.
+          In practice, mixed corpora (technical docs + conceptual notes) benefit from hybrid mode by
+          default. Switch to vector-only only if you measure a latency impact that matters for your
+          use case.
         </Callout>
       </Card>
 
@@ -96,12 +93,8 @@ export default function TradeOffsTab() {
             <thead>
               <tr className="border-b border-slate-200">
                 <th className="py-2 pr-4 font-semibold text-slate-600">Mode</th>
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  DB queries
-                </th>
-                <th className="py-2 pr-4 font-semibold text-slate-600">
-                  Typical overhead
-                </th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">DB queries</th>
+                <th className="py-2 pr-4 font-semibold text-slate-600">Typical overhead</th>
                 <th className="py-2 font-semibold text-slate-600">Notes</th>
               </tr>
             </thead>
@@ -116,24 +109,20 @@ export default function TradeOffsTab() {
                 <td className="py-2 pr-4 text-slate-700">hybrid</td>
                 <td className="py-2 pr-4 text-slate-700">2 (parallel)</td>
                 <td className="py-2 pr-4 text-slate-700">+10–30 ms</td>
-                <td className="py-2 text-slate-500">
-                  GIN index + in-memory RRF
-                </td>
+                <td className="py-2 text-slate-500">GIN index + in-memory RRF</td>
               </tr>
             </tbody>
           </table>
         </div>
         <p className="text-sm text-slate-700 leading-relaxed mb-3">
-          The two queries run via <code>Promise.all</code>, so the total DB time
-          is <code>max(vector_query, text_query)</code> rather than their sum.
-          The GIN index on <code>ts_content</code> keeps the full-text pass
-          comparable to the HNSW pass for typical corpus sizes (&lt; 1 M
-          chunks).
+          The two queries run via <code>Promise.all</code>, so the total DB time is{" "}
+          <code>max(vector_query, text_query)</code> rather than their sum. The GIN index on{" "}
+          <code>ts_content</code> keeps the full-text pass comparable to the HNSW pass for typical
+          corpus sizes (&lt; 1 M chunks).
         </p>
         <p className="text-sm text-slate-700 leading-relaxed">
-          The in-memory RRF fusion is O(n) where n = 2 × candidateLimit — at
-          limit=8 and candidateMultiplier=3, that's merging at most 48 rows.
-          Negligible.
+          The in-memory RRF fusion is O(n) where n = 2 × candidateLimit — at limit=8 and
+          candidateMultiplier=3, that's merging at most 48 rows. Negligible.
         </p>
       </Card>
     </>

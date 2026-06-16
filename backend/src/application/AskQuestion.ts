@@ -1,16 +1,20 @@
-import { randomUUID } from "crypto";
-import { Message, SourceCitation } from "../domain/entities/Message";
-import { ChunkSearchResult } from "../domain/ports/IChunkRepository";
-import { IConversationRepository } from "../domain/ports/IConversationRepository";
-import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import { ILLMPort } from "../domain/ports/ILLMPort";
+import { randomUUID } from "node:crypto";
+import type {
+  KnowledgeCheckResult,
+  Message,
+  SourceCitation,
+} from "../domain/entities/Message";
+import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
+import type { IConversationRepository } from "../domain/ports/IConversationRepository";
+import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
-import { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
+import type { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
 import {
   buildCitationForcingInstruction,
   parseCitationForcingResult,
 } from "./responseChecks/strategies/citationForcing";
-import { SearchKnowledge } from "./SearchKnowledge";
+import type { SearchKnowledge } from "./SearchKnowledge";
 
 const SLIDING_WINDOW_EXCHANGES = 4;
 const NO_INFO_RESPONSE =
@@ -136,7 +140,7 @@ export class AskQuestion {
     );
 
     let assistantContent = rawContent;
-    let inlineCitationResult;
+    let inlineCitationResult: KnowledgeCheckResult | undefined;
     if (useCitationForcing) {
       const parsed = parseCitationForcingResult(
         rawContent,

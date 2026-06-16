@@ -1,12 +1,5 @@
+import { ArrowUpDown, Brain, Combine, FlaskConical, Gauge, ShieldCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
-import {
-  FlaskConical,
-  ArrowUpDown,
-  Brain,
-  ShieldCheck,
-  Combine,
-  Gauge,
-} from "lucide-react";
 
 const pages = [
   { to: "/technical", label: "RAG Core", icon: FlaskConical, end: true },

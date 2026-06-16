@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { IChunkRepository } from "../domain/ports/IChunkRepository";
-import { ILLMPort } from "../domain/ports/ILLMPort";
+import type { IChunkRepository } from "../domain/ports/IChunkRepository";
+import type { ILLMPort } from "../domain/ports/ILLMPort";
 import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CHUNKS = 15;
@@ -26,10 +26,7 @@ export class GenerateQuiz {
     private readonly llmAdapter: ILLMPort,
   ) {}
 
-  async execute(
-    documentIds: string[],
-    questionCount: number,
-  ): Promise<QuizQuestion[]> {
+  async execute(documentIds: string[], questionCount: number): Promise<QuizQuestion[]> {
     const chunkArrays = await Promise.all(
       documentIds.map((id) => this.chunkRepo.findByDocumentId(id)),
     );
@@ -40,9 +37,7 @@ export class GenerateQuiz {
     }
 
     const selected = chunks.slice(0, MAX_CHUNKS);
-    const context = selected
-      .map((c) => c.content.slice(0, MAX_CHUNK_LENGTH))
-      .join("\n\n---\n\n");
+    const context = selected.map((c) => c.content.slice(0, MAX_CHUNK_LENGTH)).join("\n\n---\n\n");
 
     const prompt = this.buildPrompt(context, questionCount);
 
@@ -95,9 +90,7 @@ export class GenerateQuiz {
     try {
       parsed = JSON.parse(cleaned);
     } catch {
-      throw new Error(
-        `LLM returned invalid JSON for quiz: ${cleaned.slice(0, 200)}`,
-      );
+      throw new Error(`LLM returned invalid JSON for quiz: ${cleaned.slice(0, 200)}`);
     }
     const result = responseSchema.parse(parsed);
     return result.questions.slice(0, expectedCount);

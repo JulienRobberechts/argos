@@ -1,4 +1,4 @@
-import { Readable } from "stream";
+import { Readable } from "node:stream";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { R2FileStorage } from "./R2FileStorage";
 
@@ -20,11 +20,7 @@ describe("R2FileStorage", () => {
 
   it("upload sends PutObjectCommand and returns key", async () => {
     mockSend.mockResolvedValue({});
-    const key = await storage.upload(
-      "test.pdf",
-      Buffer.from("data"),
-      "application/pdf",
-    );
+    const key = await storage.upload("test.pdf", Buffer.from("data"), "application/pdf");
     expect(key).toBe("test.pdf");
     const cmd = mockSend.mock.calls[0][0];
     expect(cmd.input).toMatchObject({

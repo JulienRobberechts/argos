@@ -1,5 +1,5 @@
-import { IRerankPort } from "../../domain/ports/IRerankPort";
 import config from "../../config";
+import type { IRerankPort } from "../../domain/ports/IRerankPort";
 import { Logger } from "../logger/Logger";
 
 const logger = new Logger("VoyageRerankAdapter");
@@ -21,11 +21,7 @@ export class VoyageRerankAdapter implements IRerankPort {
     private readonly model: string = config.rerank.model,
   ) {}
 
-  async rerank(
-    query: string,
-    documents: string[],
-    model?: string,
-  ): Promise<number[]> {
+  async rerank(query: string, documents: string[], model?: string): Promise<number[]> {
     const effectiveModel = model ?? this.model;
     logger.info("Voyage rerank request", {
       model: effectiveModel,

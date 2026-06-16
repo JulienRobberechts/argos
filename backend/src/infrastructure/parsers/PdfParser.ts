@@ -1,10 +1,7 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import { PDFParse } from "pdf-parse";
-import {
-  IFileParserPort,
-  ParseResult,
-} from "../../domain/ports/IFileParserPort";
+import type { IFileParserPort, ParseResult } from "../../domain/ports/IFileParserPort";
 
 export class PdfParser implements IFileParserPort {
   async parse(filePath: string): Promise<ParseResult> {
@@ -12,10 +9,7 @@ export class PdfParser implements IFileParserPort {
     const url = `file://${filePath}`;
     const parser = new PDFParse({ url });
     try {
-      const [textResult, infoResult] = await Promise.all([
-        parser.getText(),
-        parser.getInfo(),
-      ]);
+      const [textResult, infoResult] = await Promise.all([parser.getText(), parser.getInfo()]);
       return {
         text: textResult.text,
         metadata: {

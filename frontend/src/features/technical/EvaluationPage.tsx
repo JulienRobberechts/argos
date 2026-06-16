@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Gauge } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
-import OverviewTab from "./evaluation/OverviewTab";
-import MetricsTab from "./evaluation/MetricsTab";
-import RisksTab from "./evaluation/RisksTab";
 import ImplementationTab from "./evaluation/ImplementationTab";
+import MetricsTab from "./evaluation/MetricsTab";
+import OverviewTab from "./evaluation/OverviewTab";
+import RisksTab from "./evaluation/RisksTab";
 
 const TABS = ["Overview", "Metrics", "Risks", "Implementation"] as const;
 type Tab = (typeof TABS)[number];
@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function EvaluationPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Overview",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

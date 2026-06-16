@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { VoyageEmbeddingAdapter } from "./VoyageEmbeddingAdapter";
 
 const mockFetch = vi.fn();
@@ -76,8 +76,6 @@ describe("VoyageEmbeddingAdapter", () => {
       text: vi.fn().mockResolvedValue("rate limit"),
     });
     const adapter = new VoyageEmbeddingAdapter("key");
-    await expect(adapter.embedMany(["text"])).rejects.toThrow(
-      "Voyage API error: 429",
-    );
+    await expect(adapter.embedMany(["text"])).rejects.toThrow("Voyage API error: 429");
   });
 });

@@ -1,4 +1,4 @@
-import { ILLMPort } from "../../src/domain/ports/ILLMPort";
+import type { ILLMPort } from "../../src/domain/ports/ILLMPort";
 
 export class InMemoryLLMAdapter implements ILLMPort {
   private response: string;
@@ -18,7 +18,7 @@ export class InMemoryLLMAdapter implements ILLMPort {
   ): Promise<string> {
     const tokens = this.response.split(" ");
     for (const token of tokens) {
-      onToken(token + " ");
+      onToken(`${token} `);
     }
     return this.response;
   }

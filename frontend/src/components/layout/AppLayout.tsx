@@ -1,10 +1,10 @@
-import { Outlet, useMatch, useLocation } from "react-router-dom";
-import { useState, useCallback, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Outlet, useLocation, useMatch } from "react-router-dom";
+import AdminSettingsPage from "../../features/settings/IngestionSettingsPage";
+import DocumentsSidebar from "../documents/DocumentsSidebar";
 import IconNav from "./IconNav";
 import Sidebar from "./Sidebar";
-import DocumentsSidebar from "../documents/DocumentsSidebar";
-import AdminSettingsPage from "../../features/settings/IngestionSettingsPage";
 
 const MIN_WIDTH = 200;
 const DEFAULT_WIDTH = 288;
@@ -24,7 +24,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
-  }, [pathname]);
+  }, []);
 
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
   const [collapsed, setCollapsed] = useState(false);
@@ -34,7 +34,7 @@ export default function AppLayout() {
 
   useEffect(() => {
     if (matchDocumentId) setShowSettings(false);
-  }, [matchDocumentId?.params.id]);
+  }, [matchDocumentId?.params.id, matchDocumentId]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -94,9 +94,7 @@ export default function AppLayout() {
           <div className="relative shrink-0 w-2 flex items-start">
             <div
               className={`absolute inset-y-0 left-0 w-1 cursor-col-resize transition-colors ${
-                isDragging
-                  ? "bg-amber-400"
-                  : "hover:bg-amber-400 bg-transparent"
+                isDragging ? "bg-amber-400" : "hover:bg-amber-400 bg-transparent"
               }`}
               onMouseDown={handleMouseDown}
             />

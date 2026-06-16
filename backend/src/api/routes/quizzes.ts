@@ -1,6 +1,6 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import { GenerateQuiz } from "../../application/GenerateQuiz";
+import type { GenerateQuiz } from "../../application/GenerateQuiz";
 
 const generateQuizSchema = z.object({
   documentIds: z.array(z.string().uuid()).min(1),
@@ -15,10 +15,7 @@ export function quizzesRouter(generateQuiz: GenerateQuiz): Router {
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const body = generateQuizSchema.parse(req.body);
-        const questions = await generateQuiz.execute(
-          body.documentIds,
-          body.questionCount,
-        );
+        const questions = await generateQuiz.execute(body.documentIds, body.questionCount);
         res.json({ questions });
       } catch (err) {
         next(err);

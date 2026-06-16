@@ -59,8 +59,7 @@ export const api = {
       credentials: "include",
     }),
 
-  checkAuth: () =>
-    fetch("/api/auth/me", { credentials: "include" }).then((r) => r.ok),
+  checkAuth: () => fetch("/api/auth/me", { credentials: "include" }).then((r) => r.ok),
 
   getDocuments: () => request<Document[]>("/documents"),
   getDocument: (id: string) => request<Document>(`/documents/${id}`),
@@ -74,9 +73,7 @@ export const api = {
     });
   },
   getDocumentContent: (id: string) =>
-    request<{ content: string; sourceType: string }>(
-      `/documents/${id}/content`,
-    ),
+    request<{ content: string; sourceType: string }>(`/documents/${id}/content`),
   getDocumentRaw: async (id: string): Promise<ArrayBuffer> => {
     const res = await fetch(`/api/documents/${id}/raw`, {
       credentials: "include",
@@ -92,26 +89,22 @@ export const api = {
     request<{ position: number; contentLength: number; preview: string }[]>(
       `/documents/${id}/chunks`,
     ),
-  deleteDocument: (id: string) =>
-    request<void>(`/documents/${id}`, { method: "DELETE" }),
-  getDocumentSummary: (id: string) =>
-    request<DocumentSummary>(`/documents/${id}/summary`),
+  deleteDocument: (id: string) => request<void>(`/documents/${id}`, { method: "DELETE" }),
+  getDocumentSummary: (id: string) => request<DocumentSummary>(`/documents/${id}/summary`),
   generateDocumentSummary: (id: string) =>
     request<{ content: string }>(`/documents/${id}/summary`, {
       method: "POST",
     }),
 
   getConversations: () => request<ConversationSummary[]>("/conversations"),
-  getConversation: (id: string) =>
-    request<Conversation>(`/conversations/${id}`),
+  getConversation: (id: string) => request<Conversation>(`/conversations/${id}`),
   createConversation: (params?: Partial<ConversationParams>, title?: string) =>
     request<Conversation>("/conversations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: title ?? "New conversation", params }),
     }),
-  deleteConversation: (id: string) =>
-    request<void>(`/conversations/${id}`, { method: "DELETE" }),
+  deleteConversation: (id: string) => request<void>(`/conversations/${id}`, { method: "DELETE" }),
 
   search: (query: string, limit?: number) =>
     request<SourceCitation[]>("/search", {
@@ -136,8 +129,7 @@ export const api = {
       body: JSON.stringify({ documentIds, questionCount }),
     }),
 
-  checkStorageConsistency: () =>
-    request<ConsistencyReport>("/admin/storage/consistency"),
+  checkStorageConsistency: () => request<ConsistencyReport>("/admin/storage/consistency"),
 
   getSettings: () => request<AppSettings>("/admin/settings"),
 

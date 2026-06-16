@@ -30,10 +30,7 @@ export interface Message {
   createdAt: string;
 }
 
-export type KnowledgeCheckStrategy =
-  | "faithfulness"
-  | "counterfactual"
-  | "citation_forcing";
+export type KnowledgeCheckStrategy = "faithfulness" | "counterfactual" | "citation_forcing";
 
 export interface KnowledgeClaim {
   claim: string;

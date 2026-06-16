@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { Brain } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
-import ModelsTab from "./llm-models/ModelsTab";
 import ComparisonTab from "./llm-models/ComparisonTab";
-import RagUsageTab from "./llm-models/RagUsageTab";
 import ConfigTab from "./llm-models/ConfigTab";
+import ModelsTab from "./llm-models/ModelsTab";
+import RagUsageTab from "./llm-models/RagUsageTab";
 
 const TABS = ["Models", "Comparison", "RAG Usage", "Config"] as const;
 type Tab = (typeof TABS)[number];
@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function LLMModelsPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Models",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Models");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

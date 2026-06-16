@@ -1,5 +1,5 @@
-import { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
-import { StorageBackends } from "./createFileStorage";
+import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { StorageBackends } from "./createFileStorage";
 
 export class DynamicFileStorage implements IFileStoragePort {
   constructor(

@@ -1,5 +1,5 @@
-import { readFileSync } from "fs";
-import { join } from "path";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 const dir = join(__dirname, "Orient-Express");
 
@@ -8,10 +8,7 @@ export const compagnieInterationaleDesWagonsLits = readFileSync(
   "utf-8",
 );
 
-export const reneJulesLalique = readFileSync(
-  join(dir, "René Jules Lalique.md"),
-  "utf-8",
-);
+export const reneJulesLalique = readFileSync(join(dir, "René Jules Lalique.md"), "utf-8");
 
 export const reneProu = readFileSync(join(dir, "René Prou.md"), "utf-8");
 
@@ -22,10 +19,7 @@ export const veniseSimplonOrientExpress = readFileSync(
 
 export const oeWikipedia = readFileSync(join(dir, "oe-wikipedia.md"), "utf-8");
 
-export const orientExpress = readFileSync(
-  join(dir, "orient-express.md"),
-  "utf-8",
-);
+export const orientExpress = readFileSync(join(dir, "orient-express.md"), "utf-8");
 
 export const orientExpressQuestions = readFileSync(
   join(dir, "orient-express.questions.md"),

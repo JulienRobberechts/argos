@@ -12,9 +12,7 @@ export default function ParamRow({
       <td className="py-2.5 pr-4 font-mono text-xs text-[#d97706] whitespace-nowrap font-medium">
         {name}
       </td>
-      <td className="py-2.5 pr-4 font-mono text-xs text-slate-700 whitespace-nowrap">
-        {value}
-      </td>
+      <td className="py-2.5 pr-4 font-mono text-xs text-slate-700 whitespace-nowrap">{value}</td>
       <td className="py-2.5 text-xs text-slate-600">{description}</td>
     </tr>
   );

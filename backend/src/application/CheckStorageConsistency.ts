@@ -1,6 +1,6 @@
-import path from "path";
-import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import path from "node:path";
+import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 
 export interface StorageConsistencyResult {
   orphanFiles: string[];
@@ -29,7 +29,7 @@ export class CheckStorageConsistency {
     ]);
 
     const dbKeys = new Set(
-      docs.filter((d) => d.filePath).map((d) => toKey(d.filePath!)),
+      docs.flatMap((d) => (d.filePath ? [toKey(d.filePath)] : [])),
     );
     const storageSet = new Set(storageKeys.map(toKey));
 

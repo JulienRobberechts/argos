@@ -1,5 +1,5 @@
-import { Document, DocumentStatus } from "../../domain/entities/Document";
-import { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
+import type { Document, DocumentStatus } from "../../domain/entities/Document";
+import type { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
 import pool from "./pool";
 
 function toDocument(row: Record<string, unknown>): Document {
@@ -35,16 +35,12 @@ export class PgDocumentRepository implements IDocumentRepository {
   }
 
   async findById(id: string): Promise<Document | null> {
-    const result = await pool.query("SELECT * FROM documents WHERE id = $1", [
-      id,
-    ]);
+    const result = await pool.query("SELECT * FROM documents WHERE id = $1", [id]);
     return result.rows[0] ? toDocument(result.rows[0]) : null;
   }
 
   async findAll(): Promise<Document[]> {
-    const result = await pool.query(
-      "SELECT * FROM documents ORDER BY created_at DESC",
-    );
+    const result = await pool.query("SELECT * FROM documents ORDER BY created_at DESC");
     return result.rows.map(toDocument);
   }
 
@@ -53,9 +49,6 @@ export class PgDocumentRepository implements IDocumentRepository {
   }
 
   async updateStatus(id: string, status: DocumentStatus): Promise<void> {
-    await pool.query("UPDATE documents SET status = $2 WHERE id = $1", [
-      id,
-      status,
-    ]);
+    await pool.query("UPDATE documents SET status = $2 WHERE id = $1", [id, status]);
   }
 }

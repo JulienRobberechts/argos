@@ -1,15 +1,15 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
-import { randomUUID } from "crypto";
-import { IChunkRepository } from "../domain/ports/IChunkRepository";
-import { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import { ITextEncoder } from "../domain/ports/ITextEncoder";
-import { IFileParserPort } from "../domain/ports/IFileParserPort";
-import { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import { randomUUID } from "node:crypto";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+import type { IChunkRepository } from "../domain/ports/IChunkRepository";
+import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { IFileParserPort } from "../domain/ports/IFileParserPort";
+import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import type { ITextEncoder } from "../domain/ports/ITextEncoder";
 import {
-  createChunkingStrategy,
   type ChunkingStrategyName,
+  createChunkingStrategy,
 } from "../domain/services/ChunkingStrategy";
 import { Logger } from "../infrastructure/logger/Logger";
 import type { ChunkingConfig } from "./AppSettingsService";
@@ -65,7 +65,7 @@ export class IngestDocument {
         await fs.promises.unlink(tempPath).catch(() => {});
       }
 
-      const text = rawText.replace(/\x00/g, "");
+      const text = rawText.replaceAll("\x00", "");
       const chunkResults = chunkingStrategy.chunk(text, {
         chunkSize,
         chunkOverlap,

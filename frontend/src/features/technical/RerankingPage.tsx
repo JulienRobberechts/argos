@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
 import { ArrowUpDown } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
+import ImplementationTab from "./reranking/ImplementationTab";
 import OverviewTab from "./reranking/OverviewTab";
 import PipelineTab from "./reranking/PipelineTab";
-import ImplementationTab from "./reranking/ImplementationTab";
 import TradeOffsTab from "./reranking/TradeOffsTab";
 
 const TABS = ["Overview", "Pipeline", "Implementation", "Trade-offs"] as const;
@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function RerankingPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Overview",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

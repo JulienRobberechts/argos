@@ -49,11 +49,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               boxShadow: "0 0 32px rgba(217,119,6,0.35)",
             }}
           >
-            <img
-              src="/logo-argos-1.jpg"
-              alt="Argos"
-              className="w-full h-full object-contain"
-            />
+            <img src="/logo-argos-1.jpg" alt="Argos" className="w-full h-full object-contain" />
           </div>
           <div className="text-center">
             <h1
@@ -62,8 +58,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 fontWeight: 400,
                 fontSize: "1.5rem",
                 letterSpacing: "0.05em",
-                background:
-                  "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
+                background: "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -90,7 +85,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               disabled={loading}
-              autoFocus
               className="w-full px-3 py-2.5 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 transition-all disabled:opacity-50"
               style={{
                 background: "var(--argos-steel)",
@@ -107,21 +101,16 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               disabled={loading || !password}
               className="w-full py-2.5 px-4 text-sm font-semibold rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               style={{
-                background:
-                  loading || !password
-                    ? "var(--argos-steel)"
-                    : "var(--argos-sun)",
+                background: loading || !password ? "var(--argos-steel)" : "var(--argos-sun)",
                 color: loading || !password ? "#6b7280" : "#1f2937",
               }}
               onMouseEnter={(e) => {
                 if (!loading && password)
-                  (e.currentTarget as HTMLButtonElement).style.background =
-                    "#b45309";
+                  (e.currentTarget as HTMLButtonElement).style.background = "#b45309";
               }}
               onMouseLeave={(e) => {
                 if (!loading && password)
-                  (e.currentTarget as HTMLButtonElement).style.background =
-                    "var(--argos-sun)";
+                  (e.currentTarget as HTMLButtonElement).style.background = "var(--argos-sun)";
               }}
             >
               {loading ? "Signing in…" : "Sign in"}

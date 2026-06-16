@@ -1,7 +1,7 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
-import { Chunk } from "../../src/domain/entities/Chunk";
-import { Document } from "../../src/domain/entities/Document";
+import type { Chunk } from "../../src/domain/entities/Chunk";
+import type { Document } from "../../src/domain/entities/Document";
 import { PgDocumentRepository } from "../../src/infrastructure/db/PgDocumentRepository";
 import { PgVectorChunkRepository } from "../../src/infrastructure/db/PgVectorChunkRepository";
 import pool from "../../src/infrastructure/db/pool";
@@ -20,11 +20,7 @@ function makeDoc(): Document {
   };
 }
 
-function makeChunk(
-  documentId: string,
-  embedding: number[],
-  overrides?: Partial<Chunk>,
-): Chunk {
+function makeChunk(documentId: string, embedding: number[], overrides?: Partial<Chunk>): Chunk {
   return {
     id: randomUUID(),
     documentId,
@@ -123,11 +119,7 @@ describe("PgVectorChunkRepository", () => {
       makeChunk(documentId, Array(1024).fill(0.2)),
     ]);
     await chunkRepo.deleteByDocumentId(documentId);
-    const results = await chunkRepo.searchByVector(
-      Array(1024).fill(0.1),
-      10,
-      0.0,
-    );
+    const results = await chunkRepo.searchByVector(Array(1024).fill(0.1), 10, 0.0);
     expect(results).toHaveLength(0);
   });
 });

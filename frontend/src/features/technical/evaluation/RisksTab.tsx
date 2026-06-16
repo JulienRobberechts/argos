@@ -1,7 +1,7 @@
 import { AlertTriangle, CheckCircle } from "lucide-react";
+import Callout from "../../../components/ui/Callout";
 import Card from "../../../components/ui/Card";
 import SectionTitle from "../../../components/ui/SectionTitle";
-import Callout from "../../../components/ui/Callout";
 
 type RiskItem = {
   title: string;
@@ -83,9 +83,9 @@ export default function RisksTab() {
           subtitle="What can go wrong when measuring RAG quality"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-4">
-          Evaluation metrics are proxies — they measure something correlated
-          with quality, not quality itself. Understanding where they fail is as
-          important as understanding what they measure.
+          Evaluation metrics are proxies — they measure something correlated with quality, not
+          quality itself. Understanding where they fail is as important as understanding what they
+          measure.
         </p>
 
         <div className="space-y-3">
@@ -95,27 +95,18 @@ export default function RisksTab() {
               className={`border rounded-lg p-4 ${SEVERITY_STYLES[risk.severity]}`}
             >
               <div className="flex items-start justify-between gap-2 mb-1">
-                <p className="text-sm font-semibold text-slate-800">
-                  {risk.title}
-                </p>
+                <p className="text-sm font-semibold text-slate-800">{risk.title}</p>
                 <span
                   className={`text-xs font-semibold uppercase tracking-wide flex-shrink-0 ${SEVERITY_LABEL_STYLES[risk.severity]}`}
                 >
                   {risk.severity}
                 </span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed mb-2">
-                {risk.description}
-              </p>
+              <p className="text-xs text-slate-600 leading-relaxed mb-2">{risk.description}</p>
               <div className="flex items-start gap-1.5">
-                <CheckCircle
-                  size={12}
-                  className="text-green-500 mt-0.5 flex-shrink-0"
-                />
+                <CheckCircle size={12} className="text-green-500 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-slate-500 leading-relaxed">
-                  <span className="font-medium text-slate-600">
-                    Mitigation:{" "}
-                  </span>
+                  <span className="font-medium text-slate-600">Mitigation: </span>
                   {risk.mitigation}
                 </p>
               </div>
@@ -148,10 +139,7 @@ export default function RisksTab() {
               why: "Below this, more than 30% of required information is missing from retrieved chunks",
             },
           ].map(({ metric, target, why }) => (
-            <div
-              key={metric}
-              className="border border-green-200 bg-green-50 rounded-lg p-3"
-            >
+            <div key={metric} className="border border-green-200 bg-green-50 rounded-lg p-3">
               <p className="text-xs font-semibold text-green-800 uppercase tracking-wide mb-1">
                 {metric}
               </p>
@@ -161,10 +149,9 @@ export default function RisksTab() {
           ))}
         </div>
         <Callout type="info">
-          These thresholds apply to the demo dataset (14 well-formed questions
-          on known documents). Real-world production thresholds should be
-          calibrated against human-labeled judgments on live traffic samples —
-          not just the offline eval set.
+          These thresholds apply to the demo dataset (14 well-formed questions on known documents).
+          Real-world production thresholds should be calibrated against human-labeled judgments on
+          live traffic samples — not just the offline eval set.
         </Callout>
       </Card>
     </>

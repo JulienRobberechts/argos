@@ -1,10 +1,10 @@
-import { useNavigate, useMatch } from "react-router-dom";
 import { FileText, Settings2 } from "lucide-react";
+import { useMatch, useNavigate } from "react-router-dom";
 import { useDocuments } from "../../hooks/useDocuments";
+import PageHeader from "../ui/PageHeader";
 import DocumentStatusBadge from "./DocumentStatusBadge";
 import DocumentTypeIcon from "./DocumentTypeIcon";
 import DocumentUpload from "./DocumentUpload";
-import PageHeader from "../ui/PageHeader";
 
 export default function DocumentsSidebar({
   showSettings,
@@ -27,9 +27,7 @@ export default function DocumentsSidebar({
         info="Manage documents indexed in the knowledge base. Each document is split into chunks, vectorized and stored for semantic search."
       />
       <div className="mb-4">
-        <DocumentUpload
-          onUploaded={(doc) => navigate(`/documents/${doc.id}`)}
-        />
+        <DocumentUpload onUploaded={(doc) => navigate(`/documents/${doc.id}`)} />
       </div>
       <nav className="flex flex-col gap-1 overflow-y-auto flex-1">
         {documents?.map((doc) => (

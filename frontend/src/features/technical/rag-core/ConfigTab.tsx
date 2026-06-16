@@ -1,7 +1,7 @@
 import { Code2 } from "lucide-react";
 import Card from "../../../components/ui/Card";
-import SectionTitle from "../../../components/ui/SectionTitle";
 import ParamRow from "../../../components/ui/ParamRow";
+import SectionTitle from "../../../components/ui/SectionTitle";
 
 export default function ConfigTab() {
   return (

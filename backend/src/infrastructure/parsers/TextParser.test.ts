@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeAll } from "vitest";
-import { writeFile, mkdtemp } from "fs/promises";
-import { join } from "path";
-import { tmpdir } from "os";
+import { mkdtemp, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { beforeAll, describe, expect, it } from "vitest";
 import { TextParser } from "./TextParser";
 
 let tmpDir: string;

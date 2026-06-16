@@ -17,9 +17,7 @@ export default function PipelineStep({
         <div className="w-10 h-10 rounded-full bg-[#1f2937] text-[#fcd34d] flex items-center justify-center font-bold text-sm flex-shrink-0">
           {step}
         </div>
-        {!isLast && (
-          <div className="w-0.5 h-full bg-amber-200 mt-2 min-h-[2rem]" />
-        )}
+        {!isLast && <div className="w-0.5 h-full bg-amber-200 mt-2 min-h-[2rem]" />}
       </div>
       <div className="pb-6">
         <div className="flex items-center gap-2 mb-1">

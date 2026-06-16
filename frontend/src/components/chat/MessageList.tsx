@@ -1,14 +1,14 @@
+import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { Bot } from "lucide-react";
 import type {
   KnowledgeCheckResult,
   Message,
   SourceCitation,
 } from "../../types/domain";
+import KnowledgeCheckPanel from "./KnowledgeCheckPanel";
 import SourceCard from "./SourceCard";
 import StreamingMessage from "./StreamingMessage";
-import KnowledgeCheckPanel from "./KnowledgeCheckPanel";
 
 const VISIBLE_SOURCES = 3;
 
@@ -24,6 +24,7 @@ function SourcesList({ sources }: { sources: SourceCitation[] }) {
       ))}
       {hidden > 0 && !expanded && (
         <button
+          type="button"
           onClick={() => setExpanded(true)}
           className="text-xs text-[#d97706] hover:text-[#92400e] text-left font-medium"
         >
@@ -64,7 +65,7 @@ export default function MessageList({
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, streamingText]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-6 px-4 py-6 max-w-3xl mx-auto w-full">
