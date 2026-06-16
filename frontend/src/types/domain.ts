@@ -128,7 +128,7 @@ export interface AppConfig {
     backend: "local" | "r2";
   };
   rag: {
-    chunkingStrategy: string;
+    chunkingStrategy: "recursive" | "sentence";
     chunkSize: number;
     chunkOverlap: number;
     retrievalLimit: number;
