@@ -192,11 +192,9 @@ Variables à saisir :
 
 ```env
 BACKEND_URL=http://${{argos-api.RAILWAY_PRIVATE_DOMAIN}}:3001
-VITE_API_KEY=<même valeur que API_KEY>
 ```
 
 > `${{argos-api.RAILWAY_PRIVATE_DOMAIN}}` est une variable de référence Railway — elle injecte le domaine privé du service API (réseau interne Railway, pas de frais d'egress). Utiliser le domaine **privé** (HTTP, port 3001) et non le domaine public pour éviter les frais de transit.
-> `VITE_API_KEY` est une variable **build-time** (Docker `ARG`) : elle est intégrée dans le bundle JS à la compilation, pas à l'exécution.
 
 Puis déployer :
 

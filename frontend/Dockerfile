@@ -1,7 +1,5 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-ARG VITE_API_KEY
-ENV VITE_API_KEY=$VITE_API_KEY
 COPY package*.json ./
 RUN npm ci
 COPY . .
