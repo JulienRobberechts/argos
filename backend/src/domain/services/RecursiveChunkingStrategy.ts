@@ -1,4 +1,9 @@
-import type { ChunkConfig, ChunkResult, IChunkingStrategy } from "./ChunkingTypes";
+import { ChunkMetadata } from "../entities/Chunk";
+import type {
+  ChunkConfig,
+  ChunkResult,
+  IChunkingStrategy,
+} from "./ChunkingTypes";
 
 interface Token {
   start: number;
@@ -14,7 +19,11 @@ function tokenize(text: string): Token[] {
   return tokens;
 }
 
-function findBestSplit(text: string, searchFrom: number, maxEnd: number): number {
+function findBestSplit(
+  text: string,
+  searchFrom: number,
+  maxEnd: number,
+): number {
   for (let i = maxEnd - 2; i >= searchFrom; i--) {
     if (text[i] === "\n" && text[i + 1] === "\n") return i + 2;
   }
@@ -41,7 +50,7 @@ export class RecursiveChunkingStrategy implements IChunkingStrategy {
       return [
         {
           content: text.trim(),
-          metadata: { position: 0, startChar: 0, endChar: text.length },
+          metadata: ChunkMetadata.create(0, 0, text.length),
         },
       ];
     }
@@ -59,7 +68,9 @@ export class RecursiveChunkingStrategy implements IChunkingStrategy {
       if (tokenEnd >= tokens.length) {
         charEnd = text.length;
       } else {
-        const searchFrom = Math.floor(charStart + (maxCharEnd - charStart) * 0.5);
+        const searchFrom = Math.floor(
+          charStart + (maxCharEnd - charStart) * 0.5,
+        );
         charEnd = findBestSplit(text, searchFrom, maxCharEnd);
       }
 
@@ -67,11 +78,7 @@ export class RecursiveChunkingStrategy implements IChunkingStrategy {
       if (content.length > 0) {
         results.push({
           content,
-          metadata: {
-            position: results.length,
-            startChar: charStart,
-            endChar: charEnd,
-          },
+          metadata: ChunkMetadata.create(results.length, charStart, charEnd),
         });
       }
 

@@ -1,13 +1,14 @@
-import type {
-  Conversation,
+import {
   ConversationParams,
-  ConversationSummary,
+  type ConversationParamsProps,
+  type Conversation,
+  type ConversationSummary,
 } from "../../domain/entities/Conversation";
+import { SourceCitation } from "../../domain/entities/Message";
 import type {
   KnowledgeCheckResult,
   Message,
   MessageRole,
-  SourceCitation,
 } from "../../domain/entities/Message";
 import type { IConversationRepository } from "../../domain/ports/IConversationRepository";
 import pool from "./pool";
@@ -18,7 +19,7 @@ function toMessage(row: Record<string, unknown>): Message {
     conversationId: row.conversation_id as string,
     role: row.role as MessageRole,
     content: row.content as string,
-    sources: row.sources as SourceCitation[],
+    sources: (row.sources as unknown[]).map(SourceCitation.fromPlain),
     knowledgeCheck: row.knowledge_check as KnowledgeCheckResult[] | undefined,
     createdAt: new Date(row.created_at as string),
   };
@@ -46,8 +47,8 @@ export class PgConversationRepository implements IConversationRepository {
   constructor(private readonly defaults: ConversationParams) {}
 
   private toParams(raw: unknown): ConversationParams {
-    const p = (raw ?? {}) as Partial<ConversationParams>;
-    return {
+    const p = (raw ?? {}) as Partial<ConversationParamsProps>;
+    return ConversationParams.create({
       retrievalLimit: p.retrievalLimit ?? this.defaults.retrievalLimit,
       retrievalMinScore: p.retrievalMinScore ?? this.defaults.retrievalMinScore,
       rerankEnabled: p.rerankEnabled ?? this.defaults.rerankEnabled,
@@ -61,7 +62,7 @@ export class PgConversationRepository implements IConversationRepository {
         ? p.knowledgeCheckStrategies
         : this.defaults.knowledgeCheckStrategies,
       searchMode: p.searchMode ?? this.defaults.searchMode,
-    };
+    });
   }
 
   async save(conversation: Conversation): Promise<void> {
@@ -72,7 +73,7 @@ export class PgConversationRepository implements IConversationRepository {
       [
         conversation.id,
         conversation.title,
-        JSON.stringify(conversation.params),
+        JSON.stringify(conversation.params.toPlain()),
         conversation.createdAt,
       ],
     );
@@ -121,7 +122,7 @@ export class PgConversationRepository implements IConversationRepository {
         conversationId,
         message.role,
         message.content,
-        JSON.stringify(message.sources),
+        JSON.stringify(message.sources.map((s) => s.toPlain())),
         message.knowledgeCheck ? JSON.stringify(message.knowledgeCheck) : null,
         message.createdAt,
       ],

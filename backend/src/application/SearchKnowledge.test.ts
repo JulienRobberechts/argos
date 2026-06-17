@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
-import type { Chunk } from "../domain/entities/Chunk";
+import { ChunkMetadata, type Chunk } from "../domain/entities/Chunk";
 import { nullLogger } from "../../tests/fakes/NullLogger";
 import { SearchKnowledge } from "./SearchKnowledge";
 
@@ -11,7 +11,7 @@ function makeChunk(embedding: number[], overrides?: Partial<Chunk>): Chunk {
     documentId: randomUUID(),
     content: "test content",
     embedding,
-    metadata: { position: 0, startChar: 0, endChar: 12 },
+    metadata: ChunkMetadata.create(0, 0, 12),
     ...overrides,
   };
 }

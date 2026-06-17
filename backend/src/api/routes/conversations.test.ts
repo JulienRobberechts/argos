@@ -3,11 +3,14 @@ import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
-import type { Conversation } from "../../domain/entities/Conversation";
+import {
+  ConversationParams,
+  type Conversation,
+} from "../../domain/entities/Conversation";
 import type { Message } from "../../domain/entities/Message";
 import { conversationsRouter } from "./conversations";
 
-const DEFAULT_PARAMS = {
+const DEFAULT_PARAMS = ConversationParams.create({
   retrievalLimit: 8,
   retrievalMinScore: 0.75,
   rerankEnabled: false,
@@ -17,8 +20,8 @@ const DEFAULT_PARAMS = {
   llmTemperature: 0.1,
   llmMaxTokens: 1024,
   knowledgeCheckStrategies: [],
-  searchMode: "hybrid" as const,
-};
+  searchMode: "hybrid",
+});
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {
@@ -45,12 +48,19 @@ function makeAssistantMessage(conversationId: string): Message {
 function makeApp(
   convRepo: InMemoryConversationRepository,
   askQuestion = {
-    execute: vi.fn().mockImplementation(async (convId: string) => makeAssistantMessage(convId)),
+    execute: vi
+      .fn()
+      .mockImplementation(async (convId: string) =>
+        makeAssistantMessage(convId),
+      ),
   },
 ) {
   const app = express();
   app.use(express.json());
-  app.use("/conversations", conversationsRouter(convRepo, askQuestion as never));
+  app.use(
+    "/conversations",
+    conversationsRouter(convRepo, askQuestion as never),
+  );
   return app;
 }
 
@@ -62,14 +72,18 @@ describe("conversationsRouter", () => {
   });
 
   it("POST /conversations creates a conversation", async () => {
-    const res = await request(makeApp(convRepo)).post("/conversations").send({ title: "My chat" });
+    const res = await request(makeApp(convRepo))
+      .post("/conversations")
+      .send({ title: "My chat" });
     expect(res.status).toBe(201);
     expect(res.body.title).toBe("My chat");
     expect(typeof res.body.id).toBe("string");
   });
 
   it("POST /conversations uses default title when omitted", async () => {
-    const res = await request(makeApp(convRepo)).post("/conversations").send({});
+    const res = await request(makeApp(convRepo))
+      .post("/conversations")
+      .send({});
     expect(res.status).toBe(201);
     expect(res.body.title).toBe("New conversation");
   });
@@ -85,7 +99,9 @@ describe("conversationsRouter", () => {
   it("GET /conversations/:id returns a conversation", async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    const res = await request(makeApp(convRepo)).get(`/conversations/${conv.id}`);
+    const res = await request(makeApp(convRepo)).get(
+      `/conversations/${conv.id}`,
+    );
     expect(res.status).toBe(200);
     expect(res.body.id).toBe(conv.id);
   });
@@ -98,12 +114,16 @@ describe("conversationsRouter", () => {
   it("DELETE /conversations/:id removes conversation", async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    const res = await request(makeApp(convRepo)).delete(`/conversations/${conv.id}`);
+    const res = await request(makeApp(convRepo)).delete(
+      `/conversations/${conv.id}`,
+    );
     expect(res.status).toBe(204);
   });
 
   it("DELETE /conversations/:id returns 404 for unknown id", async () => {
-    const res = await request(makeApp(convRepo)).delete("/conversations/unknown");
+    const res = await request(makeApp(convRepo)).delete(
+      "/conversations/unknown",
+    );
     expect(res.status).toBe(404);
   });
 

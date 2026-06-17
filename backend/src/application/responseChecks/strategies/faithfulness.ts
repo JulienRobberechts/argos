@@ -4,7 +4,10 @@ import type {
 } from "../../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
 import type { ILogger } from "../../../domain/ports/ILogger";
-import type { ILLMPort } from "../../../domain/ports/ILLMPort";
+import {
+  LLMStreamOptions,
+  type ILLMPort,
+} from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 function buildFaithfulnessPrompt(
@@ -71,9 +74,12 @@ export async function checkFaithfulness(
     promptLength: prompt.length,
   });
 
-  const raw = await llm.stream(prompt, () => {}, undefined, {
-    maxTokens: 4096,
-  });
+  const raw = await llm.stream(
+    prompt,
+    () => {},
+    undefined,
+    LLMStreamOptions.create({ maxTokens: 4096 }),
+  );
 
   logger.info("Faithfulness raw LLM response", {
     responseLength: raw.length,

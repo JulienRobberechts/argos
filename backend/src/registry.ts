@@ -8,6 +8,7 @@ import { ResetAll } from "./application/ResetAll";
 import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { SummarizeDocument } from "./application/SummarizeDocument";
+import { ConversationParams } from "./domain/entities/Conversation";
 import config from "./config";
 import { PgAppSettingsRepository } from "./infrastructure/db/PgAppSettingsRepository";
 import { PgConversationRepository } from "./infrastructure/db/PgConversationRepository";
@@ -24,18 +25,20 @@ import { DynamicFileStorage } from "./infrastructure/storage/DynamicFileStorage"
 
 export const documentRepo = new PgDocumentRepository();
 export const chunkRepo = new PgVectorChunkRepository();
-export const conversationRepo = new PgConversationRepository({
-  retrievalLimit: config.rag.retrievalLimit,
-  retrievalMinScore: config.rag.retrievalMinScore,
-  rerankEnabled: config.rerank.enabled,
-  rerankModel: config.rerank.model,
-  rerankCandidateMultiplier: config.rerank.candidateMultiplier,
-  llmModel: config.llm.anthropic.model,
-  llmTemperature: config.llm.anthropic.temperature,
-  llmMaxTokens: config.llm.anthropic.maxTokens,
-  knowledgeCheckStrategies: config.rag.knowledgeCheckStrategies,
-  searchMode: config.rag.searchMode,
-});
+export const conversationRepo = new PgConversationRepository(
+  ConversationParams.create({
+    retrievalLimit: config.rag.retrievalLimit,
+    retrievalMinScore: config.rag.retrievalMinScore,
+    rerankEnabled: config.rerank.enabled,
+    rerankModel: config.rerank.model,
+    rerankCandidateMultiplier: config.rerank.candidateMultiplier,
+    llmModel: config.llm.anthropic.model,
+    llmTemperature: config.llm.anthropic.temperature,
+    llmMaxTokens: config.llm.anthropic.maxTokens,
+    knowledgeCheckStrategies: config.rag.knowledgeCheckStrategies,
+    searchMode: config.rag.searchMode,
+  }),
+);
 const embeddingAdapter = new VoyageEmbeddingAdapter();
 const llmAdapter = new AnthropicLLMAdapter();
 const fileParser = new MultiFileParser();

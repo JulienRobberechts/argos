@@ -1,4 +1,11 @@
-export interface SourceCitation {
+export type MessageRole = "user" | "assistant";
+
+export type KnowledgeCheckStrategy =
+  | "faithfulness"
+  | "counterfactual"
+  | "citation_forcing";
+
+interface SourceCitationProps {
   chunkId: string;
   documentId: string;
   documentTitle: string;
@@ -7,9 +14,52 @@ export interface SourceCitation {
   score: number;
 }
 
-export type MessageRole = "user" | "assistant";
+export class SourceCitation {
+  declare private readonly _brand: void;
 
-export type KnowledgeCheckStrategy = "faithfulness" | "counterfactual" | "citation_forcing";
+  readonly chunkId: string;
+  readonly documentId: string;
+  readonly documentTitle: string;
+  readonly sourceType: "pdf" | "markdown" | "text";
+  readonly excerpt: string;
+  readonly score: number;
+
+  private constructor(props: SourceCitationProps) {
+    this.chunkId = props.chunkId;
+    this.documentId = props.documentId;
+    this.documentTitle = props.documentTitle;
+    this.sourceType = props.sourceType;
+    this.excerpt = props.excerpt;
+    this.score = props.score;
+  }
+
+  static create(props: SourceCitationProps): SourceCitation {
+    return new SourceCitation(props);
+  }
+
+  static fromPlain(plain: unknown): SourceCitation {
+    return SourceCitation.create(plain as SourceCitationProps);
+  }
+
+  toPlain(): SourceCitationProps {
+    return {
+      chunkId: this.chunkId,
+      documentId: this.documentId,
+      documentTitle: this.documentTitle,
+      sourceType: this.sourceType,
+      excerpt: this.excerpt,
+      score: this.score,
+    };
+  }
+
+  equals(other: SourceCitation): boolean {
+    return (
+      this.chunkId === other.chunkId &&
+      this.documentId === other.documentId &&
+      this.score === other.score
+    );
+  }
+}
 
 export interface KnowledgeClaim {
   claim: string;

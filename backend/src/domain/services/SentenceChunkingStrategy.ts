@@ -1,4 +1,9 @@
-import type { ChunkConfig, ChunkResult, IChunkingStrategy } from "./ChunkingTypes";
+import { ChunkMetadata } from "../entities/Chunk";
+import type {
+  ChunkConfig,
+  ChunkResult,
+  IChunkingStrategy,
+} from "./ChunkingTypes";
 
 interface Sentence {
   text: string;
@@ -49,7 +54,7 @@ export class SentenceChunkingStrategy implements IChunkingStrategy {
       return [
         {
           content: text.trim(),
-          metadata: { position: 0, startChar: 0, endChar: text.length },
+          metadata: ChunkMetadata.create(0, 0, text.length),
         },
       ];
     }
@@ -75,11 +80,7 @@ export class SentenceChunkingStrategy implements IChunkingStrategy {
       if (content.length > 0) {
         results.push({
           content,
-          metadata: {
-            position: results.length,
-            startChar: charStart,
-            endChar: charEnd,
-          },
+          metadata: ChunkMetadata.create(results.length, charStart, charEnd),
         });
       }
 

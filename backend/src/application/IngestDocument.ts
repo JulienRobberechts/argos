@@ -9,6 +9,7 @@ import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
 import type { ILogger } from "../domain/ports/ILogger";
 import type { ITextEncoder } from "../domain/ports/ITextEncoder";
 import {
+  ChunkConfig,
   type ChunkingStrategyName,
   createChunkingStrategy,
 } from "../domain/services/ChunkingStrategy";
@@ -53,10 +54,10 @@ export class IngestDocument {
       if (!key) throw new Error(`Document ${documentId} has no file`);
 
       const text = await this.downloadAndParseFile(documentId, key);
-      const chunkResults = chunkingStrategy.chunk(text, {
-        chunkSize,
-        chunkOverlap,
-      });
+      const chunkResults = chunkingStrategy.chunk(
+        text,
+        ChunkConfig.create(chunkSize, chunkOverlap),
+      );
 
       this.logger.info("Chunking complete", {
         documentId,

@@ -4,12 +4,12 @@ import type {
   KnowledgeCheckResult,
   KnowledgeCheckStrategy,
   Message,
-  SourceCitation,
 } from "../domain/entities/Message";
+import { SourceCitation } from "../domain/entities/Message";
 import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import type { IConversationRepository } from "../domain/ports/IConversationRepository";
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import type { ILLMPort } from "../domain/ports/ILLMPort";
+import { LLMStreamOptions, type ILLMPort } from "../domain/ports/ILLMPort";
 import type { ILogger } from "../domain/ports/ILogger";
 import type { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
 import {
@@ -108,11 +108,13 @@ export class AskQuestion {
       prompt,
       onToken,
       signal,
-      {
-        model: params?.llmModel,
-        temperature: params?.llmTemperature,
-        maxTokens: params?.llmMaxTokens,
-      },
+      params
+        ? LLMStreamOptions.create({
+            model: params.llmModel,
+            temperature: params.llmTemperature,
+            maxTokens: params.llmMaxTokens,
+          })
+        : undefined,
     );
     if (!streamResult.ok) return streamResult.message;
 
@@ -131,18 +133,21 @@ export class AskQuestion {
     prompt: string,
     onToken: (token: string) => void,
     signal: AbortSignal | undefined,
-    llmOptions:
-      | { model?: string; temperature?: number; maxTokens?: number }
-      | undefined,
+    llmOptions: LLMStreamOptions | undefined,
   ): Promise<{ ok: true; content: string } | { ok: false; message: Message }> {
     try {
-      const content = await this.llmAdapter.stream(prompt, onToken, signal, {
-        model: llmOptions?.model,
-        temperature: llmOptions?.temperature,
-        maxTokens: llmOptions?.maxTokens,
-        systemPrompt:
-          "Always respond in the same language as the user's question.",
-      });
+      const content = await this.llmAdapter.stream(
+        prompt,
+        onToken,
+        signal,
+        LLMStreamOptions.create({
+          model: llmOptions?.model,
+          temperature: llmOptions?.temperature,
+          maxTokens: llmOptions?.maxTokens,
+          systemPrompt:
+            "Always respond in the same language as the user's question.",
+        }),
+      );
       this.logger.info("LLM response complete", { conversationId });
       return { ok: true, content };
     } catch (err) {
@@ -241,15 +246,17 @@ export class AskQuestion {
     titleById: Map<string, string>,
     sourceTypeById: Map<string, SourceType>,
   ): SourceCitation[] {
-    return searchResults.map((result) => ({
-      chunkId: result.chunk.id,
-      documentId: result.chunk.documentId,
-      documentTitle:
-        titleById.get(result.chunk.documentId) ?? result.chunk.documentId,
-      sourceType: sourceTypeById.get(result.chunk.documentId) ?? "text",
-      excerpt: result.chunk.content,
-      score: result.score,
-    }));
+    return searchResults.map((result) =>
+      SourceCitation.create({
+        chunkId: result.chunk.id,
+        documentId: result.chunk.documentId,
+        documentTitle:
+          titleById.get(result.chunk.documentId) ?? result.chunk.documentId,
+        sourceType: sourceTypeById.get(result.chunk.documentId) ?? "text",
+        excerpt: result.chunk.content,
+        score: result.score,
+      }),
+    );
   }
 
   private async applyKnowledgeChecks(

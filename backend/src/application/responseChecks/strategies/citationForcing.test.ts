@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { parseCitationForcingResult } from "./citationForcing";
 import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
-import type { Chunk } from "../../../domain/entities/Chunk";
+import { ChunkMetadata, type Chunk } from "../../../domain/entities/Chunk";
 import { randomUUID } from "node:crypto";
 
 function makeChunkResult(content: string): ChunkSearchResult {
@@ -10,7 +10,7 @@ function makeChunkResult(content: string): ChunkSearchResult {
     documentId: "doc-1",
     content,
     embedding: [],
-    metadata: { position: 0, startChar: 0, endChar: content.length },
+    metadata: ChunkMetadata.create(0, 0, content.length),
   };
   return { chunk, score: 0.9 };
 }
@@ -19,7 +19,10 @@ describe("parseCitationForcingResult", () => {
   it("parse claims avec marker avant le point [SOURCE N].", () => {
     const raw =
       "L'Orient Express a été créé en 1883 [SOURCE 1]. Il est connu pour son luxe [SOURCE 2].";
-    const chunks = [makeChunkResult("fondé en 1883"), makeChunkResult("train luxueux")];
+    const chunks = [
+      makeChunkResult("fondé en 1883"),
+      makeChunkResult("train luxueux"),
+    ];
 
     const { cleanContent, result } = parseCitationForcingResult(raw, chunks);
 
@@ -35,7 +38,10 @@ describe("parseCitationForcingResult", () => {
   it("parse claims avec marker après le point. [SOURCE N]", () => {
     const raw =
       "L'Orient Express a été créé en 1883. [SOURCE 1] Il est connu pour son luxe. [SOURCE 2]";
-    const chunks = [makeChunkResult("fondé en 1883"), makeChunkResult("train luxueux")];
+    const chunks = [
+      makeChunkResult("fondé en 1883"),
+      makeChunkResult("train luxueux"),
+    ];
 
     const { result } = parseCitationForcingResult(raw, chunks);
 
@@ -60,20 +66,29 @@ describe("parseCitationForcingResult", () => {
   });
 
   it("parse un mélange SOURCE et OWN KNOWLEDGE dans la même réponse", () => {
-    const raw = "Fondé en 1883. [SOURCE 1] Luxueux. [OWN KNOWLEDGE] Actif aujourd'hui [SOURCE 2].";
-    const chunks = [makeChunkResult("fondé en 1883"), makeChunkResult("toujours actif")];
+    const raw =
+      "Fondé en 1883. [SOURCE 1] Luxueux. [OWN KNOWLEDGE] Actif aujourd'hui [SOURCE 2].";
+    const chunks = [
+      makeChunkResult("fondé en 1883"),
+      makeChunkResult("toujours actif"),
+    ];
 
     const { result } = parseCitationForcingResult(raw, chunks);
 
     expect(result.claims).toHaveLength(3);
-    expect(result.claims.find((c) => c.status === "UNSUPPORTED")?.claim).toBe("Luxueux");
+    expect(result.claims.find((c) => c.status === "UNSUPPORTED")?.claim).toBe(
+      "Luxueux",
+    );
     expect(result.score).toBe(2 / 3);
   });
 
   it("parse claims dans une liste markdown", () => {
     const raw =
       "- L'Orient Express a été créé en 1883 [SOURCE 1]\n- Il est connu pour son luxe [SOURCE 2]";
-    const chunks = [makeChunkResult("fondé en 1883"), makeChunkResult("train luxueux")];
+    const chunks = [
+      makeChunkResult("fondé en 1883"),
+      makeChunkResult("train luxueux"),
+    ];
 
     const { result } = parseCitationForcingResult(raw, chunks);
 

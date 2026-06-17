@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../tests/fakes/InMemoryConversationRepository";
-import type { Chunk } from "../domain/entities/Chunk";
-import type { Conversation } from "../domain/entities/Conversation";
+import { ChunkMetadata, type Chunk } from "../domain/entities/Chunk";
+import {
+  ConversationParams,
+  type Conversation,
+} from "../domain/entities/Conversation";
 import type { Message } from "../domain/entities/Message";
 import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
@@ -16,7 +19,7 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
     title: "Test",
     messages: [],
     createdAt: new Date(),
-    params: {
+    params: ConversationParams.create({
       retrievalLimit: 8,
       retrievalMinScore: 0.75,
       rerankEnabled: false,
@@ -26,8 +29,8 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
       llmTemperature: 0.1,
       llmMaxTokens: 1024,
       knowledgeCheckStrategies: [],
-      searchMode: "hybrid" as const,
-    },
+      searchMode: "hybrid",
+    }),
     ...overrides,
   };
 }
@@ -53,7 +56,7 @@ function makeChunkResult(content = "Relevant content"): ChunkSearchResult {
     documentId: randomUUID(),
     content,
     embedding: [],
-    metadata: { position: 0, startChar: 0, endChar: content.length },
+    metadata: ChunkMetadata.create(0, 0, content.length),
   };
   return { chunk, score: 0.9 };
 }
