@@ -1,5 +1,5 @@
 import type {
-  KnowledgeCheckResult,
+  ResponseGroundingResult,
   KnowledgeClaim,
 } from "../../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
@@ -64,7 +64,7 @@ export async function checkFaithfulness(
   answer: string,
   chunks: ChunkSearchResult[],
   titleById: Map<string, string>,
-): Promise<KnowledgeCheckResult> {
+): Promise<ResponseGroundingResult> {
   const prompt = buildFaithfulnessPrompt(query, answer, chunks);
 
   logger.info("Faithfulness check starting", {

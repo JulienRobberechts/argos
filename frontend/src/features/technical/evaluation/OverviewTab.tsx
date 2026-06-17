@@ -157,8 +157,8 @@ export default function OverviewTab() {
             </p>
             <p className="text-xs text-slate-600 leading-relaxed">
               Faithfulness is computed on every live request via{" "}
-              <code>CheckContextualKnowledge</code> and stored in{" "}
-              <code>Message.knowledgeCheck</code>. Catches degradations introduced by new documents,
+              <code>CheckResponseGrounding</code> and stored in{" "}
+              <code>Message.responseGrounding</code>. Catches degradations introduced by new documents,
               model updates, or traffic drift — without needing a labeled dataset.
             </p>
           </div>

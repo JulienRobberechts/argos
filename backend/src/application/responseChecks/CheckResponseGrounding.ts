@@ -1,6 +1,6 @@
 import type {
-  KnowledgeCheckResult,
-  KnowledgeCheckStrategy,
+  ResponseGroundingResult,
+  ResponseGroundingStrategy,
 } from "../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../domain/ports/IChunkRepository";
 import type { ILogger } from "../../domain/ports/ILogger";
@@ -10,7 +10,7 @@ import { checkCounterfactual } from "./strategies/counterfactual";
 import { checkFaithfulness } from "./strategies/faithfulness";
 
 /** Orchestre les stratégies de vérification de qualité des réponses (faithfulness, counterfactual, citation_forcing) et agrège leurs résultats. */
-export class CheckContextualKnowledge {
+export class CheckResponseGrounding {
   constructor(
     private readonly llm: ILLMPort,
     private readonly logger: ILogger,
@@ -20,10 +20,10 @@ export class CheckContextualKnowledge {
     query: string,
     answer: string,
     chunks: ChunkSearchResult[],
-    strategies: KnowledgeCheckStrategy[],
+    strategies: ResponseGroundingStrategy[],
     titleById: Map<string, string> = new Map(),
-  ): Promise<KnowledgeCheckResult[]> {
-    const results: KnowledgeCheckResult[] = [];
+  ): Promise<ResponseGroundingResult[]> {
+    const results: ResponseGroundingResult[] = [];
     for (const strategy of strategies) {
       try {
         if (strategy === "faithfulness") {

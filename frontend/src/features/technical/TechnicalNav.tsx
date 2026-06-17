@@ -7,8 +7,8 @@ const pages = [
   { to: "/technical/reranking", label: "Re-ranking", icon: ArrowUpDown },
   { to: "/technical/llm-models", label: "Modèles LLM", icon: Brain },
   {
-    to: "/technical/knowledge-check",
-    label: "Knowledge Check",
+    to: "/technical/response-grounding",
+    label: "Response Grounding",
     icon: ShieldCheck,
   },
   { to: "/technical/evaluation", label: "Evaluation", icon: Gauge },

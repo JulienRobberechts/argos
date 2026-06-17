@@ -1,7 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MessageSquare } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { BrowserRouter, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
 import LoginScreen from "./components/auth/LoginScreen";
 import ChatInterface from "./components/chat/ChatInterface";
 import DocumentDetail from "./components/documents/DocumentDetail";
@@ -14,7 +20,7 @@ import QuizPage from "./components/pages/QuizPage";
 import PageHeader from "./components/ui/PageHeader";
 import EvaluationPage from "./features/technical/EvaluationPage";
 import HybridSearchPage from "./features/technical/HybridSearchPage";
-import KnowledgeCheckPage from "./features/technical/KnowledgeCheckPage";
+import ResponseGroundingPage from "./features/technical/ResponseGroundingPage";
 import LLMModelsPage from "./features/technical/LLMModelsPage";
 import RerankingPage from "./features/technical/RerankingPage";
 import TechnicalLayout from "./features/technical/TechnicalLayout";
@@ -67,7 +73,9 @@ export default function App() {
   }, []);
 
   if (isAuthenticated === null) {
-    return <div className="flex items-center justify-center min-h-screen bg-gray-50" />;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-50" />
+    );
   }
 
   if (!isAuthenticated) {
@@ -91,7 +99,10 @@ export default function App() {
               <Route path="hybrid-search" element={<HybridSearchPage />} />
               <Route path="reranking" element={<RerankingPage />} />
               <Route path="llm-models" element={<LLMModelsPage />} />
-              <Route path="knowledge-check" element={<KnowledgeCheckPage />} />
+              <Route
+                path="response-grounding"
+                element={<ResponseGroundingPage />}
+              />
               <Route path="evaluation" element={<EvaluationPage />} />
             </Route>
             <Route path="font-preview" element={<FontPreviewPage />} />

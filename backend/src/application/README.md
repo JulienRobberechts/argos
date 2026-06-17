@@ -26,7 +26,7 @@ Appelé par `../api`, dépend des ports définis dans `../domain/ports` (implém
 
 | Classe / Stratégie | Description |
 |---|---|
-| `CheckContextualKnowledge` | Orchestre les stratégies de vérification et agrège leurs résultats. |
+| `CheckResponseGrounding` | Orchestre les stratégies de vérification et agrège leurs résultats. |
 | `faithfulness` | Évalue si chaque affirmation de la réponse est ancrée dans les chunks récupérés. |
 | `citationForcing` | Force le LLM à citer ses sources inline, puis parse les citations pour scorer l'ancrage. |
 | `counterfactual` | Détecte la valeur ajoutée du RAG en comparant la réponse avec et sans contexte. |

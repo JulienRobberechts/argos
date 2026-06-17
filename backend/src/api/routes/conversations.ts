@@ -14,7 +14,7 @@ import { Logger } from "../../infrastructure/logger/Logger";
 
 const logger = new Logger("conversations");
 
-const knowledgeCheckStrategySchema = z.enum([
+const responseGroundingStrategySchema = z.enum([
   "faithfulness",
   "counterfactual",
   "citation_forcing",
@@ -29,7 +29,9 @@ const conversationParamsSchema = z.object({
   llmModel: z.string().min(1).optional(),
   llmTemperature: z.number().min(0).max(1).optional(),
   llmMaxTokens: z.number().int().min(64).max(8192).optional(),
-  knowledgeCheckStrategies: z.array(knowledgeCheckStrategySchema).optional(),
+  responseGroundingStrategies: z
+    .array(responseGroundingStrategySchema)
+    .optional(),
   searchMode: z.enum(["vector", "hybrid"]).optional(),
 });
 
@@ -75,8 +77,9 @@ export function conversationsRouter(
             llmTemperature:
               p.llmTemperature ?? config.llm.anthropic.temperature,
             llmMaxTokens: p.llmMaxTokens ?? config.llm.anthropic.maxTokens,
-            knowledgeCheckStrategies:
-              p.knowledgeCheckStrategies ?? config.rag.knowledgeCheckStrategies,
+            responseGroundingStrategies:
+              p.responseGroundingStrategies ??
+              config.rag.responseGroundingStrategies,
             searchMode: p.searchMode ?? config.rag.searchMode,
           }),
           messages: [],
@@ -220,9 +223,9 @@ export function conversationsRouter(
         res.write(
           `event: sources\ndata: ${JSON.stringify({ sources: assistantMessage.sources })}\n\n`,
         );
-        if (assistantMessage.knowledgeCheck?.length) {
+        if (assistantMessage.responseGrounding?.length) {
           res.write(
-            `event: knowledge_check\ndata: ${JSON.stringify({ results: assistantMessage.knowledgeCheck })}\n\n`,
+            `event: response_grounding\ndata: ${JSON.stringify({ results: assistantMessage.responseGrounding })}\n\n`,
           );
         }
         res.write(

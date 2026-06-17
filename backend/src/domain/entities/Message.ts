@@ -1,6 +1,6 @@
 export type MessageRole = "user" | "assistant";
 
-export type KnowledgeCheckStrategy =
+export type ResponseGroundingStrategy =
   | "faithfulness"
   | "counterfactual"
   | "citation_forcing";
@@ -69,8 +69,8 @@ export interface KnowledgeClaim {
   documentTitle?: string;
 }
 
-export interface KnowledgeCheckResult {
-  strategy: KnowledgeCheckStrategy;
+export interface ResponseGroundingResult {
+  strategy: ResponseGroundingStrategy;
   score: number;
   claims: KnowledgeClaim[];
   warning?: string;
@@ -84,6 +84,6 @@ export interface Message {
   role: MessageRole;
   content: string;
   sources: SourceCitation[];
-  knowledgeCheck?: KnowledgeCheckResult[];
+  responseGrounding?: ResponseGroundingResult[];
   createdAt: Date;
 }

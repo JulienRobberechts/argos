@@ -1,4 +1,4 @@
-import type { KnowledgeCheckResult, SourceCitation } from "../types/domain";
+import type { ResponseGroundingResult, SourceCitation } from "../types/domain";
 import { setOnUnauthorized, UnauthorizedError } from "./api";
 
 export { setOnUnauthorized };
@@ -6,7 +6,7 @@ export { setOnUnauthorized };
 interface SSEHandlers {
   onDelta: (token: string) => void;
   onSources: (sources: SourceCitation[]) => void;
-  onKnowledgeCheck: (results: KnowledgeCheckResult[]) => void;
+  onResponseGrounding: (results: ResponseGroundingResult[]) => void;
   onDone: (messageId: string) => void;
   onError: (error: string) => void;
 }
@@ -58,11 +58,16 @@ export function streamMessage(
         } else if (line.startsWith("data: ") && currentEvent) {
           const data = JSON.parse(line.slice(6)) as Record<string, unknown>;
           if (currentEvent === "delta") handlers.onDelta(data.token as string);
-          else if (currentEvent === "sources") handlers.onSources(data.sources as SourceCitation[]);
-          else if (currentEvent === "knowledge_check")
-            handlers.onKnowledgeCheck(data.results as KnowledgeCheckResult[]);
-          else if (currentEvent === "done") handlers.onDone(data.messageId as string);
-          else if (currentEvent === "error") handlers.onError(data.error as string);
+          else if (currentEvent === "sources")
+            handlers.onSources(data.sources as SourceCitation[]);
+          else if (currentEvent === "response_grounding")
+            handlers.onResponseGrounding(
+              data.results as ResponseGroundingResult[],
+            );
+          else if (currentEvent === "done")
+            handlers.onDone(data.messageId as string);
+          else if (currentEvent === "error")
+            handlers.onError(data.error as string);
           currentEvent = "";
         }
       }

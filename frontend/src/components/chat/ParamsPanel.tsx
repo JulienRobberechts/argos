@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import type { ConversationParams, KnowledgeCheckStrategy } from "../../types/domain";
+import type { ConversationParams, ResponseGroundingStrategy } from "../../types/domain";
 import { Field, LLM_MODELS, RERANK_MODELS, Toggle } from "./ParamsPanelControls";
 
 export default function ParamsPanel({
@@ -259,17 +259,17 @@ export default function ParamsPanel({
 
         <section className="flex flex-col gap-2.5">
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">
-            Knowledge check
+            Response Grounding
           </p>
-          {(["faithfulness", "citation_forcing", "counterfactual"] as KnowledgeCheckStrategy[]).map(
+          {(["faithfulness", "citation_forcing", "counterfactual"] as ResponseGroundingStrategy[]).map(
             (strategy) => {
-              const active = (params.knowledgeCheckStrategies ?? []).includes(strategy);
-              const labels: Record<KnowledgeCheckStrategy, string> = {
+              const active = (params.responseGroundingStrategies ?? []).includes(strategy);
+              const labels: Record<ResponseGroundingStrategy, string> = {
                 faithfulness: "Faithfulness (RAGAS)",
                 counterfactual: "Counterfactual",
                 citation_forcing: "Citation forcing",
               };
-              const infos: Record<KnowledgeCheckStrategy, string> = {
+              const infos: Record<ResponseGroundingStrategy, string> = {
                 faithfulness:
                   "Checks whether each statement in the answer is supported by the retrieved sources.",
                 counterfactual:
@@ -282,16 +282,16 @@ export default function ParamsPanel({
                   key={strategy}
                   label={labels[strategy]}
                   info={infos[strategy]}
-                  techLink="/technical/knowledge-check"
+                  techLink="/technical/response-grounding"
                 >
                   <Toggle
                     checked={active}
                     onChange={(v) => {
                       if (readOnly) return;
-                      const current = params.knowledgeCheckStrategies ?? [];
+                      const current = params.responseGroundingStrategies ?? [];
                       onChange?.({
                         ...params,
-                        knowledgeCheckStrategies: v
+                        responseGroundingStrategies: v
                           ? [...current, strategy]
                           : current.filter((s) => s !== strategy),
                       });

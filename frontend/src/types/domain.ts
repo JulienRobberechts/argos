@@ -26,11 +26,11 @@ export interface Message {
   role: MessageRole;
   content: string;
   sources: SourceCitation[];
-  knowledgeCheck?: KnowledgeCheckResult[];
+  responseGrounding?: ResponseGroundingResult[];
   createdAt: string;
 }
 
-export type KnowledgeCheckStrategy = "faithfulness" | "counterfactual" | "citation_forcing";
+export type ResponseGroundingStrategy = "faithfulness" | "counterfactual" | "citation_forcing";
 
 export interface KnowledgeClaim {
   claim: string;
@@ -40,8 +40,8 @@ export interface KnowledgeClaim {
   documentTitle?: string;
 }
 
-export interface KnowledgeCheckResult {
-  strategy: KnowledgeCheckStrategy;
+export interface ResponseGroundingResult {
+  strategy: ResponseGroundingStrategy;
   score: number;
   claims: KnowledgeClaim[];
   warning?: string;
@@ -58,7 +58,7 @@ export interface ConversationParams {
   llmModel: string;
   llmTemperature: number;
   llmMaxTokens: number;
-  knowledgeCheckStrategies: KnowledgeCheckStrategy[];
+  responseGroundingStrategies: ResponseGroundingStrategy[];
   searchMode: "vector" | "hybrid";
 }
 

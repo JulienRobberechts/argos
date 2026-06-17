@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import type { KnowledgeCheckResult } from "../../types/domain";
+import type { ResponseGroundingResult } from "../../types/domain";
 
 const STRATEGY_LABEL: Record<string, string> = {
   faithfulness: "Faithfulness",
@@ -48,7 +48,7 @@ function ScoreBadge({ score }: { score: number }) {
   return <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${color}`}>{pct}%</span>;
 }
 
-function ClaimsList({ result }: { result: KnowledgeCheckResult }) {
+function ClaimsList({ result }: { result: ResponseGroundingResult }) {
   if (result.claims.length === 0) return null;
   return (
     <ul className="space-y-1">
@@ -84,7 +84,7 @@ function ClaimsList({ result }: { result: KnowledgeCheckResult }) {
   );
 }
 
-function CounterfactualDetail({ result }: { result: KnowledgeCheckResult }) {
+function CounterfactualDetail({ result }: { result: ResponseGroundingResult }) {
   return (
     <div className="space-y-2">
       {result.similar !== undefined && (
@@ -131,7 +131,7 @@ function CounterfactualDetail({ result }: { result: KnowledgeCheckResult }) {
   );
 }
 
-export default function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
+export default function ResponseGroundingPanel({ results }: { results: ResponseGroundingResult[] }) {
   const [open, setOpen] = useState(false);
   const sorted = [...results].sort(
     (a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy),
@@ -152,7 +152,7 @@ export default function KnowledgeCheckPanel({ results }: { results: KnowledgeChe
           <ShieldCheck size={13} className="text-green-500 shrink-0" />
         )}
         <span className="font-medium text-slate-600 flex-1 flex items-center gap-1.5">
-          Knowledge check
+          Response Grounding
           {counterfactual?.similar !== undefined &&
             (counterfactual.similar ? (
               <Globe size={12} className="text-amber-500" />

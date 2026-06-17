@@ -1,8 +1,12 @@
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import type { KnowledgeCheckResult, Message, SourceCitation } from "../../types/domain";
-import KnowledgeCheckPanel from "./KnowledgeCheckPanel";
+import type {
+  ResponseGroundingResult,
+  Message,
+  SourceCitation,
+} from "../../types/domain";
+import ResponseGroundingPanel from "./ResponseGroundingPanel";
 import SourceCard from "./SourceCard";
 import StreamingMessage from "./StreamingMessage";
 
@@ -46,7 +50,7 @@ interface Props {
   messages: Message[];
   streamingText?: string;
   streamingSources?: SourceCitation[];
-  streamingKnowledgeCheck?: KnowledgeCheckResult[];
+  streamingResponseGrounding?: ResponseGroundingResult[];
   isStreaming: boolean;
 }
 
@@ -54,7 +58,7 @@ export default function MessageList({
   messages,
   streamingText,
   streamingSources,
-  streamingKnowledgeCheck,
+  streamingResponseGrounding,
   isStreaming,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -78,8 +82,8 @@ export default function MessageList({
               <ReactMarkdown>{msg.content}</ReactMarkdown>
             </div>
             {msg.sources.length > 0 && <SourcesList sources={msg.sources} />}
-            {msg.knowledgeCheck && msg.knowledgeCheck.length > 0 && (
-              <KnowledgeCheckPanel results={msg.knowledgeCheck} />
+            {msg.responseGrounding && msg.responseGrounding.length > 0 && (
+              <ResponseGroundingPanel results={msg.responseGrounding} />
             )}
           </AssistantBubble>
         ),
@@ -90,9 +94,10 @@ export default function MessageList({
           {streamingSources && streamingSources.length > 0 && (
             <SourcesList sources={streamingSources} />
           )}
-          {streamingKnowledgeCheck && streamingKnowledgeCheck.length > 0 && (
-            <KnowledgeCheckPanel results={streamingKnowledgeCheck} />
-          )}
+          {streamingResponseGrounding &&
+            streamingResponseGrounding.length > 0 && (
+              <ResponseGroundingPanel results={streamingResponseGrounding} />
+            )}
         </AssistantBubble>
       )}
       <div ref={bottomRef} />

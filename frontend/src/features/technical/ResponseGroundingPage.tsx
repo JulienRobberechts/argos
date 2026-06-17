@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../../components/ui/PageHeader";
 import TabBar from "../../components/ui/TabBar";
-import ImplementationTab from "./knowledge-check/ImplementationTab";
-import OverviewTab from "./knowledge-check/OverviewTab";
-import StrategiesTab from "./knowledge-check/StrategiesTab";
-import TradeOffsTab from "./knowledge-check/TradeOffsTab";
+import ImplementationTab from "./response-grounding/ImplementationTab";
+import OverviewTab from "./response-grounding/OverviewTab";
+import StrategiesTab from "./response-grounding/StrategiesTab";
+import TradeOffsTab from "./response-grounding/TradeOffsTab";
 
 const TABS = ["Overview", "Strategies", "Implementation", "Trade-offs"] as const;
 type Tab = (typeof TABS)[number];
@@ -15,7 +15,7 @@ function isTab(value: string | null): value is Tab {
   return TABS.includes(value as Tab);
 }
 
-export default function KnowledgeCheckPage() {
+export default function ResponseGroundingPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
@@ -28,7 +28,7 @@ export default function KnowledgeCheckPage() {
     <div className="p-8 w-full">
       <PageHeader
         icon={<ShieldCheck className="text-[#d97706]" size={28} />}
-        title="Knowledge Check — Technical Deep Dive"
+        title="Response Grounding — Technical Deep Dive"
         info="Three strategies to detect whether an LLM answer comes from retrieved documents or from the model's training data."
       />
 

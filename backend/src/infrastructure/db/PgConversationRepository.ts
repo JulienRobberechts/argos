@@ -6,7 +6,7 @@ import {
 } from "../../domain/entities/Conversation";
 import { SourceCitation } from "../../domain/entities/Message";
 import type {
-  KnowledgeCheckResult,
+  ResponseGroundingResult,
   Message,
   MessageRole,
 } from "../../domain/entities/Message";
@@ -20,7 +20,7 @@ function toMessage(row: Record<string, unknown>): Message {
     role: row.role as MessageRole,
     content: row.content as string,
     sources: (row.sources as unknown[]).map(SourceCitation.fromPlain),
-    knowledgeCheck: row.knowledge_check as KnowledgeCheckResult[] | undefined,
+    responseGrounding: row.response_grounding as ResponseGroundingResult[] | undefined,
     createdAt: new Date(row.created_at as string),
   };
 }
@@ -58,9 +58,9 @@ export class PgConversationRepository implements IConversationRepository {
       llmModel: p.llmModel ?? this.defaults.llmModel,
       llmTemperature: p.llmTemperature ?? this.defaults.llmTemperature,
       llmMaxTokens: p.llmMaxTokens ?? this.defaults.llmMaxTokens,
-      knowledgeCheckStrategies: Array.isArray(p.knowledgeCheckStrategies)
-        ? p.knowledgeCheckStrategies
-        : this.defaults.knowledgeCheckStrategies,
+      responseGroundingStrategies: Array.isArray(p.responseGroundingStrategies)
+        ? p.responseGroundingStrategies
+        : this.defaults.responseGroundingStrategies,
       searchMode: p.searchMode ?? this.defaults.searchMode,
     });
   }
@@ -115,7 +115,7 @@ export class PgConversationRepository implements IConversationRepository {
 
   async addMessage(conversationId: string, message: Message): Promise<void> {
     await pool.query(
-      `INSERT INTO messages (id, conversation_id, role, content, sources, knowledge_check, created_at)
+      `INSERT INTO messages (id, conversation_id, role, content, sources, response_grounding, created_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7)`,
       [
         message.id,
@@ -123,7 +123,7 @@ export class PgConversationRepository implements IConversationRepository {
         message.role,
         message.content,
         JSON.stringify(message.sources.map((s) => s.toPlain())),
-        message.knowledgeCheck ? JSON.stringify(message.knowledgeCheck) : null,
+        message.responseGrounding ? JSON.stringify(message.responseGrounding) : null,
         message.createdAt,
       ],
     );

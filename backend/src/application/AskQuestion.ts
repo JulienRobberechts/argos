@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import type { SourceType } from "../domain/entities/Document";
 import type {
-  KnowledgeCheckResult,
-  KnowledgeCheckStrategy,
+  ResponseGroundingResult,
+  ResponseGroundingStrategy,
   Message,
 } from "../domain/entities/Message";
 import { SourceCitation } from "../domain/entities/Message";
@@ -11,7 +11,7 @@ import type { IConversationRepository } from "../domain/ports/IConversationRepos
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
 import { LLMStreamOptions, type ILLMPort } from "../domain/ports/ILLMPort";
 import type { ILogger } from "../domain/ports/ILogger";
-import type { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
+import type { CheckResponseGrounding } from "./responseChecks/CheckResponseGrounding";
 import {
   buildCitationForcingInstruction,
   parseCitationForcingResult,
@@ -31,7 +31,7 @@ export class AskQuestion {
     private readonly conversationRepo: IConversationRepository,
     private readonly documentRepo: IDocumentRepository,
     private readonly logger: ILogger,
-    private readonly knowledgeChecker?: CheckContextualKnowledge,
+    private readonly responseGrounder?: CheckResponseGrounding,
   ) {}
 
   async execute(
@@ -94,8 +94,8 @@ export class AskQuestion {
       return noInfoMessage;
     }
 
-    const strategies: KnowledgeCheckStrategy[] =
-      params?.knowledgeCheckStrategies ?? [];
+    const strategies: ResponseGroundingStrategy[] =
+      params?.responseGroundingStrategies ?? [];
     const prompt = this.buildPrompt(
       userContent,
       searchResults,
@@ -172,15 +172,15 @@ export class AskQuestion {
     rawContent: string,
     userContent: string,
     searchResults: ChunkSearchResult[],
-    strategies: KnowledgeCheckStrategy[],
+    strategies: ResponseGroundingStrategy[],
     conversationId: string,
     history: Message[],
   ): Promise<Message> {
     const { titleById, sourceTypeById } =
       await this.fetchDocumentMeta(searchResults);
 
-    const { assistantContent, knowledgeCheck } =
-      await this.applyKnowledgeChecks(
+    const { assistantContent, responseGrounding } =
+      await this.applyResponseGrounding(
         rawContent,
         userContent,
         searchResults,
@@ -194,10 +194,10 @@ export class AskQuestion {
       sourceTypeById,
     );
 
-    this.logger.info("Knowledge check complete", {
+    this.logger.info("Response grounding complete", {
       conversationId,
       strategies,
-      results: knowledgeCheck.length,
+      results: responseGrounding.length,
     });
 
     const assistantMessage: Message = {
@@ -206,7 +206,7 @@ export class AskQuestion {
       role: "assistant",
       content: assistantContent,
       sources,
-      knowledgeCheck: knowledgeCheck.length > 0 ? knowledgeCheck : undefined,
+      responseGrounding: responseGrounding.length > 0 ? responseGrounding : undefined,
       createdAt: new Date(),
     };
     await this.conversationRepo.addMessage(conversationId, assistantMessage);
@@ -259,19 +259,19 @@ export class AskQuestion {
     );
   }
 
-  private async applyKnowledgeChecks(
+  private async applyResponseGrounding(
     rawContent: string,
     userContent: string,
     searchResults: ChunkSearchResult[],
-    strategies: KnowledgeCheckStrategy[],
+    strategies: ResponseGroundingStrategy[],
     titleById: Map<string, string>,
   ): Promise<{
     assistantContent: string;
-    knowledgeCheck: KnowledgeCheckResult[];
+    responseGrounding: ResponseGroundingResult[];
   }> {
     const useCitationForcing = strategies.includes("citation_forcing");
     let assistantContent = rawContent;
-    let inlineCitationResult: KnowledgeCheckResult | undefined;
+    let inlineCitationResult: ResponseGroundingResult | undefined;
 
     if (useCitationForcing) {
       const parsed = parseCitationForcingResult(
@@ -285,8 +285,8 @@ export class AskQuestion {
 
     const otherStrategies = strategies.filter((s) => s !== "citation_forcing");
     const otherChecks =
-      this.knowledgeChecker && otherStrategies.length > 0
-        ? await this.knowledgeChecker.run(
+      this.responseGrounder && otherStrategies.length > 0
+        ? await this.responseGrounder.run(
             userContent,
             assistantContent,
             searchResults,
@@ -295,12 +295,12 @@ export class AskQuestion {
           )
         : [];
 
-    const knowledgeCheck: KnowledgeCheckResult[] = [
+    const responseGrounding: ResponseGroundingResult[] = [
       ...(inlineCitationResult ? [inlineCitationResult] : []),
       ...otherChecks,
     ];
 
-    return { assistantContent, knowledgeCheck };
+    return { assistantContent, responseGrounding };
   }
 
   private async generateConversationTitle(

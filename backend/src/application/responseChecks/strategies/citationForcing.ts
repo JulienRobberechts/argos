@@ -1,4 +1,4 @@
-import type { KnowledgeCheckResult, KnowledgeClaim } from "../../../domain/entities/Message";
+import type { ResponseGroundingResult, KnowledgeClaim } from "../../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
 import type { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
@@ -16,7 +16,7 @@ export function parseCitationForcingResult(
   titleById: Map<string, string> = new Map(),
 ): {
   cleanContent: string;
-  result: KnowledgeCheckResult;
+  result: ResponseGroundingResult;
 } {
   const claims: KnowledgeClaim[] = [];
 
@@ -82,7 +82,7 @@ export async function checkCitationForcing(
   answer: string,
   chunks: ChunkSearchResult[],
   titleById: Map<string, string> = new Map(),
-): Promise<KnowledgeCheckResult> {
+): Promise<ResponseGroundingResult> {
   const sourcesText = chunks.map((c, i) => `SOURCE ${i + 1}:\n${c.chunk.content}`).join("\n\n");
 
   const prompt = [

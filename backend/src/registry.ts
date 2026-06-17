@@ -5,7 +5,7 @@ import { CreateDocument } from "./application/CreateDocument";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { IngestDocument } from "./application/IngestDocument";
 import { ResetAll } from "./application/ResetAll";
-import { CheckContextualKnowledge } from "./application/responseChecks/CheckContextualKnowledge";
+import { CheckResponseGrounding } from "./application/responseChecks/CheckResponseGrounding";
 import { SearchKnowledge } from "./application/SearchKnowledge";
 import { SummarizeDocument } from "./application/SummarizeDocument";
 import { ConversationParams } from "./domain/entities/Conversation";
@@ -35,7 +35,7 @@ export const conversationRepo = new PgConversationRepository(
     llmModel: config.llm.anthropic.model,
     llmTemperature: config.llm.anthropic.temperature,
     llmMaxTokens: config.llm.anthropic.maxTokens,
-    knowledgeCheckStrategies: config.rag.knowledgeCheckStrategies,
+    responseGroundingStrategies: config.rag.responseGroundingStrategies,
     searchMode: config.rag.searchMode,
   }),
 );
@@ -68,9 +68,9 @@ export const searchKnowledge = new SearchKnowledge(
   config.rerank.candidateMultiplier,
   config.rag.searchMode,
 );
-const knowledgeChecker = new CheckContextualKnowledge(
+const responseGrounder = new CheckResponseGrounding(
   llmAdapter,
-  new Logger("CheckContextualKnowledge"),
+  new Logger("CheckResponseGrounding"),
 );
 export const askQuestion = new AskQuestion(
   searchKnowledge,
@@ -78,7 +78,7 @@ export const askQuestion = new AskQuestion(
   conversationRepo,
   documentRepo,
   new Logger("AskQuestion"),
-  knowledgeChecker,
+  responseGrounder,
 );
 export const generateQuiz = new GenerateQuiz(
   chunkRepo,

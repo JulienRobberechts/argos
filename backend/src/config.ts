@@ -110,7 +110,7 @@ const config = {
     retrievalLimit: env.RETRIEVAL_LIMIT,
     retrievalMinScore: env.RETRIEVAL_MIN_SCORE,
     searchMode: env.SEARCH_MODE,
-    knowledgeCheckStrategies: [] as (
+    responseGroundingStrategies: [] as (
       | "faithfulness"
       | "counterfactual"
       | "citation_forcing"

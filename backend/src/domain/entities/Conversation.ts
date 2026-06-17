@@ -1,4 +1,4 @@
-import type { KnowledgeCheckStrategy, Message } from "./Message";
+import type { ResponseGroundingStrategy, Message } from "./Message";
 
 export interface ConversationParamsProps {
   retrievalLimit: number;
@@ -9,7 +9,7 @@ export interface ConversationParamsProps {
   llmModel: string;
   llmTemperature: number;
   llmMaxTokens: number;
-  knowledgeCheckStrategies: KnowledgeCheckStrategy[];
+  responseGroundingStrategies: ResponseGroundingStrategy[];
   searchMode: "vector" | "hybrid";
 }
 
@@ -24,7 +24,7 @@ export class ConversationParams {
   readonly llmModel: string;
   readonly llmTemperature: number;
   readonly llmMaxTokens: number;
-  readonly knowledgeCheckStrategies: KnowledgeCheckStrategy[];
+  readonly responseGroundingStrategies: ResponseGroundingStrategy[];
   readonly searchMode: "vector" | "hybrid";
 
   private constructor(props: ConversationParamsProps) {
@@ -36,7 +36,7 @@ export class ConversationParams {
     this.llmModel = props.llmModel;
     this.llmTemperature = props.llmTemperature;
     this.llmMaxTokens = props.llmMaxTokens;
-    this.knowledgeCheckStrategies = props.knowledgeCheckStrategies;
+    this.responseGroundingStrategies = props.responseGroundingStrategies;
     this.searchMode = props.searchMode;
   }
 
@@ -68,7 +68,7 @@ export class ConversationParams {
       llmModel: this.llmModel,
       llmTemperature: this.llmTemperature,
       llmMaxTokens: this.llmMaxTokens,
-      knowledgeCheckStrategies: [...this.knowledgeCheckStrategies],
+      responseGroundingStrategies: [...this.responseGroundingStrategies],
       searchMode: this.searchMode,
     };
   }
@@ -84,10 +84,10 @@ export class ConversationParams {
       this.llmTemperature === other.llmTemperature &&
       this.llmMaxTokens === other.llmMaxTokens &&
       this.searchMode === other.searchMode &&
-      this.knowledgeCheckStrategies.length ===
-        other.knowledgeCheckStrategies.length &&
-      this.knowledgeCheckStrategies.every(
-        (s, i) => s === other.knowledgeCheckStrategies[i],
+      this.responseGroundingStrategies.length ===
+        other.responseGroundingStrategies.length &&
+      this.responseGroundingStrategies.every(
+        (s, i) => s === other.responseGroundingStrategies[i],
       )
     );
   }

@@ -1,4 +1,4 @@
-import type { KnowledgeCheckResult } from "../../../domain/entities/Message";
+import type { ResponseGroundingResult } from "../../../domain/entities/Message";
 import type { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
@@ -6,7 +6,7 @@ export async function checkCounterfactual(
   llm: ILLMPort,
   query: string,
   answerWithContext: string,
-): Promise<KnowledgeCheckResult> {
+): Promise<ResponseGroundingResult> {
   const answerWithoutContext = await llm.stream(
     [
       "Answer the following question from your training knowledge only (no documents provided).",

@@ -118,7 +118,7 @@ Compares the RAG-generated answer to an answer generated **without** any sources
 ### `citation_forcing`
 Injects an instruction into the prompt forcing the LLM to tag each claim with `[SOURCE N]` or `[OWN KNOWLEDGE]`. These markers are then parsed to build a list of traced claims, and stripped from the final text shown to the user.
 
-**Key files:** `application/responseChecks/`, `domain/entities/Message.ts` → `KnowledgeCheckResult`
+**Key files:** `application/responseChecks/`, `domain/entities/Message.ts` → `ResponseGroundingResult`
 
 ---
 
