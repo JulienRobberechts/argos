@@ -43,25 +43,15 @@ export default function PdfViewer({ id }: { id: string }) {
     >
       {isLoading && <p className="text-sm text-slate-400 mt-8">Loading…</p>}
       {isError && (
-        <p className="text-sm text-slate-500 mt-8">
-          The original file is no longer available.
-        </p>
+        <p className="text-sm text-slate-500 mt-8">The original file is no longer available.</p>
       )}
       {pdfData && (
-        <Document
-          file={pdfData}
-          onLoadSuccess={({ numPages }) => setNumPages(numPages)}
-        >
-          {Array.from({ length: numPages }, (_, i) => i + 1).map(
-            (pageNumber) => (
-              <div key={pageNumber} className="mb-4 shadow-md">
-                <Page
-                  pageNumber={pageNumber}
-                  width={Math.max(width - 48, 200)}
-                />
-              </div>
-            ),
-          )}
+        <Document file={pdfData} onLoadSuccess={({ numPages }) => setNumPages(numPages)}>
+          {Array.from({ length: numPages }, (_, i) => i + 1).map((pageNumber) => (
+            <div key={pageNumber} className="mb-4 shadow-md">
+              <Page pageNumber={pageNumber} width={Math.max(width - 48, 200)} />
+            </div>
+          ))}
         </Document>
       )}
     </div>

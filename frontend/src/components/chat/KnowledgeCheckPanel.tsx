@@ -29,12 +29,9 @@ const STRATEGY_DESCRIPTION: Record<string, string> = {
 };
 
 const STRATEGY_LINK: Record<string, string> = {
-  faithfulness:
-    "https://docs.ragas.io/en/latest/concepts/metrics/faithfulness/",
-  counterfactual:
-    "https://docs.ragas.io/en/latest/concepts/metrics/context_utilization/",
-  citation_forcing:
-    "https://docs.ragas.io/en/latest/concepts/metrics/answer_relevance/",
+  faithfulness: "https://docs.ragas.io/en/latest/concepts/metrics/faithfulness/",
+  counterfactual: "https://docs.ragas.io/en/latest/concepts/metrics/context_utilization/",
+  citation_forcing: "https://docs.ragas.io/en/latest/concepts/metrics/answer_relevance/",
 };
 
 const STRATEGY_ORDER = ["faithfulness", "citation_forcing", "counterfactual"];
@@ -48,11 +45,7 @@ function ScoreBadge({ score }: { score: number }) {
       : score >= 0.5
         ? "bg-amber-100 text-amber-700"
         : "bg-red-100 text-red-700";
-  return (
-    <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${color}`}>
-      {pct}%
-    </span>
-  );
+  return <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${color}`}>{pct}%</span>;
 }
 
 function ClaimsList({ result }: { result: KnowledgeCheckResult }) {
@@ -99,16 +92,12 @@ function CounterfactualDetail({ result }: { result: KnowledgeCheckResult }) {
           {result.similar ? (
             <>
               <Globe size={12} className="text-amber-500 shrink-0" />
-              <span className="text-amber-700">
-                Answer relies on public knowledge
-              </span>
+              <span className="text-amber-700">Answer relies on public knowledge</span>
             </>
           ) : (
             <>
               <Files size={12} className="text-green-500 shrink-0" />
-              <span className="text-green-700">
-                Answer is grounded in the provided documents
-              </span>
+              <span className="text-green-700">Answer is grounded in the provided documents</span>
             </>
           )}
         </div>
@@ -132,9 +121,7 @@ function CounterfactualDetail({ result }: { result: KnowledgeCheckResult }) {
         <div className="flex gap-1.5 items-start text-slate-600">
           <span
             className={`mt-1 shrink-0 w-1.5 h-1.5 rounded-full ${
-              result.claims[0].status === "SUPPORTED"
-                ? "bg-green-400"
-                : "bg-red-400"
+              result.claims[0].status === "SUPPORTED" ? "bg-green-400" : "bg-red-400"
             }`}
           />
           <span>{result.claims[0].claim}</span>
@@ -144,15 +131,10 @@ function CounterfactualDetail({ result }: { result: KnowledgeCheckResult }) {
   );
 }
 
-export default function KnowledgeCheckPanel({
-  results,
-}: {
-  results: KnowledgeCheckResult[];
-}) {
+export default function KnowledgeCheckPanel({ results }: { results: KnowledgeCheckResult[] }) {
   const [open, setOpen] = useState(false);
   const sorted = [...results].sort(
-    (a, b) =>
-      STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy),
+    (a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy),
   );
   const anyWarning = sorted.some((r) => r.warning);
   const counterfactual = sorted.find((r) => r.strategy === "counterfactual");
@@ -203,30 +185,23 @@ export default function KnowledgeCheckPanel({
                   <div className="relative group inline-flex items-center">
                     <Info size={11} className="text-slate-400 cursor-help" />
                     <div className="absolute bottom-full left-0 mb-2 w-64 bg-white border border-slate-200 rounded-lg shadow-md text-[10px] p-2.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 leading-relaxed">
-                      <p className="text-slate-600">
-                        {STRATEGY_DESCRIPTION[result.strategy]}
-                      </p>
+                      <p className="text-slate-600">{STRATEGY_DESCRIPTION[result.strategy]}</p>
                       <a
                         href={STRATEGY_LINK[result.strategy]}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-1.5 inline-flex items-center gap-1 text-amber-500 hover:text-amber-700 font-medium"
                       >
-                        Learn more about{" "}
-                        {STRATEGY_LABEL[result.strategy] ?? result.strategy}
+                        Learn more about {STRATEGY_LABEL[result.strategy] ?? result.strategy}
                         <ExternalLink size={8} />
                       </a>
                     </div>
                   </div>
                 )}
-                {result.strategy !== "counterfactual" && (
-                  <ScoreBadge score={result.score} />
-                )}
+                {result.strategy !== "counterfactual" && <ScoreBadge score={result.score} />}
               </div>
               {result.warning && (
-                <p className="text-amber-600 bg-amber-50 rounded px-2 py-1">
-                  {result.warning}
-                </p>
+                <p className="text-amber-600 bg-amber-50 rounded px-2 py-1">{result.warning}</p>
               )}
               {result.strategy === "counterfactual" ? (
                 <CounterfactualDetail result={result} />

@@ -45,7 +45,7 @@ function ConversationsPage() {
     } else if (conversations) {
       navigate("/conversations/new", { replace: true });
     }
-  }, [isLoading, navigate, conversations[0].id, conversations.length, conversations]);
+  }, [isLoading, navigate, conversations]);
 
   return (
     <div className="p-8">

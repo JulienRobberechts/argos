@@ -125,7 +125,7 @@ export default function DocumentDetail() {
     (doc.sourceType === "pdf" || doc.sourceType === "markdown" || doc.sourceType === "text");
 
   async function handleDelete() {
-    await deleteDocument.mutateAsync(doc?.id);
+    await deleteDocument.mutateAsync(doc!.id);
     navigate("/documents");
   }
 
