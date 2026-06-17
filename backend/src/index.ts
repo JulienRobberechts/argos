@@ -30,11 +30,16 @@ const envSchema = z.object({
 
 const envResult = envSchema.safeParse(process.env);
 if (!envResult.success) {
-  const missing = envResult.error.issues.map((e) => e.path.join(".")).join(", ");
+  const missing = envResult.error.issues
+    .map((e) => e.path.join("."))
+    .join(", ");
   console.error(`Missing required environment variables: ${missing}`);
   process.exit(1);
 }
 
+validateConfig();
+
+import { validateConfig } from "./config";
 import { apiKeyAuth } from "./api/middleware/apiKeyAuth";
 import { errorHandler } from "./api/middleware/errorHandler";
 import { adminRouter } from "./api/routes/admin";
@@ -119,8 +124,16 @@ const askQuestion = new AskQuestion(
 );
 const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
 const summaryRepo = new PgDocumentSummaryRepository();
-const summarizeDocument = new SummarizeDocument(documentRepo, chunkRepo, summaryRepo, llmAdapter);
-const checkStorageConsistency = new CheckStorageConsistency(documentRepo, fileStorage);
+const summarizeDocument = new SummarizeDocument(
+  documentRepo,
+  chunkRepo,
+  summaryRepo,
+  llmAdapter,
+);
+const checkStorageConsistency = new CheckStorageConsistency(
+  documentRepo,
+  fileStorage,
+);
 const resetAll = new ResetAll(fileStorage, appSettingsService, pool);
 
 const app = express();
@@ -140,7 +153,10 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/config", configRouter(appSettingsService));
-app.use("/api/admin", adminRouter(checkStorageConsistency, appSettingsService, resetAll));
+app.use(
+  "/api/admin",
+  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
+);
 app.use("/api/auth", authRouter());
 
 const apiLimiter = rateLimit({
@@ -164,7 +180,10 @@ app.use(
     summarizeDocument,
   ),
 );
-app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
+app.use(
+  "/api/conversations",
+  conversationsRouter(conversationRepo, askQuestion),
+);
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
