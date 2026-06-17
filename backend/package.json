@@ -12,7 +12,8 @@
     "check": "biome check --write src tests",
     "typecheck": "tsc --noEmit",
     "migrate": "tsx src/infrastructure/db/migrate.ts",
-    "migrate:prod": "node dist/infrastructure/db/migrate.js"
+    "migrate:prod": "node dist/infrastructure/db/migrate.js",
+    "eval": "tsx tests/eval/run.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.104.1",
