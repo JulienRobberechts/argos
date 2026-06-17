@@ -1,6 +1,7 @@
+import type { IAppSettingsRepository } from "../../domain/ports/IAppSettingsRepository";
 import pool from "./pool";
 
-export class PgAppSettingsRepository {
+export class PgAppSettingsRepository implements IAppSettingsRepository {
   async getAll(): Promise<Record<string, string>> {
     const result = await pool.query("SELECT key, value FROM app_settings");
     return Object.fromEntries(
