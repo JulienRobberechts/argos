@@ -16,6 +16,7 @@ function toKey(filePath: string): string {
   return path.basename(filePath);
 }
 
+/** Use case : détecte les fichiers orphelins (storage sans entrée DB) et les fichiers manquants (entrée DB sans fichier). */
 export class CheckStorageConsistency {
   constructor(
     private readonly documentRepo: IDocumentRepository,
@@ -28,7 +29,9 @@ export class CheckStorageConsistency {
       this.fileStorage.list(),
     ]);
 
-    const dbKeys = new Set(docs.flatMap((d) => (d.filePath ? [toKey(d.filePath)] : [])));
+    const dbKeys = new Set(
+      docs.flatMap((d) => (d.filePath ? [toKey(d.filePath)] : [])),
+    );
     const storageSet = new Set(storageKeys.map(toKey));
 
     return {

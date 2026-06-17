@@ -1,9 +1,13 @@
 import type { Pool } from "pg";
 import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
-import type { AppSettingsPatch, AppSettingsService } from "./AppSettingsService";
+import type {
+  AppSettingsPatch,
+  AppSettingsService,
+} from "./AppSettingsService";
 
 const logger = console;
 
+/** Use case : supprime tous les fichiers du storage et tronque toutes les tables, puis applique les nouveaux paramètres si fournis. */
 export class ResetAll {
   constructor(
     private readonly fileStorage: IFileStoragePort,

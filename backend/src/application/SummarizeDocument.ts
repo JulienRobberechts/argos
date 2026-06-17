@@ -6,6 +6,7 @@ import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CONTENT_CHARS = 12000;
 
+/** Use case : génère un résumé LLM à partir des chunks d'un document et le persiste en base. */
 export class SummarizeDocument {
   constructor(
     private readonly documentRepo: IDocumentRepository,
@@ -33,7 +34,9 @@ export class SummarizeDocument {
     this.logger.info(
       `Summarizing document ${documentId} with content length ${content.length} chars, max summary length ${maxChars} chars`,
     );
-    this.logger.debug(`Summarizing document ${documentId} with content : ${content}`);
+    this.logger.debug(
+      `Summarizing document ${documentId} with content : ${content}`,
+    );
 
     const prompt = [
       `Write a concise summary of the document titled "${doc.title}".`,

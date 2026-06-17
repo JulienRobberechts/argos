@@ -16,6 +16,7 @@ import type { ChunkingConfig } from "./AppSettingsService";
 
 const BATCH_SIZE = 20;
 
+/** Use case : parse, découpe en chunks et génère les embeddings d'un document pour le rendre interrogeable. */
 export class IngestDocument {
   private readonly logger = new Logger("IngestDocument");
 
@@ -32,8 +33,11 @@ export class IngestDocument {
     const document = await this.documentRepo.findById(documentId);
     if (!document) throw new Error(`Document ${documentId} not found`);
 
-    const { strategy, chunkSize, chunkOverlap } = await this.getChunkingConfig();
-    const chunkingStrategy = createChunkingStrategy(strategy as ChunkingStrategyName);
+    const { strategy, chunkSize, chunkOverlap } =
+      await this.getChunkingConfig();
+    const chunkingStrategy = createChunkingStrategy(
+      strategy as ChunkingStrategyName,
+    );
 
     this.logger.info("Starting ingestion", {
       documentId,
@@ -78,7 +82,10 @@ export class IngestDocument {
 
       for (let i = 0; i < contents.length; i += BATCH_SIZE) {
         const batch = contents.slice(i, i + BATCH_SIZE);
-        const batchEmbeddings = await this.embeddingAdapter.embedMany(batch, "document");
+        const batchEmbeddings = await this.embeddingAdapter.embedMany(
+          batch,
+          "document",
+        );
         embeddings.push(...batchEmbeddings);
       }
 
@@ -97,7 +104,10 @@ export class IngestDocument {
         chunks: chunks.length,
       });
     } catch (err) {
-      this.logger.error("Ingestion failed", err instanceof Error ? err : new Error(String(err)));
+      this.logger.error(
+        "Ingestion failed",
+        err instanceof Error ? err : new Error(String(err)),
+      );
       await this.documentRepo.updateStatus(documentId, "error");
     }
   }

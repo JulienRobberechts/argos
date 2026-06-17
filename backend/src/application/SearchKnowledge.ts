@@ -1,8 +1,12 @@
-import type { ChunkSearchResult, IChunkRepository } from "../domain/ports/IChunkRepository";
+import type {
+  ChunkSearchResult,
+  IChunkRepository,
+} from "../domain/ports/IChunkRepository";
 import type { IRerankPort } from "../domain/ports/IRerankPort";
 import type { ITextEncoder } from "../domain/ports/ITextEncoder";
 import { Logger } from "../infrastructure/logger/Logger";
 
+/** Use case : recherche les chunks les plus pertinents par vecteur ou en mode hybride, avec reranking optionnel. */
 export class SearchKnowledge {
   private readonly logger = new Logger("SearchKnowledge");
 
@@ -67,8 +71,13 @@ export class SearchKnowledge {
     candidateMultiplier?: number,
     model?: string,
   ): Promise<ChunkSearchResult[]> {
-    const candidateLimit = limit * (candidateMultiplier ?? this.candidateMultiplier);
-    const candidates = await this.chunkRepo.searchByVector(vector, candidateLimit, minScore * 0.5);
+    const candidateLimit =
+      limit * (candidateMultiplier ?? this.candidateMultiplier);
+    const candidates = await this.chunkRepo.searchByVector(
+      vector,
+      candidateLimit,
+      minScore * 0.5,
+    );
 
     if (candidates.length === 0) {
       this.logger.warn("No candidates found for reranking", {

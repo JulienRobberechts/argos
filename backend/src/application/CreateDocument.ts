@@ -11,13 +11,17 @@ export interface CreateDocumentInput {
   title?: string;
 }
 
-function sourceTypeFromMime(mimetype: string, originalname: string): "pdf" | "markdown" | "text" {
+function sourceTypeFromMime(
+  mimetype: string,
+  originalname: string,
+): "pdf" | "markdown" | "text" {
   if (mimetype === "application/pdf") return "pdf";
   const ext = path.extname(originalname).toLowerCase();
   if (ext === ".md" || ext === ".markdown") return "markdown";
   return "text";
 }
 
+/** Use case : upload le fichier brut en storage et persiste l'entrée document en base (statut "pending", avant ingestion). */
 export class CreateDocument {
   constructor(
     private readonly documentRepo: IDocumentRepository,
