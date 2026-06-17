@@ -20,9 +20,18 @@ export function parseCitationForcingResult(
 } {
   const claims: KnowledgeClaim[] = [];
 
-  const sourceRegex = /([^.!?\n]*?)\s*\[SOURCE\s+(\d+)\]/g;
+  // [^\[\]\n] stops at brackets (other markers) and newlines, allowing periods mid-sentence.
+  // Stripping leading/trailing punctuation handles "fact. [SOURCE N]" and "fact [SOURCE N]." equally.
+  const cleanClaim = (raw: string) =>
+    raw
+      .trim()
+      .replace(/^[.!?,;\s]+/, "")
+      .replace(/[.!?]+$/, "")
+      .trim();
+
+  const sourceRegex = /([^\[\]\n]+?)\s*\[SOURCE\s+(\d+)\]/g;
   for (const match of raw.matchAll(sourceRegex)) {
-    const claim = match[1].trim();
+    const claim = cleanClaim(match[1]);
     const sourceIndex = parseInt(match[2], 10) - 1;
     if (claim.length > 0) {
       const chunk = chunks[sourceIndex];
@@ -40,9 +49,9 @@ export function parseCitationForcingResult(
     }
   }
 
-  const ownKnowledgeRegex = /([^.!?\n]*?)\s*\[OWN KNOWLEDGE\]/g;
+  const ownKnowledgeRegex = /([^\[\]\n]+?)\s*\[OWN KNOWLEDGE\]/g;
   for (const match of raw.matchAll(ownKnowledgeRegex)) {
-    const claim = match[1].trim();
+    const claim = cleanClaim(match[1]);
     if (claim.length > 0) {
       claims.push({ claim, status: "UNSUPPORTED" });
     }
