@@ -62,7 +62,7 @@ export default function ColorPalettePage() {
               color: "transparent",
             }}
           >
-            {"ARGOS".split("").map((c, i) => (
+            {"ARGOS".split("").map((c, _i) => (
               <span key={c}>{c}</span>
             ))}
           </span>

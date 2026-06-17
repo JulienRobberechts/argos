@@ -95,7 +95,7 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
             Best for
           </p>
           <ul className="space-y-0.5">
-            {model.bestFor.map((item, i) => (
+            {model.bestFor.map((item, _i) => (
               <li key={item} className="flex items-start gap-1.5 text-xs text-slate-600">
                 <CheckCircle size={11} className="text-green-500 mt-0.5 shrink-0" />
                 {item}
@@ -108,7 +108,7 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
             Limitations
           </p>
           <ul className="space-y-0.5">
-            {model.limitations.map((item, i) => (
+            {model.limitations.map((item, _i) => (
               <li key={item} className="flex items-start gap-1.5 text-xs text-slate-600">
                 <AlertTriangle size={11} className="text-amber-500 mt-0.5 shrink-0" />
                 {item}

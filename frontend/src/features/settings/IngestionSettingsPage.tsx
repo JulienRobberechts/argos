@@ -21,7 +21,13 @@ import type {
 
 // ─── Read-only primitives ─────────────────────────────────────────────────────
 
-function SettingRow({ label, value }: { label: string; value: string | number }) {
+function SettingRow({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number;
+}) {
   return (
     <div className="flex items-center justify-between py-3 border-b border-slate-100 last:border-0">
       <span className="text-sm text-slate-500">{label}</span>
@@ -31,7 +37,11 @@ function SettingRow({ label, value }: { label: string; value: string | number })
 }
 
 function SettingGroup({ children }: { children: React.ReactNode }) {
-  return <div className="rounded-lg border border-slate-200 bg-white px-4">{children}</div>;
+  return (
+    <div className="rounded-lg border border-slate-200 bg-white px-4">
+      {children}
+    </div>
+  );
 }
 
 // ─── Config form (used only in ResetDialog) ───────────────────────────────────
@@ -97,10 +107,14 @@ function NumberInput({
   value: number;
   onChange: (v: number) => void;
 }) {
+  const id = `input-${label.toLowerCase().replace(/\s+/g, "-")}`;
   return (
     <div className="flex flex-col gap-1">
-      <label className="text-xs text-slate-500">{label}</label>
+      <label htmlFor={id} className="text-xs text-slate-500">
+        {label}
+      </label>
       <input
+        id={id}
         type="number"
         value={value}
         min={1}
@@ -111,10 +125,18 @@ function NumberInput({
   );
 }
 
-function DialogSubSection({ title, children }: { title: string; children: React.ReactNode }) {
+function DialogSubSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">{title}</p>
+      <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+        {title}
+      </p>
       {children}
     </div>
   );
@@ -153,7 +175,9 @@ function ConfigForm({
               { value: "recursive", label: "Recursive", available: true },
               { value: "sentence", label: "Sentence", available: true },
             ]}
-            onChange={(v) => onChange({ chunkingStrategy: v as "recursive" | "sentence" })}
+            onChange={(v) =>
+              onChange({ chunkingStrategy: v as "recursive" | "sentence" })
+            }
           />
           <NumberInput
             label="Chunk Size (tokens)"
@@ -188,8 +212,9 @@ function ConfigForm({
 
 function StorageSection({ settings }: { settings: AppSettings }) {
   const label =
-    settings.storage.options.find((o) => o.provider === settings.storage.provider)?.label ??
-    settings.storage.provider;
+    settings.storage.options.find(
+      (o) => o.provider === settings.storage.provider,
+    )?.label ?? settings.storage.provider;
 
   return (
     <SettingGroup>
@@ -200,8 +225,9 @@ function StorageSection({ settings }: { settings: AppSettings }) {
 
 function EmbeddingSection({ settings }: { settings: AppSettings }) {
   const label =
-    settings.embedding.options.find((o) => o.provider === settings.embedding.provider)?.label ??
-    settings.embedding.provider;
+    settings.embedding.options.find(
+      (o) => o.provider === settings.embedding.provider,
+    )?.label ?? settings.embedding.provider;
 
   return (
     <SettingGroup>
@@ -217,7 +243,10 @@ function ChunkingSection({ config }: { config: AppConfig }) {
     <SettingGroup>
       <SettingRow label="Strategy" value={config.rag.chunkingStrategy} />
       <SettingRow label="Chunk Size (tokens)" value={config.rag.chunkSize} />
-      <SettingRow label="Chunk Overlap (tokens)" value={config.rag.chunkOverlap} />
+      <SettingRow
+        label="Chunk Overlap (tokens)"
+        value={config.rag.chunkOverlap}
+      />
     </SettingGroup>
   );
 }
@@ -240,6 +269,7 @@ function ConsistencySection() {
   return (
     <div className="space-y-3">
       <button
+        type="button"
         onClick={check}
         disabled={loading}
         className="flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
@@ -318,7 +348,9 @@ function ResetDialog({
 }) {
   const [step, setStep] = useState<1 | 2>(1);
   const [changeConfig, setChangeConfig] = useState(false);
-  const [form, setForm] = useState<FormState>(() => buildForm(currentSettings, config));
+  const [form, setForm] = useState<FormState>(() =>
+    buildForm(currentSettings, config),
+  );
   const [confirmText, setConfirmText] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -380,12 +412,14 @@ function ResetDialog({
 
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 onClick={onClose}
                 className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={() => setStep(2)}
                 className="px-4 py-2 text-sm bg-slate-700 text-white hover:bg-slate-800 rounded-md transition-colors"
               >
@@ -398,10 +432,13 @@ function ResetDialog({
         {step === 2 && (
           <>
             <div className="flex items-start gap-3 mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-              <AlertTriangle className="text-red-500 shrink-0 mt-0.5" size={18} />
+              <AlertTriangle
+                className="text-red-500 shrink-0 mt-0.5"
+                size={18}
+              />
               <p className="text-sm text-red-700">
-                This action is irreversible. All data (documents, conversations, files) will be
-                permanently deleted.
+                This action is irreversible. All data (documents, conversations,
+                files) will be permanently deleted.
               </p>
             </div>
 
@@ -412,10 +449,15 @@ function ResetDialog({
             )}
 
             <div className="mb-4">
-              <label className="text-sm text-slate-600 mb-1.5 block">
-                Type <span className="font-mono font-semibold">RESET</span> to confirm
+              <label
+                htmlFor="confirm-reset"
+                className="text-sm text-slate-600 mb-1.5 block"
+              >
+                Type <span className="font-mono font-semibold">RESET</span> to
+                confirm
               </label>
               <input
+                id="confirm-reset"
                 type="text"
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
@@ -426,12 +468,14 @@ function ResetDialog({
 
             <div className="flex justify-end gap-2">
               <button
+                type="button"
                 onClick={() => setStep(1)}
                 className="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-md transition-colors"
               >
                 Back
               </button>
               <button
+                type="button"
                 onClick={handleReset}
                 disabled={confirmText !== "RESET" || loading}
                 className="px-4 py-2 text-sm bg-red-600 text-white hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed rounded-md transition-colors flex items-center gap-2"
@@ -451,7 +495,13 @@ function ResetDialog({
 
 // ─── Main Page ────────────────────────────────────────────────────────────────
 
-function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+function SectionCard({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="mb-8">
       <h2 className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">
@@ -462,7 +512,11 @@ function SectionCard({ title, children }: { title: string; children: React.React
   );
 }
 
-export default function AdminSettingsPage({ onClose }: { onClose?: () => void }) {
+export default function AdminSettingsPage({
+  onClose,
+}: {
+  onClose?: () => void;
+}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [showReset, setShowReset] = useState(false);
@@ -497,6 +551,7 @@ export default function AdminSettingsPage({ onClose }: { onClose?: () => void })
         />
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
             className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors mt-1 shrink-0"
           >
@@ -506,7 +561,9 @@ export default function AdminSettingsPage({ onClose }: { onClose?: () => void })
       </div>
 
       {isLoading && <p className="text-slate-400 text-sm">Loading…</p>}
-      {isError && <p className="text-red-500 text-sm">Failed to load configuration.</p>}
+      {isError && (
+        <p className="text-red-500 text-sm">Failed to load configuration.</p>
+      )}
 
       {settings && (
         <>
@@ -531,9 +588,11 @@ export default function AdminSettingsPage({ onClose }: { onClose?: () => void })
           <SectionCard title="Danger Zone">
             <div className="border border-red-200 rounded-lg p-4 bg-red-50">
               <p className="text-sm text-red-700 mb-3">
-                Permanently deletes all data — documents, chunks, conversations, and stored files.
+                Permanently deletes all data — documents, chunks, conversations,
+                and stored files.
               </p>
               <button
+                type="button"
                 onClick={() => setShowReset(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
               >
@@ -545,10 +604,10 @@ export default function AdminSettingsPage({ onClose }: { onClose?: () => void })
         </>
       )}
 
-      {showReset && settings && (
+      {showReset && settings && config && (
         <ResetDialog
           currentSettings={settings}
-          config={config!}
+          config={config}
           onClose={() => setShowReset(false)}
           onSuccess={handleResetSuccess}
         />

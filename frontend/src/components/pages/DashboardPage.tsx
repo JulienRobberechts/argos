@@ -65,7 +65,7 @@ export default function DashboardPage() {
                 color: "transparent",
               }}
             >
-              {"ARGOS".split("").map((char, i) => (
+              {"ARGOS".split("").map((char, _i) => (
                 <span key={char}>{char}</span>
               ))}
             </h1>
