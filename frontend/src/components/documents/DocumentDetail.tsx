@@ -90,7 +90,8 @@ function SummaryTab({ id }: { id: string }) {
 
 export default function DocumentDetail() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const navigate = 
+  useNavigate();
   const deleteDocument = useDeleteDocument();
   const [tab, setTab] = useState<"document" | "details" | "summary">("document");
   const [confirmDelete, setConfirmDelete] = useState(false);
