@@ -114,7 +114,7 @@ describe("SearchKnowledge", () => {
 
     it("should call search (vector only) when searchMode is vector", async () => {
       const queryVec = unitVec(1024, 0);
-      const search = vi.spyOn(chunkRepo, "search");
+      const search = vi.spyOn(chunkRepo, "searchByVector");
       const searchKnowledge = new SearchKnowledge(
         chunkRepo,
         { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
