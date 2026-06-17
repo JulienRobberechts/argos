@@ -16,13 +16,7 @@ function IdCell({ value }: { value: string }) {
   );
 }
 
-function Row({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
+function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-[88px_1fr] items-center py-1.5 border-b border-slate-100 last:border-0">
       <span className="text-[10px] font-medium uppercase tracking-widest text-slate-400">
@@ -93,9 +87,7 @@ export default function SourceCard({ source }: { source: SourceCitation }) {
               />
             </button>
           </div>
-          <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">
-            {source.excerpt}
-          </p>
+          <p className="text-slate-500 text-xs line-clamp-2 leading-relaxed">{source.excerpt}</p>
         </div>
       </div>
       {open && <DebugPanel source={source} />}

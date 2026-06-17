@@ -1,14 +1,6 @@
 import { X } from "lucide-react";
-import type {
-  ConversationParams,
-  KnowledgeCheckStrategy,
-} from "../../types/domain";
-import {
-  Field,
-  LLM_MODELS,
-  RERANK_MODELS,
-  Toggle,
-} from "./ParamsPanelControls";
+import type { ConversationParams, KnowledgeCheckStrategy } from "../../types/domain";
+import { Field, LLM_MODELS, RERANK_MODELS, Toggle } from "./ParamsPanelControls";
 
 export default function ParamsPanel({
   params,
@@ -37,9 +29,7 @@ export default function ParamsPanel({
         <div>
           <p className="text-sm font-semibold text-slate-800">Settings</p>
           <p className="text-[11px] text-slate-400 mt-0.5">
-            {readOnly
-              ? "Read-only · active conversation"
-              : "Applied to the next conversation"}
+            {readOnly ? "Read-only · active conversation" : "Applied to the next conversation"}
           </p>
         </div>
         {onClose && (
@@ -135,11 +125,7 @@ export default function ParamsPanel({
           >
             <Toggle
               checked={params.rerankEnabled ?? false}
-              onChange={
-                readOnly
-                  ? () => {}
-                  : (v) => onChange?.({ ...params, rerankEnabled: v })
-              }
+              onChange={readOnly ? () => {} : (v) => onChange?.({ ...params, rerankEnabled: v })}
               disabled={readOnly}
             />
           </Field>
@@ -155,8 +141,7 @@ export default function ParamsPanel({
                 onChange={
                   readOnly
                     ? undefined
-                    : (e) =>
-                        onChange?.({ ...params, rerankModel: e.target.value })
+                    : (e) => onChange?.({ ...params, rerankModel: e.target.value })
                 }
                 className={selectClass}
               >
@@ -210,9 +195,7 @@ export default function ParamsPanel({
               value={params.llmModel ?? LLM_MODELS[0].value}
               disabled={readOnly}
               onChange={
-                readOnly
-                  ? undefined
-                  : (e) => onChange?.({ ...params, llmModel: e.target.value })
+                readOnly ? undefined : (e) => onChange?.({ ...params, llmModel: e.target.value })
               }
               className={selectClass}
             >
@@ -278,53 +261,47 @@ export default function ParamsPanel({
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">
             Knowledge check
           </p>
-          {(
-            [
-              "faithfulness",
-              "citation_forcing",
-              "counterfactual",
-            ] as KnowledgeCheckStrategy[]
-          ).map((strategy) => {
-            const active = (params.knowledgeCheckStrategies ?? []).includes(
-              strategy,
-            );
-            const labels: Record<KnowledgeCheckStrategy, string> = {
-              faithfulness: "Faithfulness (RAGAS)",
-              counterfactual: "Counterfactual",
-              citation_forcing: "Citation forcing",
-            };
-            const infos: Record<KnowledgeCheckStrategy, string> = {
-              faithfulness:
-                "Checks whether each statement in the answer is supported by the retrieved sources.",
-              counterfactual:
-                "Tests resistance to false context by injecting contradictory information into the sources.",
-              citation_forcing:
-                "Forces the model to cite its sources and verifies that the citations are accurate.",
-            };
-            return (
-              <Field
-                key={strategy}
-                label={labels[strategy]}
-                info={infos[strategy]}
-                techLink="/technical/knowledge-check"
-              >
-                <Toggle
-                  checked={active}
-                  onChange={(v) => {
-                    if (readOnly) return;
-                    const current = params.knowledgeCheckStrategies ?? [];
-                    onChange?.({
-                      ...params,
-                      knowledgeCheckStrategies: v
-                        ? [...current, strategy]
-                        : current.filter((s) => s !== strategy),
-                    });
-                  }}
-                  disabled={readOnly}
-                />
-              </Field>
-            );
-          })}
+          {(["faithfulness", "citation_forcing", "counterfactual"] as KnowledgeCheckStrategy[]).map(
+            (strategy) => {
+              const active = (params.knowledgeCheckStrategies ?? []).includes(strategy);
+              const labels: Record<KnowledgeCheckStrategy, string> = {
+                faithfulness: "Faithfulness (RAGAS)",
+                counterfactual: "Counterfactual",
+                citation_forcing: "Citation forcing",
+              };
+              const infos: Record<KnowledgeCheckStrategy, string> = {
+                faithfulness:
+                  "Checks whether each statement in the answer is supported by the retrieved sources.",
+                counterfactual:
+                  "Tests resistance to false context by injecting contradictory information into the sources.",
+                citation_forcing:
+                  "Forces the model to cite its sources and verifies that the citations are accurate.",
+              };
+              return (
+                <Field
+                  key={strategy}
+                  label={labels[strategy]}
+                  info={infos[strategy]}
+                  techLink="/technical/knowledge-check"
+                >
+                  <Toggle
+                    checked={active}
+                    onChange={(v) => {
+                      if (readOnly) return;
+                      const current = params.knowledgeCheckStrategies ?? [];
+                      onChange?.({
+                        ...params,
+                        knowledgeCheckStrategies: v
+                          ? [...current, strategy]
+                          : current.filter((s) => s !== strategy),
+                      });
+                    }}
+                    disabled={readOnly}
+                  />
+                </Field>
+              );
+            },
+          )}
         </section>
       </div>
     </div>

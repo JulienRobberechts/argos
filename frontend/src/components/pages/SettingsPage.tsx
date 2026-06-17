@@ -51,21 +51,13 @@ function Row({
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-5">
       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
         {title}
       </p>
-      <div className="bg-white border border-slate-200 rounded-lg px-3">
-        {children}
-      </div>
+      <div className="bg-white border border-slate-200 rounded-lg px-3">{children}</div>
     </div>
   );
 }
@@ -94,9 +86,7 @@ export default function SettingsPage({ onClose }: { onClose?: () => void }) {
 
       <div>
         {isLoading && <p className="text-slate-400 text-xs">Loading…</p>}
-        {isError && (
-          <p className="text-red-500 text-xs">Failed to load configuration.</p>
-        )}
+        {isError && <p className="text-red-500 text-xs">Failed to load configuration.</p>}
 
         {config && (
           <>

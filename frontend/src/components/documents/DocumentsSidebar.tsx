@@ -27,9 +27,7 @@ export default function DocumentsSidebar({
         info="Manage documents indexed in the knowledge base. Each document is split into chunks, vectorized and stored for semantic search."
       />
       <div className="mb-4">
-        <DocumentUpload
-          onUploaded={(doc) => navigate(`/documents/${doc.id}`)}
-        />
+        <DocumentUpload onUploaded={(doc) => navigate(`/documents/${doc.id}`)} />
       </div>
       <nav className="flex flex-col gap-1 overflow-y-auto flex-1">
         {documents?.map((doc) => (

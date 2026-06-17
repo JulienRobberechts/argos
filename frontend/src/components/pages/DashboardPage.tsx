@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  Database,
-  FileText,
-  MessageSquare,
-  TrendingUp,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, Database, FileText, MessageSquare, TrendingUp, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useConfig } from "../../hooks/useConfig";
 import { useConversations } from "../../hooks/useConversation";
@@ -20,15 +13,11 @@ import {
 
 export default function DashboardPage() {
   const { data: documents = [], isLoading: docsLoading } = useDocuments();
-  const { data: conversations = [], isLoading: convsLoading } =
-    useConversations();
+  const { data: conversations = [], isLoading: convsLoading } = useConversations();
   const { data: config, isLoading: configLoading } = useConfig();
 
   const readyDocs = documents.filter((d) => d.status === "ready").length;
-  const totalMessages = conversations.reduce(
-    (sum, c) => sum + (c.messageCount ?? 0),
-    0,
-  );
+  const totalMessages = conversations.reduce((sum, c) => sum + (c.messageCount ?? 0), 0);
 
   return (
     <div className="space-y-8">
@@ -36,8 +25,7 @@ export default function DashboardPage() {
       <div
         className="relative overflow-hidden px-8 py-10"
         style={{
-          background:
-            "linear-gradient(135deg, #111827 0%, #1f2937 60%, #374151 100%)",
+          background: "linear-gradient(135deg, #111827 0%, #1f2937 60%, #374151 100%)",
         }}
       >
         {/* Glow circle behind logo */}
@@ -50,11 +38,7 @@ export default function DashboardPage() {
             className="relative h-32 w-32 rounded-full shrink-0 border-[6px] border-[#d97706] bg-white overflow-hidden"
             style={{ boxShadow: "0 0 40px rgba(217,119,6,0.25)" }}
           >
-            <img
-              src="/logo-argos-1.jpg"
-              alt="Argos"
-              className="h-full w-full object-contain"
-            />
+            <img src="/logo-argos-1.jpg" alt="Argos" className="h-full w-full object-contain" />
             <div
               className="absolute inset-0"
               style={{ background: "#374151", mixBlendMode: "color" }}
@@ -74,8 +58,7 @@ export default function DashboardPage() {
                 lineHeight: 1,
                 display: "flex",
                 justifyContent: "space-between",
-                background:
-                  "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
+                background: "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -91,8 +74,7 @@ export default function DashboardPage() {
               style={{
                 textAlign: "justify",
                 textAlignLast: "justify",
-                background:
-                  "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
+                background: "linear-gradient(90deg, #92400e 0%, #d97706 40%, #fcd34d 100%)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -104,9 +86,7 @@ export default function DashboardPage() {
             <p className="mt-3 text-xs italic text-slate-400">
               Turn your documents into an intelligent,
             </p>
-            <p className="text-xs italic text-slate-400">
-              conversational knowledge base.
-            </p>
+            <p className="text-xs italic text-slate-400">conversational knowledge base.</p>
           </div>
         </div>
       </div>
@@ -151,9 +131,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Database size={16} className="text-amber-500" />
-                <h2 className="font-semibold text-slate-800 text-sm">
-                  Recent documents
-                </h2>
+                <h2 className="font-semibold text-slate-800 text-sm">Recent documents</h2>
               </div>
               <Link
                 to="/documents"
@@ -187,9 +165,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MessageSquare size={16} className="text-amber-500" />
-                <h2 className="font-semibold text-slate-800 text-sm">
-                  Recent conversations
-                </h2>
+                <h2 className="font-semibold text-slate-800 text-sm">Recent conversations</h2>
               </div>
               <Link
                 to="/conversations"
@@ -202,10 +178,7 @@ export default function DashboardPage() {
               <p className="text-sm text-slate-400">Loading…</p>
             ) : conversations.length === 0 ? (
               <div className="text-center py-6">
-                <MessageSquare
-                  size={32}
-                  className="text-slate-200 mx-auto mb-2"
-                />
+                <MessageSquare size={32} className="text-slate-200 mx-auto mb-2" />
                 <p className="text-sm text-slate-400">No conversations</p>
                 <Link
                   to="/conversations/new"
@@ -225,9 +198,7 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap size={16} className="text-amber-500" />
-                <h2 className="font-semibold text-slate-800 text-sm">
-                  Active RAG configuration
-                </h2>
+                <h2 className="font-semibold text-slate-800 text-sm">Active RAG configuration</h2>
               </div>
               <Link
                 to="/settings"

@@ -21,8 +21,7 @@ export function useCreateConversation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (params?: Partial<ConversationParams>) =>
-      api.createConversation(params),
+    mutationFn: (params?: Partial<ConversationParams>) => api.createConversation(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },

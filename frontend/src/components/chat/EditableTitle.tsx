@@ -2,13 +2,7 @@ import { Pencil } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useUpdateConversationTitle } from "../../hooks/useConversation";
 
-export default function EditableTitle({
-  id,
-  title,
-}: {
-  id: string;
-  title: string;
-}) {
+export default function EditableTitle({ id, title }: { id: string; title: string }) {
   const [editing, setEditing] = useState(false);
   const [value, setValue] = useState(title);
   const inputRef = useRef<HTMLInputElement>(null);

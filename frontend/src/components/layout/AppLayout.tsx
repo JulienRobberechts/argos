@@ -95,9 +95,7 @@ export default function AppLayout() {
               type="button"
               aria-label="Drag to resize sidebar"
               className={`absolute inset-y-0 left-0 w-1 cursor-col-resize transition-colors focus:outline-none ${
-                isDragging
-                  ? "bg-amber-400"
-                  : "hover:bg-amber-400 bg-transparent"
+                isDragging ? "bg-amber-400" : "hover:bg-amber-400 bg-transparent"
               }`}
               onMouseDown={handleMouseDown}
             />

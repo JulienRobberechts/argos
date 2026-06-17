@@ -12,9 +12,7 @@ export default function DocumentList() {
 
   if (!documents?.length) {
     return (
-      <div className="text-sm text-slate-500">
-        No documents yet. Upload one to get started.
-      </div>
+      <div className="text-sm text-slate-500">No documents yet. Upload one to get started.</div>
     );
   }
 
@@ -27,9 +25,7 @@ export default function DocumentList() {
         >
           <div className="flex items-center gap-3 min-w-0">
             <DocumentTypeIcon sourceType={doc.sourceType} />
-            <span className="text-sm font-medium text-slate-800 truncate">
-              {doc.title}
-            </span>
+            <span className="text-sm font-medium text-slate-800 truncate">{doc.title}</span>
             <DocumentStatusBadge status={doc.status} />
           </div>
           <button

@@ -14,9 +14,7 @@ export default function PageHeader({ icon, title, info }: PageHeaderProps) {
     <div className="mb-6">
       <div className="flex items-center gap-3">
         {icon}
-        <h1 className="text-2xl font-bold text-slate-800 font-audiowide">
-          {title}
-        </h1>
+        <h1 className="text-2xl font-bold text-slate-800 font-audiowide">{title}</h1>
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}

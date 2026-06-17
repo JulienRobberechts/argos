@@ -1,11 +1,7 @@
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import type {
-  KnowledgeCheckResult,
-  Message,
-  SourceCitation,
-} from "../../types/domain";
+import type { KnowledgeCheckResult, Message, SourceCitation } from "../../types/domain";
 import KnowledgeCheckPanel from "./KnowledgeCheckPanel";
 import SourceCard from "./SourceCard";
 import StreamingMessage from "./StreamingMessage";
