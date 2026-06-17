@@ -12,7 +12,7 @@ export function useConversations() {
 export function useConversation(id: string | null) {
   return useQuery({
     queryKey: ["conversations", id],
-    queryFn: () => api.getConversation(id!),
+    queryFn: () => api.getConversation(id as string),
     enabled: id !== null,
   });
 }
@@ -21,7 +21,8 @@ export function useCreateConversation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (params?: Partial<ConversationParams>) => api.createConversation(params),
+    mutationFn: (params?: Partial<ConversationParams>) =>
+      api.createConversation(params),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     },

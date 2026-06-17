@@ -32,7 +32,9 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
       <div className="flex items-start justify-between mb-3">
         <div>
           <p className="font-semibold text-slate-900 text-sm">{model.name}</p>
-          <code className="text-[11px] text-slate-400 font-mono">{model.id}</code>
+          <code className="text-[11px] text-slate-400 font-mono">
+            {model.id}
+          </code>
         </div>
         <TierBadge tier={model.tier} />
       </div>
@@ -41,25 +43,29 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
         <div className="flex items-center gap-1.5 text-slate-600">
           <Layers size={12} className="text-slate-400 shrink-0" />
           <span>
-            Context: <strong className="text-slate-800">{model.contextWindow}</strong>
+            Context:{" "}
+            <strong className="text-slate-800">{model.contextWindow}</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-slate-600">
           <ArrowRight size={12} className="text-slate-400 shrink-0" />
           <span>
-            Max output: <strong className="text-slate-800">{model.maxOutput}</strong>
+            Max output:{" "}
+            <strong className="text-slate-800">{model.maxOutput}</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-slate-600">
           <DollarSign size={12} className="text-slate-400 shrink-0" />
           <span>
-            Input: <strong className="text-slate-800">{model.inputPrice}/MTok</strong>
+            Input:{" "}
+            <strong className="text-slate-800">{model.inputPrice}/MTok</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-slate-600">
           <DollarSign size={12} className="text-slate-400 shrink-0" />
           <span>
-            Output: <strong className="text-slate-800">{model.outputPrice}/MTok</strong>
+            Output:{" "}
+            <strong className="text-slate-800">{model.outputPrice}/MTok</strong>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-slate-600">
@@ -71,7 +77,8 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
         <div className="flex items-center gap-1.5 text-slate-600">
           <Brain size={12} className="text-slate-400 shrink-0" />
           <span>
-            Cutoff: <strong className="text-slate-800">{model.knowledgeCutoff}</strong>
+            Cutoff:{" "}
+            <strong className="text-slate-800">{model.knowledgeCutoff}</strong>
           </span>
         </div>
       </div>
@@ -96,8 +103,14 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
           </p>
           <ul className="space-y-0.5">
             {model.bestFor.map((item, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
-                <CheckCircle size={11} className="text-green-500 mt-0.5 shrink-0" />
+              <li
+                key={item}
+                className="flex items-start gap-1.5 text-xs text-slate-600"
+              >
+                <CheckCircle
+                  size={11}
+                  className="text-green-500 mt-0.5 shrink-0"
+                />
                 {item}
               </li>
             ))}
@@ -109,8 +122,14 @@ export default function ModelCard({ model }: { model: ModelSpec }) {
           </p>
           <ul className="space-y-0.5">
             {model.limitations.map((item, i) => (
-              <li key={i} className="flex items-start gap-1.5 text-xs text-slate-600">
-                <AlertTriangle size={11} className="text-amber-500 mt-0.5 shrink-0" />
+              <li
+                key={item}
+                className="flex items-start gap-1.5 text-xs text-slate-600"
+              >
+                <AlertTriangle
+                  size={11}
+                  className="text-amber-500 mt-0.5 shrink-0"
+                />
                 {item}
               </li>
             ))}

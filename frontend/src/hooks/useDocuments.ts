@@ -30,7 +30,7 @@ export function useUploadDocument() {
 export function useDocumentChunks(id: string | undefined) {
   return useQuery({
     queryKey: ["documents", id, "chunks"],
-    queryFn: () => api.getDocumentChunks(id!),
+    queryFn: () => api.getDocumentChunks(id as string),
     enabled: !!id,
   });
 }
@@ -49,7 +49,7 @@ export function useDeleteDocument() {
 export function useDocumentSummary(id: string | undefined) {
   return useQuery({
     queryKey: ["documents", id, "summary"],
-    queryFn: () => api.getDocumentSummary(id!),
+    queryFn: () => api.getDocumentSummary(id as string),
     enabled: !!id,
     retry: false,
   });

@@ -32,6 +32,7 @@ function TrashIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <polyline points="3 6 5 6 21 6" />
       <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
@@ -53,6 +54,7 @@ function SummaryTab({ id }: { id: string }) {
             {summary.content.length.toLocaleString()} characters
           </p>
           <button
+            type="button"
             onClick={() => generateSummary.mutate(id)}
             disabled={generateSummary.isPending}
             className="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 disabled:opacity-50 transition-colors"
@@ -67,6 +69,7 @@ function SummaryTab({ id }: { id: string }) {
           <div className="flex flex-col items-center justify-center h-full gap-3">
             <p className="text-sm text-slate-500">No summary yet.</p>
             <button
+              type="button"
               onClick={() => generateSummary.mutate(id)}
               disabled={generateSummary.isPending}
               className="px-4 py-2 text-xs font-medium text-white bg-slate-900 rounded-md hover:bg-slate-700 disabled:opacity-50 transition-colors"
@@ -89,16 +92,20 @@ export default function DocumentDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const deleteDocument = useDeleteDocument();
-  const [tab, setTab] = useState<"document" | "details" | "summary">("document");
+  const [tab, setTab] = useState<"document" | "details" | "summary">(
+    "document",
+  );
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { data: doc, isLoading } = useQuery({
     queryKey: ["documents", id],
-    queryFn: () => api.getDocument(id!),
+    queryFn: () => api.getDocument(id as string),
     enabled: !!id,
   });
 
-  const { data: chunks } = useDocumentChunks(doc?.status === "ready" ? id : undefined);
+  const { data: chunks } = useDocumentChunks(
+    doc?.status === "ready" ? id : undefined,
+  );
   const charCount = chunks?.reduce((sum, c) => sum + c.contentLength, 0);
   const chunkCount = chunks?.length;
 
@@ -119,7 +126,9 @@ export default function DocumentDetail() {
 
   const canPreview =
     doc.status === "ready" &&
-    (doc.sourceType === "pdf" || doc.sourceType === "markdown" || doc.sourceType === "text");
+    (doc.sourceType === "pdf" ||
+      doc.sourceType === "markdown" ||
+      doc.sourceType === "text");
 
   async function handleDelete() {
     await deleteDocument.mutateAsync(doc?.id);
@@ -152,6 +161,7 @@ export default function DocumentDetail() {
             <div className="flex items-center gap-2 shrink-0 ml-4">
               <span className="text-xs text-slate-500">Delete?</span>
               <button
+                type="button"
                 onClick={() => void handleDelete()}
                 disabled={deleteDocument.isPending}
                 className="px-2.5 py-1 text-xs font-medium text-white bg-red-500 rounded-md hover:bg-red-600 disabled:opacity-50 transition-colors"
@@ -159,6 +169,7 @@ export default function DocumentDetail() {
                 {deleteDocument.isPending ? "…" : "Confirm"}
               </button>
               <button
+                type="button"
                 onClick={() => setConfirmDelete(false)}
                 className="px-2.5 py-1 text-xs font-medium text-slate-600 bg-slate-100 rounded-md hover:bg-slate-200 transition-colors"
               >
@@ -167,6 +178,7 @@ export default function DocumentDetail() {
             </div>
           ) : (
             <button
+              type="button"
               onClick={() => setConfirmDelete(true)}
               className="shrink-0 ml-4 p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
               title="Delete document"
@@ -179,6 +191,7 @@ export default function DocumentDetail() {
         <div className="flex">
           {canPreview && (
             <button
+              type="button"
               onClick={() => setTab("document")}
               className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "document" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}
             >
@@ -186,6 +199,7 @@ export default function DocumentDetail() {
             </button>
           )}
           <button
+            type="button"
             onClick={() => setTab("details")}
             className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "details" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}
           >
@@ -193,6 +207,7 @@ export default function DocumentDetail() {
           </button>
           {doc.status === "ready" && (
             <button
+              type="button"
               onClick={() => setTab("summary")}
               className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${tab === "summary" ? "border-slate-900 text-slate-900" : "border-transparent text-slate-500 hover:text-slate-700"}`}
             >
@@ -205,13 +220,15 @@ export default function DocumentDetail() {
       <div className="flex-1 overflow-hidden">
         {tab === "document" && canPreview && (
           <>
-            {doc.sourceType === "pdf" && <PdfViewer id={id!} />}
-            {doc.sourceType === "markdown" && <MarkdownViewer id={id!} />}
-            {doc.sourceType === "text" && <TextViewer id={id!} />}
+            {doc.sourceType === "pdf" && <PdfViewer id={id as string} />}
+            {doc.sourceType === "markdown" && (
+              <MarkdownViewer id={id as string} />
+            )}
+            {doc.sourceType === "text" && <TextViewer id={id as string} />}
           </>
         )}
 
-        {tab === "summary" && <SummaryTab id={id!} />}
+        {tab === "summary" && <SummaryTab id={id as string} />}
 
         {tab === "details" && (
           <div className="h-full overflow-y-auto p-6">
@@ -243,23 +260,33 @@ export default function DocumentDetail() {
               </div>
               <dl>
                 <div className="flex items-center px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Type</dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
+                    Type
+                  </dt>
                   <dd className="text-xs text-slate-800">
                     {sourceTypeLabel[doc.sourceType] ?? doc.sourceType}
                   </dd>
                 </div>
                 <div className="flex items-center px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Status</dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
+                    Status
+                  </dt>
                   <dd>
                     <DocumentStatusBadge status={doc.status} />
                   </dd>
                 </div>
                 <div className="flex items-start px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0 mt-0.5">ID</dt>
-                  <dd className="text-xs text-slate-500 font-mono break-all">{doc.id}</dd>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0 mt-0.5">
+                    ID
+                  </dt>
+                  <dd className="text-xs text-slate-500 font-mono break-all">
+                    {doc.id}
+                  </dd>
                 </div>
                 <div className="flex items-center px-4 py-3 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Added on</dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
+                    Added on
+                  </dt>
                   <dd className="text-xs text-slate-800">
                     {new Date(doc.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",

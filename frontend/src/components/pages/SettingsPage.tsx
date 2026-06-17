@@ -23,6 +23,7 @@ function Row({
         <div className="flex items-center gap-1.5">
           <span className="text-xs text-slate-600">{label}</span>
           <button
+            type="button"
             onClick={() => setOpen((v) => !v)}
             className="text-slate-300 hover:text-[#d97706] transition-colors"
             aria-label={`About: ${label}`}
@@ -50,13 +51,21 @@ function Row({
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="mb-5">
       <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
         {title}
       </p>
-      <div className="bg-white border border-slate-200 rounded-lg px-3">{children}</div>
+      <div className="bg-white border border-slate-200 rounded-lg px-3">
+        {children}
+      </div>
     </div>
   );
 }
@@ -74,6 +83,7 @@ export default function SettingsPage({ onClose }: { onClose?: () => void }) {
         />
         {onClose && (
           <button
+            type="button"
             onClick={onClose}
             className="p-1 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors mt-1 shrink-0"
           >
@@ -84,7 +94,9 @@ export default function SettingsPage({ onClose }: { onClose?: () => void }) {
 
       <div>
         {isLoading && <p className="text-slate-400 text-xs">Loading…</p>}
-        {isError && <p className="text-red-500 text-xs">Failed to load configuration.</p>}
+        {isError && (
+          <p className="text-red-500 text-xs">Failed to load configuration.</p>
+        )}
 
         {config && (
           <>

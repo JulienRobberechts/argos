@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Outlet, useLocation, useMatch } from "react-router-dom";
+import { Outlet, useMatch } from "react-router-dom";
 import AdminSettingsPage from "../../features/settings/IngestionSettingsPage";
 import DocumentsSidebar from "../documents/DocumentsSidebar";
 import IconNav from "./IconNav";
@@ -19,7 +19,6 @@ export default function AppLayout() {
   const matchDocumentId = useMatch("/documents/:id");
   const onDocuments = matchDocuments ?? matchDocumentId;
 
-  const { pathname } = useLocation();
   const mainRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -92,13 +91,18 @@ export default function AppLayout() {
             </div>
           </div>
           <div className="relative shrink-0 w-2 flex items-start">
-            <div
-              className={`absolute inset-y-0 left-0 w-1 cursor-col-resize transition-colors ${
-                isDragging ? "bg-amber-400" : "hover:bg-amber-400 bg-transparent"
+            <button
+              type="button"
+              aria-label="Drag to resize sidebar"
+              className={`absolute inset-y-0 left-0 w-1 cursor-col-resize transition-colors focus:outline-none ${
+                isDragging
+                  ? "bg-amber-400"
+                  : "hover:bg-amber-400 bg-transparent"
               }`}
               onMouseDown={handleMouseDown}
             />
             <button
+              type="button"
               onClick={() => setCollapsed((c) => !c)}
               title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
               className="absolute top-5 -right-2.5 z-10 flex items-center justify-center w-5 h-5 bg-white border border-slate-200 rounded-full shadow-sm hover:bg-slate-50 cursor-pointer"

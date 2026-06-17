@@ -18,27 +18,38 @@ type Phase = "setup" | "quiz" | "results";
 
 const QUESTION_COUNTS = [5, 10, 15];
 
-function SetupScreen({ onStart }: { onStart: (documentIds: string[], count: number) => void }) {
+function SetupScreen({
+  onStart,
+}: {
+  onStart: (documentIds: string[], count: number) => void;
+}) {
   const { data: documents = [], isLoading } = useDocuments();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [count, setCount] = useState(5);
   const ready = documents.filter((d) => d.status === "ready");
 
   function toggleDoc(id: string) {
-    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
+    );
   }
 
   return (
     <div className="max-w-lg space-y-6">
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-5">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">
-            Documents <span className="text-slate-400 font-normal">(select one or more)</span>
-          </label>
+          <p className="text-sm font-medium text-slate-700">
+            Documents{" "}
+            <span className="text-slate-400 font-normal">
+              (select one or more)
+            </span>
+          </p>
           {isLoading ? (
             <p className="text-sm text-slate-400">Loading documents…</p>
           ) : ready.length === 0 ? (
-            <p className="text-sm text-slate-400">No indexed documents. Import documents first.</p>
+            <p className="text-sm text-slate-400">
+              No indexed documents. Import documents first.
+            </p>
           ) : (
             <div className="space-y-1 max-h-48 overflow-y-auto">
               {ready.map((doc) => {
@@ -67,11 +78,14 @@ function SetupScreen({ onStart }: { onStart: (documentIds: string[], count: numb
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Number of questions</label>
+          <p className="text-sm font-medium text-slate-700">
+            Number of questions
+          </p>
           <div className="flex gap-2">
             {QUESTION_COUNTS.map((n) => (
               <button
                 key={n}
+                type="button"
                 onClick={() => setCount(n)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium border transition-colors ${
                   count === n
@@ -86,6 +100,7 @@ function SetupScreen({ onStart }: { onStart: (documentIds: string[], count: numb
         </div>
 
         <button
+          type="button"
           onClick={() => onStart(selectedIds, count)}
           disabled={selectedIds.length === 0}
           className="w-full py-2.5 bg-[#d97706] text-white rounded-lg text-sm font-medium hover:bg-[#b45309] disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
@@ -115,7 +130,7 @@ function QuizScreen({
   const progress = ((index + 1) / questions.length) * 100;
 
   function next() {
-    const newAnswers = [...answers, selected!];
+    const newAnswers = [...answers, selected as number];
     if (isLast) {
       onFinish(newAnswers);
     } else {
@@ -139,7 +154,9 @@ function QuizScreen({
         />
       </div>
       <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <p className="text-slate-800 font-medium leading-snug">{question.text}</p>
+        <p className="text-slate-800 font-medium leading-snug">
+          {question.text}
+        </p>
         <div className="space-y-2">
           {question.options.map((option, i) => {
             let style =
@@ -147,14 +164,16 @@ function QuizScreen({
             if (confirmed) {
               if (i === question.correctIndex)
                 style = "border border-green-400 bg-green-50 text-green-800";
-              else if (i === selected) style = "border border-red-400 bg-red-50 text-red-700";
+              else if (i === selected)
+                style = "border border-red-400 bg-red-50 text-red-700";
               else style = "border border-slate-100 text-slate-400";
             } else if (i === selected) {
               style = "border border-amber-400 bg-amber-50 text-[#92400e]";
             }
             return (
               <button
-                key={i}
+                key={option}
+                type="button"
                 onClick={() => !confirmed && setSelected(i)}
                 disabled={confirmed}
                 className={`w-full text-left px-4 py-3 rounded-lg text-sm transition-colors flex items-center gap-3 ${style}`}
@@ -164,10 +183,16 @@ function QuizScreen({
                 </span>
                 <span>{option}</span>
                 {confirmed && i === question.correctIndex && (
-                  <CheckCircle size={14} className="ml-auto text-green-500 shrink-0" />
+                  <CheckCircle
+                    size={14}
+                    className="ml-auto text-green-500 shrink-0"
+                  />
                 )}
                 {confirmed && i === selected && i !== question.correctIndex && (
-                  <XCircle size={14} className="ml-auto text-red-400 shrink-0" />
+                  <XCircle
+                    size={14}
+                    className="ml-auto text-red-400 shrink-0"
+                  />
                 )}
               </button>
             );
@@ -175,6 +200,7 @@ function QuizScreen({
         </div>
         {confirmed && (
           <button
+            type="button"
             onClick={next}
             className="w-full py-2.5 bg-[#1f2937] text-white rounded-lg text-sm font-medium hover:bg-[#374151] transition-colors flex items-center justify-center gap-2"
           >
@@ -196,9 +222,16 @@ function ResultsScreen({
   answers: number[];
   onRestart: () => void;
 }) {
-  const correct = answers.filter((a, i) => a === questions[i].correctIndex).length;
+  const correct = answers.filter(
+    (a, i) => a === questions[i].correctIndex,
+  ).length;
   const pct = Math.round((correct / questions.length) * 100);
-  const color = pct >= 80 ? "text-green-600" : pct >= 50 ? "text-[#d97706]" : "text-red-500";
+  const color =
+    pct >= 80
+      ? "text-green-600"
+      : pct >= 50
+        ? "text-[#d97706]"
+        : "text-red-500";
 
   return (
     <div className="max-w-xl space-y-5">
@@ -211,6 +244,7 @@ function ResultsScreen({
           </p>
         </div>
         <button
+          type="button"
           onClick={onRestart}
           className="mt-2 flex items-center gap-2 mx-auto px-4 py-2 border border-slate-200 rounded-lg text-sm text-slate-600 hover:bg-slate-50 transition-colors"
         >
@@ -223,12 +257,15 @@ function ResultsScreen({
           const isCorrect = answers[i] === q.correctIndex;
           return (
             <div
-              key={i}
+              key={q.text}
               className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 space-y-2"
             >
               <div className="flex items-start gap-2">
                 {isCorrect ? (
-                  <CheckCircle size={16} className="text-green-500 shrink-0 mt-0.5" />
+                  <CheckCircle
+                    size={16}
+                    className="text-green-500 shrink-0 mt-0.5"
+                  />
                 ) : (
                   <XCircle size={16} className="text-red-400 shrink-0 mt-0.5" />
                 )}
@@ -238,7 +275,9 @@ function ResultsScreen({
                 <p className="text-xs text-slate-500 pl-6">
                   <span className="text-red-500">Your answer: </span>
                   {q.options[answers[i]]}
-                  <span className="text-green-600 ml-2">✓ {q.options[q.correctIndex]}</span>
+                  <span className="text-green-600 ml-2">
+                    ✓ {q.options[q.correctIndex]}
+                  </span>
                 </p>
               )}
             </div>
@@ -259,8 +298,13 @@ export default function QuizPage() {
     isPending,
     error,
   } = useMutation({
-    mutationFn: ({ documentIds, count }: { documentIds: string[]; count: number }) =>
-      api.generateQuiz(documentIds, count),
+    mutationFn: ({
+      documentIds,
+      count,
+    }: {
+      documentIds: string[];
+      count: number;
+    }) => api.generateQuiz(documentIds, count),
     onSuccess: (data) => {
       setQuestions(data.questions);
       setPhase("quiz");
@@ -284,10 +328,14 @@ export default function QuizPage() {
           <p className="text-sm text-red-500">
             {error instanceof Error ? error.message : "Generation failed"}
           </p>
-          <SetupScreen onStart={(ids, count) => generate({ documentIds: ids, count })} />
+          <SetupScreen
+            onStart={(ids, count) => generate({ documentIds: ids, count })}
+          />
         </div>
       ) : phase === "setup" ? (
-        <SetupScreen onStart={(ids, count) => generate({ documentIds: ids, count })} />
+        <SetupScreen
+          onStart={(ids, count) => generate({ documentIds: ids, count })}
+        />
       ) : phase === "quiz" ? (
         <QuizScreen
           questions={questions}

@@ -27,14 +27,17 @@ export default function DocumentsSidebar({
         info="Manage documents indexed in the knowledge base. Each document is split into chunks, vectorized and stored for semantic search."
       />
       <div className="mb-4">
-        <DocumentUpload onUploaded={(doc) => navigate(`/documents/${doc.id}`)} />
+        <DocumentUpload
+          onUploaded={(doc) => navigate(`/documents/${doc.id}`)}
+        />
       </div>
       <nav className="flex flex-col gap-1 overflow-y-auto flex-1">
         {documents?.map((doc) => (
-          <div
+          <button
             key={doc.id}
+            type="button"
             onClick={() => navigate(`/documents/${doc.id}`)}
-            className={`group flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer ${
+            className={`group w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm cursor-pointer text-left ${
               activeId === doc.id
                 ? "bg-amber-50 text-[#92400e] font-medium border border-amber-200"
                 : "text-slate-600 hover:bg-slate-50"
@@ -45,7 +48,7 @@ export default function DocumentsSidebar({
               <span className="truncate">{doc.title}</span>
               <DocumentStatusBadge status={doc.status} />
             </div>
-          </div>
+          </button>
         ))}
         {!documents?.length && (
           <p className="text-xs text-slate-400 px-3 py-2">No documents yet.</p>
@@ -54,6 +57,7 @@ export default function DocumentsSidebar({
       {onToggleSettings && (
         <div className="mt-2 pt-2 border-t border-slate-100">
           <button
+            type="button"
             onClick={onToggleSettings}
             className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg transition-colors ${
               showSettings

@@ -1,6 +1,9 @@
 import { MessageSquare } from "lucide-react";
 import { Link, useMatch, useNavigate } from "react-router-dom";
-import { useConversations, useDeleteConversation } from "../../hooks/useConversation";
+import {
+  useConversations,
+  useDeleteConversation,
+} from "../../hooks/useConversation";
 import PageHeader from "../ui/PageHeader";
 
 export default function Sidebar() {
@@ -33,6 +36,7 @@ export default function Sidebar() {
         info="Ask questions about your documents. The system retrieves relevant passages and generates a contextual answer."
       />
       <button
+        type="button"
         onClick={() => navigate("/conversations/new")}
         className="w-full mb-4 px-3 py-2 bg-[#1f2937] text-white rounded-lg text-sm font-medium hover:bg-[#374151] transition-colors"
       >
@@ -56,6 +60,7 @@ export default function Sidebar() {
               <span className="truncate">{conv.title}</span>
             </Link>
             <button
+              type="button"
               onClick={(e) => void handleDelete(e, conv.id)}
               className="hidden group-hover:block ml-2 text-slate-300 hover:text-red-400"
             >
