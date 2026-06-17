@@ -52,20 +52,7 @@ export class IngestDocument {
       const key = document.filePath;
       if (!key) throw new Error(`Document ${documentId} has no file`);
 
-      const buffer = await this.fileStorage.download(key);
-      const ext = path.extname(key);
-      const tempPath = path.join(os.tmpdir(), `ingest-${documentId}${ext}`);
-      await fs.promises.writeFile(tempPath, buffer);
-
-      let rawText: string;
-      try {
-        const parsed = await this.fileParser.parse(tempPath);
-        rawText = parsed.text;
-      } finally {
-        await fs.promises.unlink(tempPath).catch(() => {});
-      }
-
-      const text = rawText.replaceAll("\x00", "");
+      const text = await this.downloadAndParseFile(documentId, key);
       const chunkResults = chunkingStrategy.chunk(text, {
         chunkSize,
         chunkOverlap,
@@ -76,17 +63,9 @@ export class IngestDocument {
         chunks: chunkResults.length,
       });
 
-      const contents = chunkResults.map((r) => r.content);
-      const embeddings: number[][] = [];
-
-      for (let i = 0; i < contents.length; i += BATCH_SIZE) {
-        const batch = contents.slice(i, i + BATCH_SIZE);
-        const batchEmbeddings = await this.embeddingAdapter.embedMany(
-          batch,
-          "document",
-        );
-        embeddings.push(...batchEmbeddings);
-      }
+      const embeddings = await this.generateEmbeddingsBatched(
+        chunkResults.map((r) => r.content),
+      );
 
       const chunks = chunkResults.map((result, index) => ({
         id: randomUUID(),
@@ -109,5 +88,40 @@ export class IngestDocument {
       );
       await this.documentRepo.updateStatus(documentId, "error");
     }
+  }
+
+  private async downloadAndParseFile(
+    documentId: string,
+    key: string,
+  ): Promise<string> {
+    const buffer = await this.fileStorage.download(key);
+    const ext = path.extname(key);
+    const tempPath = path.join(os.tmpdir(), `ingest-${documentId}${ext}`);
+    await fs.promises.writeFile(tempPath, buffer);
+
+    let rawText: string;
+    try {
+      const parsed = await this.fileParser.parse(tempPath);
+      rawText = parsed.text;
+    } finally {
+      await fs.promises.unlink(tempPath).catch(() => {});
+    }
+
+    return rawText.replaceAll("\x00", "");
+  }
+
+  private async generateEmbeddingsBatched(
+    contents: string[],
+  ): Promise<number[][]> {
+    const embeddings: number[][] = [];
+    for (let i = 0; i < contents.length; i += BATCH_SIZE) {
+      const batch = contents.slice(i, i + BATCH_SIZE);
+      const batchEmbeddings = await this.embeddingAdapter.embedMany(
+        batch,
+        "document",
+      );
+      embeddings.push(...batchEmbeddings);
+    }
+    return embeddings;
   }
 }

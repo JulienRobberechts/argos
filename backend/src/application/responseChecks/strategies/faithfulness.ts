@@ -7,16 +7,13 @@ import type { ILogger } from "../../../domain/ports/ILogger";
 import type { ILLMPort } from "../../../domain/ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
-export async function checkFaithfulness(
-  llm: ILLMPort,
-  logger: ILogger,
+function buildFaithfulnessPrompt(
   query: string,
   answer: string,
   chunks: ChunkSearchResult[],
-  titleById: Map<string, string>,
-): Promise<KnowledgeCheckResult> {
+): string {
   const sourcesText = chunks.map((c) => c.chunk.content).join("\n---\n");
-  const prompt = [
+  return [
     `Question: "${query}"`,
     "",
     "Sources provided:",
@@ -28,6 +25,44 @@ export async function checkFaithfulness(
     "Reply ONLY with valid JSON in this exact format:",
     '{"claims": [{"claim": "...", "status": "SUPPORTED|UNSUPPORTED", "sourceExcerpt": "exact quote or null"}]}',
   ].join("\n");
+}
+
+function resolveKnowledgeClaim(
+  c: { claim: string; status: string; sourceExcerpt?: string | null },
+  chunks: ChunkSearchResult[],
+  titleById: Map<string, string>,
+): KnowledgeClaim {
+  const excerpt = c.sourceExcerpt ?? undefined;
+  let documentId: string | undefined;
+  let documentTitle: string | undefined;
+  if (excerpt) {
+    const needle = excerpt.slice(0, 60).toLowerCase();
+    const matched = chunks.find((ch) =>
+      ch.chunk.content.toLowerCase().includes(needle),
+    );
+    if (matched) {
+      documentId = matched.chunk.documentId;
+      documentTitle = titleById.get(documentId) ?? documentId;
+    }
+  }
+  return {
+    claim: c.claim,
+    status: c.status === "SUPPORTED" ? "SUPPORTED" : "UNSUPPORTED",
+    sourceExcerpt: excerpt,
+    documentId,
+    documentTitle,
+  };
+}
+
+export async function checkFaithfulness(
+  llm: ILLMPort,
+  logger: ILogger,
+  query: string,
+  answer: string,
+  chunks: ChunkSearchResult[],
+  titleById: Map<string, string>,
+): Promise<KnowledgeCheckResult> {
+  const prompt = buildFaithfulnessPrompt(query, answer, chunks);
 
   logger.info("Faithfulness check starting", {
     query,
@@ -63,28 +98,9 @@ export async function checkFaithfulness(
     }>;
   };
 
-  const claims: KnowledgeClaim[] = parsed.claims.map((c) => {
-    const excerpt = c.sourceExcerpt ?? undefined;
-    let documentId: string | undefined;
-    let documentTitle: string | undefined;
-    if (excerpt) {
-      const needle = excerpt.slice(0, 60).toLowerCase();
-      const matched = chunks.find((ch) =>
-        ch.chunk.content.toLowerCase().includes(needle),
-      );
-      if (matched) {
-        documentId = matched.chunk.documentId;
-        documentTitle = titleById.get(documentId) ?? documentId;
-      }
-    }
-    return {
-      claim: c.claim,
-      status: c.status === "SUPPORTED" ? "SUPPORTED" : "UNSUPPORTED",
-      sourceExcerpt: excerpt,
-      documentId,
-      documentTitle,
-    };
-  });
+  const claims: KnowledgeClaim[] = parsed.claims.map((c) =>
+    resolveKnowledgeClaim(c, chunks, titleById),
+  );
 
   const supported = claims.filter((c) => c.status === "SUPPORTED").length;
   const score = claims.length > 0 ? supported / claims.length : 1;

@@ -96,25 +96,55 @@ export class AskQuestion {
 
     const strategies: KnowledgeCheckStrategy[] =
       params?.knowledgeCheckStrategies ?? [];
-    const useCitationForcing = strategies.includes("citation_forcing");
-
     const prompt = this.buildPrompt(
       userContent,
       searchResults,
       history,
-      useCitationForcing,
+      strategies.includes("citation_forcing"),
     );
 
-    let rawContent: string;
-    try {
-      rawContent = await this.llmAdapter.stream(prompt, onToken, signal, {
+    const streamResult = await this.streamLLMResponse(
+      conversationId,
+      prompt,
+      onToken,
+      signal,
+      {
         model: params?.llmModel,
         temperature: params?.llmTemperature,
         maxTokens: params?.llmMaxTokens,
+      },
+    );
+    if (!streamResult.ok) return streamResult.message;
+
+    return this.finalizeAssistantMessage(
+      streamResult.content,
+      userContent,
+      searchResults,
+      strategies,
+      conversationId,
+      history,
+    );
+  }
+
+  private async streamLLMResponse(
+    conversationId: string,
+    prompt: string,
+    onToken: (token: string) => void,
+    signal: AbortSignal | undefined,
+    llmOptions:
+      | { model?: string; temperature?: number; maxTokens?: number }
+      | undefined,
+  ): Promise<{ ok: true; content: string } | { ok: false; message: Message }> {
+    try {
+      const content = await this.llmAdapter.stream(prompt, onToken, signal, {
+        model: llmOptions?.model,
+        temperature: llmOptions?.temperature,
+        maxTokens: llmOptions?.maxTokens,
         systemPrompt:
           "Always respond in the same language as the user's question.",
       });
       this.logger.info("LLM response complete", { conversationId });
+      return { ok: true, content };
     } catch (err) {
       this.logger.error(
         "LLM streaming failed",
@@ -129,9 +159,18 @@ export class AskQuestion {
         createdAt: new Date(),
       };
       await this.conversationRepo.addMessage(conversationId, errorMessage);
-      return errorMessage;
+      return { ok: false, message: errorMessage };
     }
+  }
 
+  private async finalizeAssistantMessage(
+    rawContent: string,
+    userContent: string,
+    searchResults: ChunkSearchResult[],
+    strategies: KnowledgeCheckStrategy[],
+    conversationId: string,
+    history: Message[],
+  ): Promise<Message> {
     const { titleById, sourceTypeById } =
       await this.fetchDocumentMeta(searchResults);
 
@@ -168,7 +207,10 @@ export class AskQuestion {
     await this.conversationRepo.addMessage(conversationId, assistantMessage);
 
     if (history.length === 0) {
-      const title = await this.generateConversationTitle(userContent, assistantContent);
+      const title = await this.generateConversationTitle(
+        userContent,
+        assistantContent,
+      );
       await this.conversationRepo.updateTitle(conversationId, title);
     }
 
