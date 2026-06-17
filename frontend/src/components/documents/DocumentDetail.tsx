@@ -92,9 +92,7 @@ export default function DocumentDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const deleteDocument = useDeleteDocument();
-  const [tab, setTab] = useState<"document" | "details" | "summary">(
-    "document",
-  );
+  const [tab, setTab] = useState<"document" | "details" | "summary">("document");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { data: doc, isLoading } = useQuery({
@@ -103,9 +101,7 @@ export default function DocumentDetail() {
     enabled: !!id,
   });
 
-  const { data: chunks } = useDocumentChunks(
-    doc?.status === "ready" ? id : undefined,
-  );
+  const { data: chunks } = useDocumentChunks(doc?.status === "ready" ? id : undefined);
   const charCount = chunks?.reduce((sum, c) => sum + c.contentLength, 0);
   const chunkCount = chunks?.length;
 
@@ -126,9 +122,7 @@ export default function DocumentDetail() {
 
   const canPreview =
     doc.status === "ready" &&
-    (doc.sourceType === "pdf" ||
-      doc.sourceType === "markdown" ||
-      doc.sourceType === "text");
+    (doc.sourceType === "pdf" || doc.sourceType === "markdown" || doc.sourceType === "text");
 
   const docId = doc.id;
   async function handleDelete() {
@@ -222,9 +216,7 @@ export default function DocumentDetail() {
         {tab === "document" && canPreview && (
           <>
             {doc.sourceType === "pdf" && <PdfViewer id={id as string} />}
-            {doc.sourceType === "markdown" && (
-              <MarkdownViewer id={id as string} />
-            )}
+            {doc.sourceType === "markdown" && <MarkdownViewer id={id as string} />}
             {doc.sourceType === "text" && <TextViewer id={id as string} />}
           </>
         )}
@@ -261,33 +253,23 @@ export default function DocumentDetail() {
               </div>
               <dl>
                 <div className="flex items-center px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
-                    Type
-                  </dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Type</dt>
                   <dd className="text-xs text-slate-800">
                     {sourceTypeLabel[doc.sourceType] ?? doc.sourceType}
                   </dd>
                 </div>
                 <div className="flex items-center px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
-                    Status
-                  </dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Status</dt>
                   <dd>
                     <DocumentStatusBadge status={doc.status} />
                   </dd>
                 </div>
                 <div className="flex items-start px-4 py-3 border-b border-slate-100 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0 mt-0.5">
-                    ID
-                  </dt>
-                  <dd className="text-xs text-slate-500 font-mono break-all">
-                    {doc.id}
-                  </dd>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0 mt-0.5">ID</dt>
+                  <dd className="text-xs text-slate-500 font-mono break-all">{doc.id}</dd>
                 </div>
                 <div className="flex items-center px-4 py-3 last:border-0">
-                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">
-                    Added on
-                  </dt>
+                  <dt className="w-28 text-xs font-medium text-slate-500 shrink-0">Added on</dt>
                   <dd className="text-xs text-slate-800">
                     {new Date(doc.createdAt).toLocaleDateString("en-US", {
                       year: "numeric",
