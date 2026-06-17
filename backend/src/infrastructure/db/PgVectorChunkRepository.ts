@@ -1,8 +1,5 @@
 import type { Chunk } from "../../domain/entities/Chunk";
-import type {
-  ChunkSearchResult,
-  IChunkRepository,
-} from "../../domain/ports/IChunkRepository";
+import type { ChunkSearchResult, IChunkRepository } from "../../domain/ports/IChunkRepository";
 import pool from "./pool";
 
 export class PgVectorChunkRepository implements IChunkRepository {
@@ -124,27 +121,7 @@ export class PgVectorChunkRepository implements IChunkRepository {
       ),
     ]);
 
-    const k = 60;
-    const scores = new Map<
-      string,
-      { row: Record<string, unknown>; score: number }
-    >();
-
-    for (const row of vectorResult.rows) {
-      const id = row.id as string;
-      scores.set(id, { row, score: 1 / (k + Number(row.rank)) });
-    }
-
-    for (const row of textResult.rows) {
-      const id = row.id as string;
-      const rrfScore = 1 / (k + Number(row.rank));
-      const existing = scores.get(id);
-      if (existing) {
-        existing.score += rrfScore;
-      } else {
-        scores.set(id, { row, score: rrfScore });
-      }
-    }
+    const scores = this.computeRRFScores(vectorResult.rows, textResult.rows);
 
     return Array.from(scores.values())
       .sort((a, b) => b.score - a.score)
@@ -159,6 +136,26 @@ export class PgVectorChunkRepository implements IChunkRepository {
         },
         score,
       }));
+  }
+
+  private computeRRFScores(
+    vectorRows: Record<string, unknown>[],
+    textRows: Record<string, unknown>[],
+    k = 60,
+  ): Map<string, { row: Record<string, unknown>; score: number }> {
+    const scores = new Map<string, { row: Record<string, unknown>; score: number }>();
+    for (const row of vectorRows) {
+      const id = row.id as string;
+      scores.set(id, { row, score: 1 / (k + Number(row.rank)) });
+    }
+    for (const row of textRows) {
+      const id = row.id as string;
+      const rrfScore = 1 / (k + Number(row.rank));
+      const existing = scores.get(id);
+      if (existing) existing.score += rrfScore;
+      else scores.set(id, { row, score: rrfScore });
+    }
+    return scores;
   }
 
   async deleteByDocumentId(documentId: string): Promise<void> {
