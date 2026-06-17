@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import { IngestDocument } from "../../src/application/IngestDocument";
-import { SearchKnowledge } from "../../src/application/SearchKnowledge";
+import { RetrieveKnowledge } from "../../src/application/RetrieveKnowledge";
 import { VoyageEmbeddingAdapter } from "../../src/infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { MarkdownParser } from "../../src/infrastructure/parsers/MarkdownParser";
 import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
@@ -24,7 +24,8 @@ const CHUNK_SIZE = 512;
 const CHUNK_OVERLAP = 128;
 const MIN_SCORE = 0.1;
 
-const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY;
+const VOYAGE_API_KEY =
+  process.env.VOYAGE_API_KEY !== "test-key" ? process.env.VOYAGE_API_KEY : undefined;
 const DOCUMENT_PATH = path.resolve(
   __dirname,
   "../DOCUMENTS/Orient-Express/Venise-Simplon-Orient-Express.md",
@@ -33,13 +34,11 @@ const DOCUMENT_PATH = path.resolve(
 describe.skipIf(!VOYAGE_API_KEY)(
   "Retrieval – Venise-Simplon-Orient-Express (requires VOYAGE_API_KEY)",
   () => {
-    let search: SearchKnowledge;
+    let search: RetrieveKnowledge;
     let chunkCount: number;
 
     beforeAll(async () => {
-      const embeddingAdapter = new VoyageEmbeddingAdapter(
-        VOYAGE_API_KEY as string,
-      );
+      const embeddingAdapter = new VoyageEmbeddingAdapter(VOYAGE_API_KEY as string);
       const parser = new MarkdownParser();
       const docRepo = new InMemoryDocumentRepository();
       const chunkRepo = new InMemoryChunkRepository();
@@ -77,7 +76,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
       chunkCount = allChunks.length;
       expect(chunkCount).toBeGreaterThan(1);
 
-      search = new SearchKnowledge(chunkRepo, embeddingAdapter, nullLogger);
+      search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     }, 60_000);
 
     it("document was split into multiple chunks", () => {
@@ -92,10 +91,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
         // display retrieved chunks for debugging
         console.log(
           `Question: ${question}\nRetrieved chunks:\n${results
-            .map(
-              (r, i) =>
-                `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`,
-            )
+            .map((r, i) => `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`)
             .join("\n")}\n`,
         );
         const combined = results

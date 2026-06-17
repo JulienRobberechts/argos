@@ -24,7 +24,7 @@ import {
   generateQuiz,
   ingestDocument,
   resetAll,
-  searchKnowledge,
+  retrieveKnowledge,
   summaryRepo,
   summarizeDocument,
 } from "../registry";
@@ -78,7 +78,7 @@ app.use(
   ),
 );
 app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
-app.use("/api/search", searchRouter(searchKnowledge));
+app.use("/api/search", searchRouter(retrieveKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
 app.use(errorHandler);

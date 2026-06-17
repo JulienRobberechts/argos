@@ -1,12 +1,14 @@
 import { AppSettingsService } from "./application/AppSettingsService";
 import { AskQuestion } from "./application/AskQuestion";
 import { CheckStorageConsistency } from "./application/CheckStorageConsistency";
+import { ConversationTitleGenerator } from "./application/ConversationTitleGenerator";
 import { CreateDocument } from "./application/CreateDocument";
 import { GenerateQuiz } from "./application/GenerateQuiz";
 import { IngestDocument } from "./application/IngestDocument";
 import { ResetAll } from "./application/ResetAll";
 import { CheckResponseGrounding } from "./application/responseChecks/CheckResponseGrounding";
-import { SearchKnowledge } from "./application/SearchKnowledge";
+import { RetrieveKnowledge } from "./application/RetrieveKnowledge";
+import { SourceCitationResolver } from "./application/SourceCitationResolver";
 import { SummarizeDocument } from "./application/SummarizeDocument";
 import { ConversationParams } from "./domain/entities/Conversation";
 import config from "./config";
@@ -60,10 +62,10 @@ export const ingestDocument = new IngestDocument(
   new Logger("IngestDocument"),
 );
 const reranker = config.rerank.enabled ? new VoyageRerankAdapter() : null;
-export const searchKnowledge = new SearchKnowledge(
+export const retrieveKnowledge = new RetrieveKnowledge(
   chunkRepo,
   embeddingAdapter,
-  new Logger("SearchKnowledge"),
+  new Logger("RetrieveKnowledge"),
   reranker,
   config.rerank.candidateMultiplier,
   config.rag.searchMode,
@@ -72,11 +74,14 @@ const responseGrounder = new CheckResponseGrounding(
   llmAdapter,
   new Logger("CheckResponseGrounding"),
 );
+const citationResolver = new SourceCitationResolver(documentRepo);
+const titleGenerator = new ConversationTitleGenerator(llmAdapter);
 export const askQuestion = new AskQuestion(
-  searchKnowledge,
+  retrieveKnowledge,
   llmAdapter,
   conversationRepo,
-  documentRepo,
+  citationResolver,
+  titleGenerator,
   new Logger("AskQuestion"),
   responseGrounder,
 );

@@ -6,12 +6,13 @@ import {
   ConversationParams,
   type Conversation,
 } from "../domain/entities/Conversation";
-import type { Message } from "../domain/entities/Message";
+import { SourceCitation, type Message } from "../domain/entities/Message";
 import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
-import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
+import type { IRetrieveKnowledge } from "../domain/ports/IRetrieveKnowledge";
 import { nullLogger } from "../../tests/fakes/NullLogger";
 import { AskQuestion } from "./AskQuestion";
-import type { SearchKnowledge } from "./SearchKnowledge";
+import type { SourceCitationResolver } from "./SourceCitationResolver";
+import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {
@@ -77,32 +78,40 @@ function makeLLMAdapter(response = "Test LLM response") {
 describe("AskQuestion", () => {
   let convRepo: InMemoryConversationRepository;
   let llmAdapter: ReturnType<typeof makeLLMAdapter>;
-  let mockSearchKnowledge: Pick<SearchKnowledge, "execute"> & {
-    execute: ReturnType<typeof vi.fn>;
-  };
-  let mockDocumentRepo: { findById: ReturnType<typeof vi.fn> };
+  let mockRetrieveKnowledge: { execute: ReturnType<typeof vi.fn> };
+  let mockCitationResolver: { resolve: ReturnType<typeof vi.fn> };
+  let mockTitleGenerator: { generate: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     convRepo = new InMemoryConversationRepository();
     llmAdapter = makeLLMAdapter();
-    mockSearchKnowledge = {
+    mockRetrieveKnowledge = {
       execute: vi.fn().mockResolvedValue([makeChunkResult()]),
     };
-    mockDocumentRepo = { findById: vi.fn().mockResolvedValue(null) };
+    mockCitationResolver = {
+      resolve: vi.fn().mockResolvedValue({ sources: [], titleById: new Map() }),
+    };
+    mockTitleGenerator = {
+      generate: vi.fn().mockResolvedValue("Test Title"),
+    };
   });
 
-  it("should call SearchKnowledge to retrieve relevant chunks", async () => {
-    const conv = makeConversation();
-    await convRepo.save(conv);
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
+  function makeAskQuestion() {
+    return new AskQuestion(
+      mockRetrieveKnowledge as unknown as IRetrieveKnowledge,
       llmAdapter,
       convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
+      mockCitationResolver as unknown as SourceCitationResolver,
+      mockTitleGenerator as unknown as ConversationTitleGenerator,
       nullLogger,
     );
-    await ask.execute(conv.id, "What is RAG?", vi.fn());
-    expect(mockSearchKnowledge.execute).toHaveBeenCalledWith(
+  }
+
+  it("should call RetrieveKnowledge to retrieve relevant chunks", async () => {
+    const conv = makeConversation();
+    await convRepo.save(conv);
+    await makeAskQuestion().execute(conv.id, "What is RAG?", vi.fn());
+    expect(mockRetrieveKnowledge.execute).toHaveBeenCalledWith(
       "What is RAG?",
       expect.any(Number),
       expect.any(Number),
@@ -114,18 +123,11 @@ describe("AskQuestion", () => {
   it("should build a context prompt with retrieved chunks formatted as SOURCE N", async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    mockSearchKnowledge.execute.mockResolvedValue([
+    mockRetrieveKnowledge.execute.mockResolvedValue([
       makeChunkResult("First relevant chunk"),
       makeChunkResult("Second relevant chunk"),
     ]);
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
-    await ask.execute(conv.id, "Question?", vi.fn());
+    await makeAskQuestion().execute(conv.id, "Question?", vi.fn());
     const prompt: string = llmAdapter.stream.mock.calls[0][0];
     expect(prompt).toContain("SOURCE 1:");
     expect(prompt).toContain("First relevant chunk");
@@ -146,14 +148,7 @@ describe("AskQuestion", () => {
         makeMessage(conv.id, "assistant", `Assistant msg ${i}`),
       );
     }
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
-    await ask.execute(conv.id, "Current question", vi.fn());
+    await makeAskQuestion().execute(conv.id, "Current question", vi.fn());
     const prompt: string = llmAdapter.stream.mock.calls[0][0];
     expect(prompt).toContain("User msg 1");
     expect(prompt).toContain("Assistant msg 1");
@@ -173,14 +168,7 @@ describe("AskQuestion", () => {
         return "token1token2";
       },
     );
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
-    await ask.execute(conv.id, "Question?", onToken);
+    await makeAskQuestion().execute(conv.id, "Question?", onToken);
     expect(onToken).toHaveBeenCalledWith("token1");
     expect(onToken).toHaveBeenCalledWith("token2");
   });
@@ -188,14 +176,7 @@ describe("AskQuestion", () => {
   it("should save the user message and assistant message to conversation repository", async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
-    await ask.execute(conv.id, "My question", vi.fn());
+    await makeAskQuestion().execute(conv.id, "My question", vi.fn());
     const updated = await convRepo.findById(conv.id);
     expect(updated?.messages).toHaveLength(2);
     expect(updated?.messages[0].role).toBe("user");
@@ -207,15 +188,22 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     const chunkResult = makeChunkResult("Source content");
-    mockSearchKnowledge.execute.mockResolvedValue([chunkResult]);
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
-    await ask.execute(conv.id, "Question?", vi.fn());
+    mockRetrieveKnowledge.execute.mockResolvedValue([chunkResult]);
+
+    const fakeCitation = SourceCitation.create({
+      chunkId: chunkResult.chunk.id,
+      documentId: chunkResult.chunk.documentId,
+      documentTitle: "Doc",
+      sourceType: "text",
+      excerpt: chunkResult.chunk.content,
+      score: chunkResult.score,
+    });
+    mockCitationResolver.resolve.mockResolvedValue({
+      sources: [fakeCitation],
+      titleById: new Map([[chunkResult.chunk.documentId, "Doc"]]),
+    });
+
+    await makeAskQuestion().execute(conv.id, "Question?", vi.fn());
     const updated = await convRepo.findById(conv.id);
     const assistantMsg = updated?.messages[1];
     expect(assistantMsg).toBeDefined();
@@ -229,15 +217,8 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     llmAdapter.stream.mockRejectedValue(new Error("LLM failed"));
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
-    );
     await expect(
-      ask.execute(conv.id, "Question?", vi.fn()),
+      makeAskQuestion().execute(conv.id, "Question?", vi.fn()),
     ).resolves.toBeDefined();
     const updated = await convRepo.findById(conv.id);
     expect(updated?.messages).toHaveLength(2);
@@ -248,15 +229,12 @@ describe("AskQuestion", () => {
   it('should return "no information found" response when no chunks above threshold', async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    mockSearchKnowledge.execute.mockResolvedValue([]);
-    const ask = new AskQuestion(
-      mockSearchKnowledge as unknown as SearchKnowledge,
-      llmAdapter,
-      convRepo,
-      mockDocumentRepo as unknown as IDocumentRepository,
-      nullLogger,
+    mockRetrieveKnowledge.execute.mockResolvedValue([]);
+    const result = await makeAskQuestion().execute(
+      conv.id,
+      "Unknown topic",
+      vi.fn(),
     );
-    const result = await ask.execute(conv.id, "Unknown topic", vi.fn());
     expect(llmAdapter.stream).not.toHaveBeenCalled();
     expect(result.role).toBe("assistant");
     expect(result.sources).toHaveLength(0);

@@ -5,9 +5,10 @@ import type {
 import type { ILogger } from "../domain/ports/ILogger";
 import type { IRerankPort } from "../domain/ports/IRerankPort";
 import type { ITextEncoder } from "../domain/ports/ITextEncoder";
+import type { IRetrieveKnowledge } from "../domain/ports/IRetrieveKnowledge";
 
 /** Use case : recherche les chunks les plus pertinents par vecteur ou en mode hybride, avec reranking optionnel. */
-export class SearchKnowledge {
+export class RetrieveKnowledge implements IRetrieveKnowledge {
   constructor(
     private readonly chunkRepo: IChunkRepository,
     private readonly embeddingAdapter: ITextEncoder,

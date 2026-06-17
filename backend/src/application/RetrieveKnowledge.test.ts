@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
 import { ChunkMetadata, type Chunk } from "../domain/entities/Chunk";
 import { nullLogger } from "../../tests/fakes/NullLogger";
-import { SearchKnowledge } from "./SearchKnowledge";
+import { RetrieveKnowledge } from "./RetrieveKnowledge";
 
 function makeChunk(embedding: number[], overrides?: Partial<Chunk>): Chunk {
   return {
@@ -20,7 +20,7 @@ function unitVec(dim: number, hotIndex: number): number[] {
   return Array.from({ length: dim }, (_, i) => (i === hotIndex ? 1 : 0));
 }
 
-describe("SearchKnowledge", () => {
+describe("RetrieveKnowledge", () => {
   let chunkRepo: InMemoryChunkRepository;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("SearchKnowledge", () => {
 
   it("should embed the query using the embedding adapter", async () => {
     const embed = vi.fn().mockResolvedValue(Array(1024).fill(0.1));
-    const search = new SearchKnowledge(
+    const search = new RetrieveKnowledge(
       chunkRepo,
       {
         embed,
@@ -53,7 +53,7 @@ describe("SearchKnowledge", () => {
     const chunk3 = makeChunk(unitVec(1024, 1), { content: "poor match" });
     await chunkRepo.saveMany([chunk1, chunk2, chunk3]);
 
-    const search = new SearchKnowledge(
+    const search = new RetrieveKnowledge(
       chunkRepo,
       {
         embed: vi.fn().mockResolvedValue(queryVec),
@@ -74,7 +74,7 @@ describe("SearchKnowledge", () => {
       makeChunk(unitVec(1024, 1), { content: "low score" }),
     ]);
 
-    const search = new SearchKnowledge(
+    const search = new RetrieveKnowledge(
       chunkRepo,
       {
         embed: vi.fn().mockResolvedValue(queryVec),
@@ -88,7 +88,7 @@ describe("SearchKnowledge", () => {
   });
 
   it("should return empty array when no chunks match the threshold", async () => {
-    const search = new SearchKnowledge(
+    const search = new RetrieveKnowledge(
       chunkRepo,
       {
         embed: vi.fn().mockResolvedValue(Array(1024).fill(0.1)),
@@ -108,7 +108,7 @@ describe("SearchKnowledge", () => {
       makeChunk(unitVec(1024, 0)),
     ]);
 
-    const search = new SearchKnowledge(
+    const search = new RetrieveKnowledge(
       chunkRepo,
       {
         embed: vi.fn().mockResolvedValue(queryVec),
@@ -124,7 +124,7 @@ describe("SearchKnowledge", () => {
     it("should call searchHybrid when searchMode is hybrid", async () => {
       const queryVec = unitVec(1024, 0);
       const searchHybrid = vi.spyOn(chunkRepo, "searchHybrid");
-      const search = new SearchKnowledge(
+      const search = new RetrieveKnowledge(
         chunkRepo,
         { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
         nullLogger,
@@ -139,7 +139,7 @@ describe("SearchKnowledge", () => {
     it("should call search (vector only) when searchMode is vector", async () => {
       const queryVec = unitVec(1024, 0);
       const search = vi.spyOn(chunkRepo, "searchByVector");
-      const searchKnowledge = new SearchKnowledge(
+      const retrieveKnowledge = new RetrieveKnowledge(
         chunkRepo,
         { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
         nullLogger,
@@ -147,7 +147,7 @@ describe("SearchKnowledge", () => {
         3,
         "vector",
       );
-      await searchKnowledge.execute("my query", 5, 0);
+      await retrieveKnowledge.execute("my query", 5, 0);
       expect(search).toHaveBeenCalledWith(queryVec, 5, 0);
     });
 
@@ -158,7 +158,7 @@ describe("SearchKnowledge", () => {
       });
       await chunkRepo.save(chunk);
 
-      const search = new SearchKnowledge(
+      const search = new RetrieveKnowledge(
         chunkRepo,
         { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
         nullLogger,

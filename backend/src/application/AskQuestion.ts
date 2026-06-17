@@ -1,24 +1,20 @@
 import { randomUUID } from "node:crypto";
-import type { SourceType } from "../domain/entities/Document";
 import type {
   ResponseGroundingResult,
   ResponseGroundingStrategy,
   Message,
 } from "../domain/entities/Message";
-import { SourceCitation } from "../domain/entities/Message";
 import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import type { IConversationRepository } from "../domain/ports/IConversationRepository";
-import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
 import { LLMStreamOptions, type ILLMPort } from "../domain/ports/ILLMPort";
 import type { ILogger } from "../domain/ports/ILogger";
+import type { IRetrieveKnowledge } from "../domain/ports/IRetrieveKnowledge";
+import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
 import type { CheckResponseGrounding } from "./responseChecks/CheckResponseGrounding";
-import {
-  buildCitationForcingInstruction,
-  parseCitationForcingResult,
-} from "./responseChecks/strategies/citationForcing";
-import type { SearchKnowledge } from "./SearchKnowledge";
+import { parseCitationForcingResult } from "./responseChecks/strategies/citationForcing";
+import { buildRagPrompt } from "../domain/services/ragPrompt";
+import type { SourceCitationResolver } from "./SourceCitationResolver";
 
-const SLIDING_WINDOW_EXCHANGES = 4;
 const NO_INFO_RESPONSE =
   "I don't have enough information to answer this question based on the available knowledge base.";
 const ERROR_RESPONSE = "An error occurred while generating the response.";
@@ -26,10 +22,11 @@ const ERROR_RESPONSE = "An error occurred while generating the response.";
 /** Use case : répond à une question utilisateur via RAG — récupère les chunks pertinents, streame la réponse LLM et applique les vérifications de qualité configurées. */
 export class AskQuestion {
   constructor(
-    private readonly searchKnowledge: SearchKnowledge,
+    private readonly retrieveKnowledge: IRetrieveKnowledge,
     private readonly llmAdapter: ILLMPort,
     private readonly conversationRepo: IConversationRepository,
-    private readonly documentRepo: IDocumentRepository,
+    private readonly citationResolver: SourceCitationResolver,
+    private readonly titleGenerator: ConversationTitleGenerator,
     private readonly logger: ILogger,
     private readonly responseGrounder?: CheckResponseGrounding,
   ) {}
@@ -59,7 +56,7 @@ export class AskQuestion {
     });
 
     const params = conversation?.params;
-    const searchResults = await this.searchKnowledge.execute(
+    const searchResults = await this.retrieveKnowledge.execute(
       userContent,
       params?.retrievalLimit,
       params?.retrievalMinScore,
@@ -96,7 +93,7 @@ export class AskQuestion {
 
     const strategies: ResponseGroundingStrategy[] =
       params?.responseGroundingStrategies ?? [];
-    const prompt = this.buildPrompt(
+    const prompt = buildRagPrompt(
       userContent,
       searchResults,
       history,
@@ -176,8 +173,8 @@ export class AskQuestion {
     conversationId: string,
     history: Message[],
   ): Promise<Message> {
-    const { titleById, sourceTypeById } =
-      await this.fetchDocumentMeta(searchResults);
+    const { sources, titleById } =
+      await this.citationResolver.resolve(searchResults);
 
     const { assistantContent, responseGrounding } =
       await this.applyResponseGrounding(
@@ -187,12 +184,6 @@ export class AskQuestion {
         strategies,
         titleById,
       );
-
-    const sources = this.buildSourceCitations(
-      searchResults,
-      titleById,
-      sourceTypeById,
-    );
 
     this.logger.info("Response grounding complete", {
       conversationId,
@@ -206,13 +197,14 @@ export class AskQuestion {
       role: "assistant",
       content: assistantContent,
       sources,
-      responseGrounding: responseGrounding.length > 0 ? responseGrounding : undefined,
+      responseGrounding:
+        responseGrounding.length > 0 ? responseGrounding : undefined,
       createdAt: new Date(),
     };
     await this.conversationRepo.addMessage(conversationId, assistantMessage);
 
     if (history.length === 0) {
-      const title = await this.generateConversationTitle(
+      const title = await this.titleGenerator.generate(
         userContent,
         assistantContent,
       );
@@ -220,43 +212,6 @@ export class AskQuestion {
     }
 
     return assistantMessage;
-  }
-
-  private async fetchDocumentMeta(searchResults: ChunkSearchResult[]): Promise<{
-    titleById: Map<string, string>;
-    sourceTypeById: Map<string, SourceType>;
-  }> {
-    const uniqueDocIds = [
-      ...new Set(searchResults.map((r) => r.chunk.documentId)),
-    ];
-    const docs = await Promise.all(
-      uniqueDocIds.map((id) => this.documentRepo.findById(id)),
-    );
-    const titleById = new Map(
-      uniqueDocIds.map((id, i) => [id, docs[i]?.title ?? id]),
-    );
-    const sourceTypeById = new Map<string, SourceType>(
-      uniqueDocIds.map((id, i) => [id, docs[i]?.sourceType ?? "text"]),
-    );
-    return { titleById, sourceTypeById };
-  }
-
-  private buildSourceCitations(
-    searchResults: ChunkSearchResult[],
-    titleById: Map<string, string>,
-    sourceTypeById: Map<string, SourceType>,
-  ): SourceCitation[] {
-    return searchResults.map((result) =>
-      SourceCitation.create({
-        chunkId: result.chunk.id,
-        documentId: result.chunk.documentId,
-        documentTitle:
-          titleById.get(result.chunk.documentId) ?? result.chunk.documentId,
-        sourceType: sourceTypeById.get(result.chunk.documentId) ?? "text",
-        excerpt: result.chunk.content,
-        score: result.score,
-      }),
-    );
   }
 
   private async applyResponseGrounding(
@@ -295,62 +250,12 @@ export class AskQuestion {
           )
         : [];
 
-    const responseGrounding: ResponseGroundingResult[] = [
-      ...(inlineCitationResult ? [inlineCitationResult] : []),
-      ...otherChecks,
-    ];
-
-    return { assistantContent, responseGrounding };
-  }
-
-  private async generateConversationTitle(
-    userContent: string,
-    assistantContent: string,
-  ): Promise<string> {
-    const prompt = [
-      "Generate a short title (5 words maximum) summarizing this exchange. Reply with only the title, no quotes, no punctuation at the end.",
-      "",
-      `User: ${userContent.slice(0, 300)}`,
-      `Assistant: ${assistantContent.slice(0, 300)}`,
-    ].join("\n");
-
-    try {
-      const title = await this.llmAdapter.stream(prompt, () => {});
-      return title.trim().slice(0, 80);
-    } catch {
-      return userContent.slice(0, 60);
-    }
-  }
-
-  private buildPrompt(
-    question: string,
-    searchResults: ChunkSearchResult[],
-    allMessages: Message[],
-    useCitationForcing = false,
-  ): string {
-    const sourcesText = searchResults
-      .map((r, i) => `SOURCE ${i + 1}:\n${r.chunk.content}`)
-      .join("\n\n");
-
-    const windowedMessages = allMessages.slice(-(SLIDING_WINDOW_EXCHANGES * 2));
-    const historyLines = windowedMessages
-      .map((m) => `${m.role === "user" ? "User" : "Assistant"}: ${m.content}`)
-      .join("\n");
-
-    const parts = [
-      "You are a helpful assistant. Answer based only on the provided sources.",
-      ...(useCitationForcing ? [buildCitationForcingInstruction()] : []),
-      "",
-      "SOURCES:",
-      sourcesText,
-    ];
-
-    if (historyLines) {
-      parts.push("", "CONVERSATION:", historyLines);
-    }
-
-    parts.push("", `User: ${question}`);
-
-    return parts.join("\n");
+    return {
+      assistantContent,
+      responseGrounding: [
+        ...(inlineCitationResult ? [inlineCitationResult] : []),
+        ...otherChecks,
+      ],
+    };
   }
 }
