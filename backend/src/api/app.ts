@@ -3,15 +3,15 @@ import cors from "cors";
 import express from "express";
 import rateLimit from "express-rate-limit";
 
-import { apiKeyAuth } from "./api/middleware/apiKeyAuth";
-import { errorHandler } from "./api/middleware/errorHandler";
-import { adminRouter } from "./api/routes/admin";
-import { authRouter } from "./api/routes/auth";
-import { configRouter } from "./api/routes/config";
-import { conversationsRouter } from "./api/routes/conversations";
-import { documentsRouter } from "./api/routes/documents";
-import { quizzesRouter } from "./api/routes/quizzes";
-import { searchRouter } from "./api/routes/search";
+import { apiKeyAuth } from "./middleware/apiKeyAuth";
+import { errorHandler } from "./middleware/errorHandler";
+import { adminRouter } from "./routes/admin";
+import { authRouter } from "./routes/auth";
+import { configRouter } from "./routes/config";
+import { conversationsRouter } from "./routes/conversations";
+import { documentsRouter } from "./routes/documents";
+import { quizzesRouter } from "./routes/quizzes";
+import { searchRouter } from "./routes/search";
 import {
   appSettingsService,
   askQuestion,
@@ -27,8 +27,15 @@ import {
   searchKnowledge,
   summaryRepo,
   summarizeDocument,
-} from "./registry";
-import config from "./config";
+} from "../registry";
+import config from "../config";
+
+export function startApiServer(): void {
+  const PORT = config.server.port;
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
 
 const app = express();
 
@@ -46,10 +53,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/config", configRouter(appSettingsService));
-app.use(
-  "/api/admin",
-  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
-);
+app.use("/api/admin", adminRouter(checkStorageConsistency, appSettingsService, resetAll));
 app.use("/api/auth", authRouter());
 
 const apiLimiter = rateLimit({
@@ -73,10 +77,7 @@ app.use(
     summarizeDocument,
   ),
 );
-app.use(
-  "/api/conversations",
-  conversationsRouter(conversationRepo, askQuestion),
-);
+app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
