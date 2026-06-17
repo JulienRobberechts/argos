@@ -39,50 +39,19 @@ const config = {
     },
   },
   rag: {
-    chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as
-      | "recursive"
-      | "sentence",
+    chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as "recursive" | "sentence",
     chunkSize: parseInt(process.env.CHUNK_SIZE_TOKENS ?? "512", 10),
     chunkOverlap: parseInt(process.env.CHUNK_OVERLAP_TOKENS ?? "128", 10),
     retrievalLimit: parseInt(process.env.RETRIEVAL_LIMIT ?? "8", 10),
     retrievalMinScore: parseFloat(process.env.RETRIEVAL_MIN_SCORE ?? "0.75"),
     searchMode: (process.env.SEARCH_MODE ?? "hybrid") as "vector" | "hybrid",
-    knowledgeCheckStrategies: [] as (
-      | "faithfulness"
-      | "counterfactual"
-      | "citation_forcing"
-    )[],
+    knowledgeCheckStrategies: [] as ("faithfulness" | "counterfactual" | "citation_forcing")[],
   },
   rerank: {
     enabled: process.env.RERANK_ENABLED !== "false",
     model: process.env.RERANK_MODEL ?? "rerank-2.5",
-    candidateMultiplier: parseInt(
-      process.env.RERANK_CANDIDATE_MULTIPLIER ?? "3",
-      10,
-    ),
+    candidateMultiplier: parseInt(process.env.RERANK_CANDIDATE_MULTIPLIER ?? "3", 10),
   },
 };
-
-export function validateConfig(): void {
-  const errors: string[] = [];
-
-  if (config.storage.backend === "r2") {
-    if (!config.storage.r2.accountId)
-      errors.push("R2_ACCOUNT_ID is required when STORAGE_BACKEND=r2");
-    if (!config.storage.r2.accessKeyId)
-      errors.push("R2_ACCESS_KEY_ID is required when STORAGE_BACKEND=r2");
-    if (!config.storage.r2.secretAccessKey)
-      errors.push("R2_SECRET_ACCESS_KEY is required when STORAGE_BACKEND=r2");
-    if (!config.storage.r2.bucketName)
-      errors.push("R2_BUCKET_NAME is required when STORAGE_BACKEND=r2");
-  }
-
-  if (errors.length > 0) {
-    console.error(
-      "Invalid configuration:\n" + errors.map((e) => `  - ${e}`).join("\n"),
-    );
-    process.exit(1);
-  }
-}
 
 export default config;

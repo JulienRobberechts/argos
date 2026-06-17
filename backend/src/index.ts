@@ -21,25 +21,44 @@ process.on("SIGTERM", () => {
 
 dotenv.config({ path: path.join(__dirname, "../../.env") });
 
-const envSchema = z.object({
-  DATABASE_URL: z.string().min(1),
-  ANTHROPIC_API_KEY: z.string().min(1),
-  VOYAGE_API_KEY: z.string().min(1),
-  APP_PASSWORD: z.string().min(1),
-});
+const envSchema = z
+  .object({
+    DATABASE_URL: z.string().min(1),
+    ANTHROPIC_API_KEY: z.string().min(1),
+    VOYAGE_API_KEY: z.string().min(1),
+    APP_PASSWORD: z.string().min(1),
+    STORAGE_BACKEND: z.enum(["local", "r2"]).optional(),
+    R2_ACCOUNT_ID: z.string().optional(),
+    R2_ACCESS_KEY_ID: z.string().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().optional(),
+    R2_BUCKET_NAME: z.string().optional(),
+  })
+  .superRefine((env, ctx) => {
+    if (env.STORAGE_BACKEND === "r2") {
+      for (const key of [
+        "R2_ACCOUNT_ID",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY",
+        "R2_BUCKET_NAME",
+      ] as const) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${key} is required when STORAGE_BACKEND=r2`,
+            path: [key],
+          });
+        }
+      }
+    }
+  });
 
 const envResult = envSchema.safeParse(process.env);
 if (!envResult.success) {
-  const missing = envResult.error.issues
-    .map((e) => e.path.join("."))
-    .join(", ");
-  console.error(`Missing required environment variables: ${missing}`);
+  const missing = envResult.error.issues.map((e) => e.message || e.path.join(".")).join("\n  ");
+  console.error(`Invalid configuration:\n  ${missing}`);
   process.exit(1);
 }
 
-validateConfig();
-
-import { validateConfig } from "./config";
 import { apiKeyAuth } from "./api/middleware/apiKeyAuth";
 import { errorHandler } from "./api/middleware/errorHandler";
 import { adminRouter } from "./api/routes/admin";
@@ -124,16 +143,8 @@ const askQuestion = new AskQuestion(
 );
 const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
 const summaryRepo = new PgDocumentSummaryRepository();
-const summarizeDocument = new SummarizeDocument(
-  documentRepo,
-  chunkRepo,
-  summaryRepo,
-  llmAdapter,
-);
-const checkStorageConsistency = new CheckStorageConsistency(
-  documentRepo,
-  fileStorage,
-);
+const summarizeDocument = new SummarizeDocument(documentRepo, chunkRepo, summaryRepo, llmAdapter);
+const checkStorageConsistency = new CheckStorageConsistency(documentRepo, fileStorage);
 const resetAll = new ResetAll(fileStorage, appSettingsService, pool);
 
 const app = express();
@@ -153,10 +164,7 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/api/config", configRouter(appSettingsService));
-app.use(
-  "/api/admin",
-  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
-);
+app.use("/api/admin", adminRouter(checkStorageConsistency, appSettingsService, resetAll));
 app.use("/api/auth", authRouter());
 
 const apiLimiter = rateLimit({
@@ -180,10 +188,7 @@ app.use(
     summarizeDocument,
   ),
 );
-app.use(
-  "/api/conversations",
-  conversationsRouter(conversationRepo, askQuestion),
-);
+app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
 app.use("/api/search", searchRouter(searchKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
