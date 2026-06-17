@@ -8,7 +8,7 @@ import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
 import type { IConversationRepository } from "../domain/ports/IConversationRepository";
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
 import type { ILLMPort } from "../domain/ports/ILLMPort";
-import { Logger } from "../infrastructure/logger/Logger";
+import type { ILogger } from "../domain/ports/ILogger";
 import type { CheckContextualKnowledge } from "./responseChecks/CheckContextualKnowledge";
 import {
   buildCitationForcingInstruction,
@@ -23,13 +23,12 @@ const ERROR_RESPONSE = "An error occurred while generating the response.";
 
 /** Use case : répond à une question utilisateur via RAG — récupère les chunks pertinents, streame la réponse LLM et applique les vérifications de qualité configurées. */
 export class AskQuestion {
-  private readonly logger = new Logger("AskQuestion");
-
   constructor(
     private readonly searchKnowledge: SearchKnowledge,
     private readonly llmAdapter: ILLMPort,
     private readonly conversationRepo: IConversationRepository,
     private readonly documentRepo: IDocumentRepository,
+    private readonly logger: ILogger,
     private readonly knowledgeChecker?: CheckContextualKnowledge,
   ) {}
 

@@ -4,6 +4,7 @@ import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkReposito
 import { InMemoryDocumentRepository } from "../../tests/fakes/InMemoryDocumentRepository";
 import type { Document } from "../domain/entities/Document";
 import type { ChunkingConfig } from "./AppSettingsService";
+import { nullLogger } from "../../tests/fakes/NullLogger";
 import { IngestDocument } from "./IngestDocument";
 
 function makeDocument(overrides?: Partial<Document>): Document {
@@ -30,7 +31,9 @@ function makeFileStorage(content = Buffer.from("dummy")) {
 
 function makeFileParser(text = "word1 word2 word3 word4 word5") {
   return {
-    parse: vi.fn().mockResolvedValue({ text, metadata: { fileName: "test.txt" } }),
+    parse: vi
+      .fn()
+      .mockResolvedValue({ text, metadata: { fileName: "test.txt" } }),
   };
 }
 
@@ -39,7 +42,9 @@ function makeEmbeddingAdapter() {
     embed: vi.fn(),
     embedMany: vi
       .fn()
-      .mockImplementation(async (texts: string[]) => texts.map(() => Array(1024).fill(0.1))),
+      .mockImplementation(async (texts: string[]) =>
+        texts.map(() => Array(1024).fill(0.1)),
+      ),
   };
 }
 
@@ -69,6 +74,7 @@ describe("IngestDocument", () => {
         chunkSize: config?.chunkSize ?? 512,
         chunkOverlap: config?.chunkOverlap ?? 128,
       }),
+      nullLogger,
     );
   }
 
@@ -89,7 +95,11 @@ describe("IngestDocument", () => {
     const doc = makeDocument();
     await docRepo.save(doc);
     await makeIngest({ chunkSize: 3, chunkOverlap: 0 }).execute(doc.id);
-    const results = await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0);
+    const results = await chunkRepo.searchByVector(
+      Array(1024).fill(0.1),
+      100,
+      0,
+    );
     expect(results.length).toBeGreaterThan(1);
   });
 
@@ -111,7 +121,11 @@ describe("IngestDocument", () => {
     const doc = makeDocument();
     await docRepo.save(doc);
     await makeIngest().execute(doc.id);
-    const results = await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0);
+    const results = await chunkRepo.searchByVector(
+      Array(1024).fill(0.1),
+      100,
+      0,
+    );
     expect(results.length).toBeGreaterThan(0);
   });
 
@@ -141,6 +155,7 @@ describe("IngestDocument", () => {
         chunkSize: 512,
         chunkOverlap: 128,
       }),
+      nullLogger,
     );
     await ingest.execute(doc.id);
     const updated = await docRepo.findById(doc.id);
@@ -160,11 +175,15 @@ describe("IngestDocument", () => {
     const doc = makeDocument();
     await docRepo.save(doc);
     await makeIngest().execute(doc.id);
-    const firstCount = (await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0)).length;
+    const firstCount = (
+      await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0)
+    ).length;
 
     await docRepo.updateStatus(doc.id, "pending");
     await makeIngest().execute(doc.id);
-    const secondCount = (await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0)).length;
+    const secondCount = (
+      await chunkRepo.searchByVector(Array(1024).fill(0.1), 100, 0)
+    ).length;
     expect(secondCount).toBe(firstCount);
   });
 });

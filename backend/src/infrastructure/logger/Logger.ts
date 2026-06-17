@@ -1,5 +1,6 @@
 import pino from "pino";
 import config from "../../config";
+import type { ILogger } from "../../domain/ports/ILogger";
 
 const isDev = process.env.NODE_ENV !== "production";
 
@@ -15,7 +16,7 @@ const rootLogger = pino({
     : {}),
 });
 
-export class Logger {
+export class Logger implements ILogger {
   private readonly logger: pino.Logger;
 
   constructor(component: string) {

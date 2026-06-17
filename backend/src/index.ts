@@ -90,6 +90,7 @@ import { VoyageEmbeddingAdapter } from "./infrastructure/embeddings/VoyageEmbedd
 import { AnthropicLLMAdapter } from "./infrastructure/llm/AnthropicLLMAdapter";
 import { MultiFileParser } from "./infrastructure/parsers/MultiFileParser";
 import { VoyageRerankAdapter } from "./infrastructure/reranking/VoyageRerankAdapter";
+import { Logger } from "./infrastructure/logger/Logger";
 import { createStorageBackends } from "./infrastructure/storage/createFileStorage";
 import { DynamicFileStorage } from "./infrastructure/storage/DynamicFileStorage";
 
@@ -125,30 +126,41 @@ const ingestDocument = new IngestDocument(
   fileStorage,
   fileParser,
   () => appSettingsService.getChunkingConfig(),
+  new Logger("IngestDocument"),
 );
 const reranker = config.rerank.enabled ? new VoyageRerankAdapter() : null;
 const searchKnowledge = new SearchKnowledge(
   chunkRepo,
   embeddingAdapter,
+  new Logger("SearchKnowledge"),
   reranker,
   config.rerank.candidateMultiplier,
   config.rag.searchMode,
 );
-const knowledgeChecker = new CheckContextualKnowledge(llmAdapter);
+const knowledgeChecker = new CheckContextualKnowledge(
+  llmAdapter,
+  new Logger("CheckContextualKnowledge"),
+);
 const askQuestion = new AskQuestion(
   searchKnowledge,
   llmAdapter,
   conversationRepo,
   documentRepo,
+  new Logger("AskQuestion"),
   knowledgeChecker,
 );
-const generateQuiz = new GenerateQuiz(chunkRepo, llmAdapter);
+const generateQuiz = new GenerateQuiz(
+  chunkRepo,
+  llmAdapter,
+  new Logger("GenerateQuiz"),
+);
 const summaryRepo = new PgDocumentSummaryRepository();
 const summarizeDocument = new SummarizeDocument(
   documentRepo,
   chunkRepo,
   summaryRepo,
   llmAdapter,
+  new Logger("SummarizeDocument"),
 );
 const checkStorageConsistency = new CheckStorageConsistency(
   documentRepo,
@@ -161,6 +173,7 @@ const resetAll = new ResetAll(
   summaryRepo,
   conversationRepo,
   documentRepo,
+  new Logger("ResetAll"),
 );
 
 const app = express();

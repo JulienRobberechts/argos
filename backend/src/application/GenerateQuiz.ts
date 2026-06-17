@@ -1,7 +1,7 @@
 import { z } from "zod";
 import type { IChunkRepository } from "../domain/ports/IChunkRepository";
+import type { ILogger } from "../domain/ports/ILogger";
 import type { ILLMPort } from "../domain/ports/ILLMPort";
-import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CHUNKS = 15;
 const MAX_CHUNK_LENGTH = 800;
@@ -20,11 +20,10 @@ export type QuizQuestion = z.infer<typeof questionSchema>;
 
 /** Use case : génère des questions à choix multiples à partir du contenu de documents via le LLM. */
 export class GenerateQuiz {
-  private readonly logger = new Logger("GenerateQuiz");
-
   constructor(
     private readonly chunkRepo: IChunkRepository,
     private readonly llmAdapter: ILLMPort,
+    private readonly logger: ILogger,
   ) {}
 
   async execute(

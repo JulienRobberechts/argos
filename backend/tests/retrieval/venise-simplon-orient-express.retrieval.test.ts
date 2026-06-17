@@ -7,6 +7,7 @@ import { SearchKnowledge } from "../../src/application/SearchKnowledge";
 import { VoyageEmbeddingAdapter } from "../../src/infrastructure/embeddings/VoyageEmbeddingAdapter";
 import { MarkdownParser } from "../../src/infrastructure/parsers/MarkdownParser";
 import { InMemoryChunkRepository } from "../fakes/InMemoryChunkRepository";
+import { nullLogger } from "../fakes/NullLogger";
 import { InMemoryDocumentRepository } from "../fakes/InMemoryDocumentRepository";
 
 const diskFileStorage = {
@@ -36,7 +37,9 @@ describe.skipIf(!VOYAGE_API_KEY)(
     let chunkCount: number;
 
     beforeAll(async () => {
-      const embeddingAdapter = new VoyageEmbeddingAdapter(VOYAGE_API_KEY as string);
+      const embeddingAdapter = new VoyageEmbeddingAdapter(
+        VOYAGE_API_KEY as string,
+      );
       const parser = new MarkdownParser();
       const docRepo = new InMemoryDocumentRepository();
       const chunkRepo = new InMemoryChunkRepository();
@@ -62,6 +65,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
           chunkSize: CHUNK_SIZE,
           chunkOverlap: CHUNK_OVERLAP,
         }),
+        nullLogger,
       );
 
       await ingest.execute(documentId);
@@ -73,7 +77,7 @@ describe.skipIf(!VOYAGE_API_KEY)(
       chunkCount = allChunks.length;
       expect(chunkCount).toBeGreaterThan(1);
 
-      search = new SearchKnowledge(chunkRepo, embeddingAdapter);
+      search = new SearchKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     }, 60_000);
 
     it("document was split into multiple chunks", () => {
@@ -88,7 +92,10 @@ describe.skipIf(!VOYAGE_API_KEY)(
         // display retrieved chunks for debugging
         console.log(
           `Question: ${question}\nRetrieved chunks:\n${results
-            .map((r, i) => `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`)
+            .map(
+              (r, i) =>
+                `  ${i + 1}. (score: ${r.score.toFixed(3)}) ${r.chunk.content}`,
+            )
             .join("\n")}\n`,
         );
         const combined = results

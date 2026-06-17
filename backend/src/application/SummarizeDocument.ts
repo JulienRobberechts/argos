@@ -1,8 +1,8 @@
 import type { IChunkRepository } from "../domain/ports/IChunkRepository";
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
 import type { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
+import type { ILogger } from "../domain/ports/ILogger";
 import type { ILLMPort } from "../domain/ports/ILLMPort";
-import { Logger } from "../infrastructure/logger/Logger";
 
 const MAX_CONTENT_CHARS = 12000;
 
@@ -13,9 +13,8 @@ export class SummarizeDocument {
     private readonly chunkRepo: IChunkRepository,
     private readonly summaryRepo: IDocumentSummaryRepository,
     private readonly llmAdapter: ILLMPort,
+    private readonly logger: ILogger,
   ) {}
-
-  private readonly logger = new Logger("SummarizeDocument");
 
   async execute(documentId: string): Promise<string> {
     const doc = await this.documentRepo.findById(documentId);

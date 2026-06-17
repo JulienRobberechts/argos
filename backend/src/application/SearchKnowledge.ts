@@ -2,17 +2,16 @@ import type {
   ChunkSearchResult,
   IChunkRepository,
 } from "../domain/ports/IChunkRepository";
+import type { ILogger } from "../domain/ports/ILogger";
 import type { IRerankPort } from "../domain/ports/IRerankPort";
 import type { ITextEncoder } from "../domain/ports/ITextEncoder";
-import { Logger } from "../infrastructure/logger/Logger";
 
 /** Use case : recherche les chunks les plus pertinents par vecteur ou en mode hybride, avec reranking optionnel. */
 export class SearchKnowledge {
-  private readonly logger = new Logger("SearchKnowledge");
-
   constructor(
     private readonly chunkRepo: IChunkRepository,
     private readonly embeddingAdapter: ITextEncoder,
+    private readonly logger: ILogger,
     private readonly reranker: IRerankPort | null = null,
     private readonly candidateMultiplier = 3,
     private readonly searchMode: "vector" | "hybrid" = "vector",

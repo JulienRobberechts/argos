@@ -6,20 +6,18 @@ import type { IChunkRepository } from "../domain/ports/IChunkRepository";
 import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
 import type { IFileParserPort } from "../domain/ports/IFileParserPort";
 import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import type { ILogger } from "../domain/ports/ILogger";
 import type { ITextEncoder } from "../domain/ports/ITextEncoder";
 import {
   type ChunkingStrategyName,
   createChunkingStrategy,
 } from "../domain/services/ChunkingStrategy";
-import { Logger } from "../infrastructure/logger/Logger";
 import type { ChunkingConfig } from "./AppSettingsService";
 
 const BATCH_SIZE = 20;
 
 /** Use case : parse, découpe en chunks et génère les embeddings d'un document pour le rendre interrogeable. */
 export class IngestDocument {
-  private readonly logger = new Logger("IngestDocument");
-
   constructor(
     private readonly documentRepo: IDocumentRepository,
     private readonly chunkRepo: IChunkRepository,
@@ -27,6 +25,7 @@ export class IngestDocument {
     private readonly fileStorage: IFileStoragePort,
     private readonly fileParser: IFileParserPort,
     private readonly getChunkingConfig: () => Promise<ChunkingConfig>,
+    private readonly logger: ILogger,
   ) {}
 
   async execute(documentId: string): Promise<void> {
