@@ -31,11 +31,7 @@ function makeConversation(overrides?: Partial<Conversation>): Conversation {
   };
 }
 
-function makeMessage(
-  conversationId: string,
-  role: "user" | "assistant",
-  content: string,
-): Message {
+function makeMessage(conversationId: string, role: "user" | "assistant", content: string): Message {
   return {
     id: randomUUID(),
     conversationId,
@@ -59,14 +55,10 @@ function makeChunkResult(content = "Relevant content"): ChunkSearchResult {
 
 function makeLLMAdapter(response = "Test LLM response") {
   return {
-    stream: vi
-      .fn()
-      .mockImplementation(
-        async (_prompt: string, onToken: (t: string) => void) => {
-          onToken(response);
-          return response;
-        },
-      ),
+    stream: vi.fn().mockImplementation(async (_prompt: string, onToken: (t: string) => void) => {
+      onToken(response);
+      return response;
+    }),
   };
 }
 
@@ -131,14 +123,8 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     for (let i = 0; i < 5; i++) {
-      await convRepo.addMessage(
-        conv.id,
-        makeMessage(conv.id, "user", `User msg ${i}`),
-      );
-      await convRepo.addMessage(
-        conv.id,
-        makeMessage(conv.id, "assistant", `Assistant msg ${i}`),
-      );
+      await convRepo.addMessage(conv.id, makeMessage(conv.id, "user", `User msg ${i}`));
+      await convRepo.addMessage(conv.id, makeMessage(conv.id, "assistant", `Assistant msg ${i}`));
     }
     const ask = new AskQuestion(
       mockSearchKnowledge as unknown as SearchKnowledge,
@@ -159,13 +145,11 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     const onToken = vi.fn();
-    llmAdapter.stream.mockImplementation(
-      async (_p: string, cb: (t: string) => void) => {
-        cb("token1");
-        cb("token2");
-        return "token1token2";
-      },
-    );
+    llmAdapter.stream.mockImplementation(async (_p: string, cb: (t: string) => void) => {
+      cb("token1");
+      cb("token2");
+      return "token1token2";
+    });
     const ask = new AskQuestion(
       mockSearchKnowledge as unknown as SearchKnowledge,
       llmAdapter,
@@ -225,9 +209,7 @@ describe("AskQuestion", () => {
       convRepo,
       mockDocumentRepo as unknown as IDocumentRepository,
     );
-    await expect(
-      ask.execute(conv.id, "Question?", vi.fn()),
-    ).resolves.toBeDefined();
+    await expect(ask.execute(conv.id, "Question?", vi.fn())).resolves.toBeDefined();
     const updated = await convRepo.findById(conv.id);
     expect(updated?.messages).toHaveLength(2);
     expect(updated?.messages[1].role).toBe("assistant");
