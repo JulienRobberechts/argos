@@ -1,56 +1,125 @@
+import path from "node:path";
+import dotenv from "dotenv";
+import { z } from "zod";
+
+dotenv.config({ path: path.join(__dirname, "../../.env") });
+
+const envSchema = z
+  .object({
+    DATABASE_URL: z.string().min(1),
+    ANTHROPIC_API_KEY: z.string().min(1),
+    VOYAGE_API_KEY: z.string().min(1),
+    APP_PASSWORD: z.string().min(1),
+    STORAGE_BACKEND: z.enum(["local", "r2"]).default("local"),
+    R2_ACCOUNT_ID: z.string().optional(),
+    R2_ACCESS_KEY_ID: z.string().optional(),
+    R2_SECRET_ACCESS_KEY: z.string().optional(),
+    R2_BUCKET_NAME: z.string().optional(),
+    PORT: z.coerce.number().default(3001),
+    NODE_ENV: z.string().default("development"),
+    LOG_LEVEL: z.string().default("info"),
+    ALLOWED_ORIGIN: z.string().optional(),
+    LLM_MODEL: z.string().default("claude-haiku-4-5-20251001"),
+    LLM_MAX_TOKENS: z.coerce.number().default(1024),
+    LLM_TEMPERATURE: z.coerce.number().default(0.1),
+    EMBEDDING_MODEL: z.string().default("voyage-4-lite"),
+    UPLOAD_DIR: z.string().default("/app/uploads"),
+    CHUNKING_STRATEGY: z.enum(["recursive", "sentence"]).default("recursive"),
+    CHUNK_SIZE_TOKENS: z.coerce.number().default(512),
+    CHUNK_OVERLAP_TOKENS: z.coerce.number().default(128),
+    RETRIEVAL_LIMIT: z.coerce.number().default(8),
+    RETRIEVAL_MIN_SCORE: z.coerce.number().default(0.75),
+    SEARCH_MODE: z.enum(["vector", "hybrid"]).default("hybrid"),
+    RERANK_ENABLED: z.string().default("true"),
+    RERANK_MODEL: z.string().default("rerank-2.5"),
+    RERANK_CANDIDATE_MULTIPLIER: z.coerce.number().default(3),
+  })
+  .superRefine((env, ctx) => {
+    if (env.STORAGE_BACKEND === "r2") {
+      for (const key of [
+        "R2_ACCOUNT_ID",
+        "R2_ACCESS_KEY_ID",
+        "R2_SECRET_ACCESS_KEY",
+        "R2_BUCKET_NAME",
+      ] as const) {
+        if (!env[key]) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${key} is required when STORAGE_BACKEND=r2`,
+            path: [key],
+          });
+        }
+      }
+    }
+  });
+
+const result = envSchema.safeParse(process.env);
+if (!result.success) {
+  const missing = result.error.issues
+    .map((e) => e.message || e.path.join("."))
+    .join("\n  ");
+  console.error(`Invalid configuration:\n  ${missing}`);
+  process.exit(1);
+}
+
+const env = result.data;
+
 const config = {
   server: {
-    port: Number(process.env.PORT) || 3001,
-    nodeEnv: process.env.NODE_ENV || "development",
-    logLevel: process.env.LOG_LEVEL || "info",
+    port: env.PORT,
+    nodeEnv: env.NODE_ENV,
+    logLevel: env.LOG_LEVEL,
+    allowedOrigin: env.ALLOWED_ORIGIN,
   },
   db: {
     postgres: {
-      connectionString:
-        process.env.DATABASE_URL ||
-        "postgresql://devknowledge:devknowledge@localhost:5432/devknowledge",
+      connectionString: env.DATABASE_URL,
     },
   },
   llm: {
     anthropic: {
-      apiKey: process.env.ANTHROPIC_API_KEY ?? "",
-      model: process.env.LLM_MODEL ?? "claude-haiku-4-5-20251001",
-      maxTokens: parseInt(process.env.LLM_MAX_TOKENS ?? "1024", 10),
-      temperature: parseFloat(process.env.LLM_TEMPERATURE ?? "0.1"),
+      apiKey: env.ANTHROPIC_API_KEY,
+      model: env.LLM_MODEL,
+      maxTokens: env.LLM_MAX_TOKENS,
+      temperature: env.LLM_TEMPERATURE,
     },
   },
   embeddings: {
     voyage: {
-      apiKey: process.env.VOYAGE_API_KEY ?? "",
-      model: process.env.EMBEDDING_MODEL ?? "voyage-4-lite",
+      apiKey: env.VOYAGE_API_KEY,
+      model: env.EMBEDDING_MODEL,
     },
   },
   api: {
-    key: process.env.APP_PASSWORD,
-    uploadDir: process.env.UPLOAD_DIR ?? "/app/uploads",
+    key: env.APP_PASSWORD,
+    uploadDir: env.UPLOAD_DIR,
   },
   storage: {
-    backend: (process.env.STORAGE_BACKEND ?? "local") as "local" | "r2",
+    backend: env.STORAGE_BACKEND,
     r2: {
-      accountId: process.env.R2_ACCOUNT_ID ?? "",
-      accessKeyId: process.env.R2_ACCESS_KEY_ID ?? "",
-      secretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? "",
-      bucketName: process.env.R2_BUCKET_NAME ?? "",
+      accountId: env.R2_ACCOUNT_ID ?? "",
+      accessKeyId: env.R2_ACCESS_KEY_ID ?? "",
+      secretAccessKey: env.R2_SECRET_ACCESS_KEY ?? "",
+      bucketName: env.R2_BUCKET_NAME ?? "",
     },
   },
   rag: {
-    chunkingStrategy: (process.env.CHUNKING_STRATEGY ?? "recursive") as "recursive" | "sentence",
-    chunkSize: parseInt(process.env.CHUNK_SIZE_TOKENS ?? "512", 10),
-    chunkOverlap: parseInt(process.env.CHUNK_OVERLAP_TOKENS ?? "128", 10),
-    retrievalLimit: parseInt(process.env.RETRIEVAL_LIMIT ?? "8", 10),
-    retrievalMinScore: parseFloat(process.env.RETRIEVAL_MIN_SCORE ?? "0.75"),
-    searchMode: (process.env.SEARCH_MODE ?? "hybrid") as "vector" | "hybrid",
-    knowledgeCheckStrategies: [] as ("faithfulness" | "counterfactual" | "citation_forcing")[],
+    chunkingStrategy: env.CHUNKING_STRATEGY,
+    chunkSize: env.CHUNK_SIZE_TOKENS,
+    chunkOverlap: env.CHUNK_OVERLAP_TOKENS,
+    retrievalLimit: env.RETRIEVAL_LIMIT,
+    retrievalMinScore: env.RETRIEVAL_MIN_SCORE,
+    searchMode: env.SEARCH_MODE,
+    knowledgeCheckStrategies: [] as (
+      | "faithfulness"
+      | "counterfactual"
+      | "citation_forcing"
+    )[],
   },
   rerank: {
-    enabled: process.env.RERANK_ENABLED !== "false",
-    model: process.env.RERANK_MODEL ?? "rerank-2.5",
-    candidateMultiplier: parseInt(process.env.RERANK_CANDIDATE_MULTIPLIER ?? "3", 10),
+    enabled: env.RERANK_ENABLED !== "false",
+    model: env.RERANK_MODEL,
+    candidateMultiplier: env.RERANK_CANDIDATE_MULTIPLIER,
   },
 };
 
