@@ -9,7 +9,7 @@ import { z } from "zod";
 import type { AskQuestion } from "../../application/rag/AskQuestion";
 import config from "../../config";
 import { ConversationParams } from "../../domain/entities/Conversation";
-import type { IConversationRepository } from "../../infra-ports/IConversationRepository";
+import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
 import { Logger } from "../../infrastructure/logger/Logger";
 
 const logger = new Logger("conversations");

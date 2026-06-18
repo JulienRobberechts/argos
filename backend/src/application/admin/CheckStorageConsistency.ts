@@ -1,6 +1,6 @@
 import path from "node:path";
-import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
-import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
+import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
+import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
 import type {
   ICheckStorageConsistency,
   StorageConsistencyResult,

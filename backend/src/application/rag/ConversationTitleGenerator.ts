@@ -1,4 +1,4 @@
-import type { ILLMPort } from "../../infra-ports/ILLMPort";
+import type { ILLMPort } from "../../infra-ports/ai/ILLMPort";
 import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
 
 export class ConversationTitleGenerator implements IConversationTitleGenerator {

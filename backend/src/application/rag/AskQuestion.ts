@@ -5,8 +5,8 @@ import type {
   Message,
 } from "../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
-import type { IConversationRepository } from "../../infra-ports/IConversationRepository";
-import { LLMStreamOptions, type ILLMPort } from "../../infra-ports/ILLMPort";
+import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
+import { LLMStreamOptions, type ILLMPort } from "../../infra-ports/ai/ILLMPort";
 import type { ILogger } from "../../infra-ports/ILogger";
 import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
 import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";

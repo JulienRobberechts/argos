@@ -7,7 +7,7 @@ import type { ILogger } from "../../../../infra-ports/ILogger";
 import {
   LLMStreamOptions,
   type ILLMPort,
-} from "../../../../infra-ports/ILLMPort";
+} from "../../../../infra-ports/ai/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 function buildFaithfulnessPrompt(

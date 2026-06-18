@@ -1,5 +1,5 @@
 import config from "../../config";
-import type { IAppSettingsRepository } from "../../infra-ports/IAppSettingsRepository";
+import type { IAppSettingsRepository } from "../../infra-ports/persistence/IAppSettingsRepository";
 import type {
   AppSettings,
   AppSettingsPatch,

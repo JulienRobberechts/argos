@@ -2,12 +2,12 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
-import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
-import type { IFileParserPort } from "../../infra-ports/IFileParserPort";
-import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
+import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
+import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
+import type { IFileParserPort } from "../../infra-ports/storage/IFileParserPort";
+import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
 import type { ILogger } from "../../infra-ports/ILogger";
-import type { ITextEncoder } from "../../infra-ports/ITextEncoder";
+import type { ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
 import {
   ChunkConfig,
   type ChunkingStrategyName,

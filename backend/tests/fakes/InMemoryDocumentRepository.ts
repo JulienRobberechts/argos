@@ -2,7 +2,7 @@ import type {
   Document,
   DocumentStatus,
 } from "../../src/domain/entities/Document";
-import type { IDocumentRepository } from "../../src/infra-ports/IDocumentRepository";
+import type { IDocumentRepository } from "../../src/infra-ports/persistence/IDocumentRepository";
 
 export class InMemoryDocumentRepository implements IDocumentRepository {
   private documents: Map<string, Document> = new Map();

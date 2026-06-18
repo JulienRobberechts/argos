@@ -1,8 +1,8 @@
-import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
-import type { IConversationRepository } from "../../infra-ports/IConversationRepository";
-import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../../infra-ports/IDocumentSummaryRepository";
-import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
+import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
+import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
+import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../../infra-ports/persistence/IDocumentSummaryRepository";
+import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
 import type { ILogger } from "../../infra-ports/ILogger";
 import type { AppSettingsPatch } from "../../app-ports/admin/IAppSettingsService";
 import type { IResetAll } from "../../app-ports/admin/IResetAll";

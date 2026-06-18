@@ -1,4 +1,4 @@
-import type { ILLMPort } from "../../src/infra-ports/ILLMPort";
+import type { ILLMPort } from "../../src/infra-ports/ai/ILLMPort";
 
 export class InMemoryLLMAdapter implements ILLMPort {
   private response: string;

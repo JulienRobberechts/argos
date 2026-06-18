@@ -1,5 +1,5 @@
 import type { Document, DocumentStatus } from "../../domain/entities/Document";
-import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
+import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
 import pool from "./pool";
 
 function toDocument(row: Record<string, unknown>): Document {

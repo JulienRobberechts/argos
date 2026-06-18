@@ -10,7 +10,7 @@ import type {
   Message,
   MessageRole,
 } from "../../domain/entities/Message";
-import type { IConversationRepository } from "../../infra-ports/IConversationRepository";
+import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
 import pool from "./pool";
 
 function toMessage(row: Record<string, unknown>): Message {

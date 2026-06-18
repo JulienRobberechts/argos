@@ -3,7 +3,7 @@ import type {
   KnowledgeClaim,
 } from "../../../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../../../domain/entities/ChunkSearchResult";
-import type { ILLMPort } from "../../../../infra-ports/ILLMPort";
+import type { ILLMPort } from "../../../../infra-ports/ai/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 export function buildCitationForcingInstruction(): string {

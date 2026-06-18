@@ -1,8 +1,8 @@
 import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
-import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
+import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
 import type { ILogger } from "../../infra-ports/ILogger";
-import type { IRerankPort } from "../../infra-ports/IRerankPort";
-import type { ITextEncoder } from "../../infra-ports/ITextEncoder";
+import type { IRerankPort } from "../../infra-ports/ai/IRerankPort";
+import type { ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
 import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
 
 /** Use case: retrieves the most relevant chunks by vector or hybrid search, with optional reranking. */

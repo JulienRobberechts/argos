@@ -2,7 +2,7 @@ import type { Chunk } from "../../src/domain/entities/Chunk";
 import type {
   ChunkSearchResult,
   IChunkRepository,
-} from "../../src/infra-ports/IChunkRepository";
+} from "../../src/infra-ports/persistence/IChunkRepository";
 
 function cosineSimilarity(a: number[], b: number[]): number {
   if (a.length !== b.length) return 0;

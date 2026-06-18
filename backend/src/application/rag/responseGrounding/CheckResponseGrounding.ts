@@ -4,7 +4,7 @@ import type {
 } from "../../../domain/entities/Message";
 import type { ChunkSearchResult } from "../../../domain/entities/ChunkSearchResult";
 import type { ILogger } from "../../../infra-ports/ILogger";
-import type { ILLMPort } from "../../../infra-ports/ILLMPort";
+import type { ILLMPort } from "../../../infra-ports/ai/ILLMPort";
 import { checkCitationForcing } from "./strategies/citationForcing";
 import { checkCounterfactual } from "./strategies/counterfactual";
 import { checkFaithfulness } from "./strategies/faithfulness";

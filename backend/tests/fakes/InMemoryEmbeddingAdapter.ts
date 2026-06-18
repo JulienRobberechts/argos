@@ -1,4 +1,4 @@
-import type { ITextEncoder } from "../../src/infra-ports/ITextEncoder";
+import type { ITextEncoder } from "../../src/infra-ports/ai/ITextEncoder";
 
 export class InMemoryEmbeddingAdapter implements ITextEncoder {
   private readonly dimension = 1024;
