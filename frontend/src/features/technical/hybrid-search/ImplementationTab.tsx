@@ -14,8 +14,9 @@ export default function ImplementationTab() {
           subtitle="Migration 005_hybrid_search.sql"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-4">
-          The migration adds a <code>tsvector</code> column to the <code>chunks</code> table and
-          keeps it in sync automatically via a PostgreSQL trigger.
+          The migration adds a <code>tsvector</code> column to the{" "}
+          <code>chunks</code> table and keeps it in sync automatically via a
+          PostgreSQL trigger.
         </p>
         <CodeBlock
           code={`-- Add the tsvector column
@@ -45,9 +46,9 @@ CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
   ON chunks USING GIN(ts_content);`}
         />
         <p className="text-sm text-slate-600 mt-3 leading-relaxed">
-          The <code>'simple'</code> text search configuration tokenises by whitespace and lowercases
-          — no stemming, no stop-word removal. This preserves acronyms and proper nouns exactly as
-          they appear.
+          The <code>'simple'</code> text search configuration tokenises by
+          whitespace and lowercases — no stemming, no stop-word removal. This
+          preserves acronyms and proper nouns exactly as they appear.
         </p>
       </Card>
 
@@ -111,9 +112,10 @@ CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
 }`}
         />
         <Callout type="info">
-          <code>_minScore</code> is intentionally ignored in hybrid mode: BM25 scores are not on the
-          same scale as cosine similarity, so a unified threshold is meaningless. The limit
-          parameter acts as the cutoff instead.
+          <code>_minScore</code> is intentionally ignored in hybrid mode: BM25
+          scores are not on the same scale as cosine similarity, so a unified
+          threshold is meaningless. The limit parameter acts as the cutoff
+          instead.
         </Callout>
       </Card>
 
@@ -128,26 +130,26 @@ CREATE INDEX IF NOT EXISTS chunks_ts_content_idx
         </p>
         <ol className="list-decimal list-inside space-y-2 text-sm text-slate-700 mb-4">
           <li>
-            <strong>Global default</strong> — <code>SEARCH_MODE</code> environment variable
-            (defaults to <code>"hybrid"</code>), read at startup into{" "}
-            <code>config.rag.searchMode</code>.
+            <strong>Global default</strong> — <code>SEARCH_MODE</code>{" "}
+            environment variable (defaults to <code>"hybrid"</code>), read at
+            startup into <code>config.rag.searchMode</code>.
           </li>
           <li>
-            <strong>Per-conversation override</strong> — stored as <code>searchMode</code> in the{" "}
-            <code>params</code> JSONB column of each conversation. Set in the panel before starting
-            a conversation.
+            <strong>Per-conversation override</strong> — stored as{" "}
+            <code>searchMode</code> in the <code>params</code> JSONB column of
+            each conversation. Set in the panel before starting a conversation.
           </li>
         </ol>
         <CodeBlock
-          code={`// SearchKnowledge.execute() — 5th parameter overrides constructor default
+          code={`// RetrieveKnowledge.execute() — 5th parameter overrides constructor default
 async execute(
   query, limit, minScore, rerankOptions,
   searchMode?: "vector" | "hybrid",   // from conversation.params
 ) {
   const effectiveMode = searchMode ?? this.searchMode; // fallback to config
-  const results = effectiveMode === "hybrid"
+  const candidates = effectiveMode === "hybrid"
     ? await this.chunkRepo.searchHybrid(query, vector, limit, minScore)
-    : await this.chunkRepo.search(vector, limit, minScore);
+    : await this.chunkRepo.searchByVector(vector, limit, minScore);
   …
 }`}
         />

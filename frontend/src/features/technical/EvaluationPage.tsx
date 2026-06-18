@@ -18,7 +18,9 @@ function isTab(value: string | null): value is Tab {
 export default function EvaluationPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
+  const [activeTab, setActiveTab] = useState<Tab>(
+    isTab(tabParam) ? tabParam : "Overview",
+  );
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);
@@ -29,7 +31,7 @@ export default function EvaluationPage() {
       <PageHeader
         icon={<Gauge className="text-[#d97706]" size={28} />}
         title="RAG Evaluation — Technical Deep Dive"
-        info="Why RAG systems fail silently, how three independent metrics expose each failure mode, and how the eval pipeline is wired in this project."
+        info="Why RAG systems fail silently, how three independent metrics expose each failure mode, and how an offline eval pipeline can build on the grounding checks this project already implements."
       />
 
       <TabBar

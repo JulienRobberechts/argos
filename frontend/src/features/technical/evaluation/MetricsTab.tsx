@@ -22,17 +22,22 @@ export default function MetricsTab() {
           subtitle="Does the answer contain only what the sources say?"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-2">
-          Faithfulness measures whether every factual claim in the generated answer is explicitly
-          supported by the retrieved chunks. A score below 1.0 means the LLM introduced information
-          from its training weights.
+          Faithfulness measures whether every factual claim in the generated
+          answer is explicitly supported by the retrieved chunks. A score below
+          1.0 means the LLM introduced information from its training weights.
         </p>
         <FormulaBox formula="Faithfulness = supported claims / total claims in the answer" />
 
-        <p className="text-sm font-medium text-slate-800 mb-2">How it works (LLM-as-judge)</p>
+        <p className="text-sm font-medium text-slate-800 mb-2">
+          How it works (LLM-as-judge)
+        </p>
         <ol className="list-decimal list-inside space-y-1 text-sm text-slate-600 mb-4">
-          <li>Extract every factual claim from the answer as an atomic statement.</li>
           <li>
-            For each claim, check whether it can be directly inferred from the retrieved chunks.
+            Extract every factual claim from the answer as an atomic statement.
+          </li>
+          <li>
+            For each claim, check whether it can be directly inferred from the
+            retrieved chunks.
           </li>
           <li>Score = proportion of supported claims.</li>
         </ol>
@@ -55,9 +60,10 @@ Reply ONLY with valid JSON:
         />
 
         <Callout type="tip">
-          <strong>Already implemented</strong> in this project:{" "}
-          <code>src/application/responseChecks/strategies/faithfulness.ts</code>. The eval scorer is
-          a direct wrapper — no duplication needed.
+          <strong>Already implemented</strong> as a grounding strategy:{" "}
+          <code>src/application/responseChecks/strategies/faithfulness.ts</code>
+          . An offline eval scorer would be a thin wrapper around it — no
+          duplication needed.
         </Callout>
       </Card>
 
@@ -68,31 +74,41 @@ Reply ONLY with valid JSON:
           subtitle="Does the answer actually respond to the question asked?"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-2">
-          Answer relevance catches cases where the LLM answers <em>something</em> related but not
-          the actual question — common when retrieved chunks are broadly relevant but don't contain
-          the precise information sought.
+          Answer relevance catches cases where the LLM answers{" "}
+          <em>something</em> related but not the actual question — common when
+          retrieved chunks are broadly relevant but don't contain the precise
+          information sought.
         </p>
         <FormulaBox formula="AnswerRelevance = cosine_similarity(original_question, regenerated_question)" />
 
-        <p className="text-sm font-medium text-slate-800 mb-2">How it works (embedding-based)</p>
+        <p className="text-sm font-medium text-slate-800 mb-2">
+          How it works (embedding-based)
+        </p>
         <ol className="list-decimal list-inside space-y-1 text-sm text-slate-600 mb-4">
           <li>
             Ask the LLM: <em>"What question does this answer respond to?"</em>
           </li>
           <li>
             Embed both the original question and the regenerated question via{" "}
-            <code className="bg-slate-100 px-1 rounded">VoyageEmbeddingAdapter</code>.
+            <code className="bg-slate-100 px-1 rounded">
+              VoyageEmbeddingAdapter
+            </code>
+            .
           </li>
           <li>Cosine similarity between the two vectors = relevance score.</li>
         </ol>
 
         <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-          <p className="text-sm font-semibold text-amber-900 mb-1">Example — low relevance</p>
-          <p className="text-xs text-slate-600 mb-1">
-            Original: <em>"What caused the end of the Direct Orient-Express service?"</em>
+          <p className="text-sm font-semibold text-amber-900 mb-1">
+            Example — low relevance
           </p>
           <p className="text-xs text-slate-600 mb-1">
-            Answer: <em>"The Orient-Express ran at barely 55 km/h at the end."</em>
+            Original:{" "}
+            <em>"What caused the end of the Direct Orient-Express service?"</em>
+          </p>
+          <p className="text-xs text-slate-600 mb-1">
+            Answer:{" "}
+            <em>"The Orient-Express ran at barely 55 km/h at the end."</em>
           </p>
           <p className="text-xs text-slate-600 mb-1">
             Regenerated: <em>"How fast was the Orient-Express?"</em>
@@ -109,6 +125,13 @@ Reply ONLY with valid JSON:
   return dot / (norm(a) * norm(b));
 }`}
         />
+        <div className="mt-4">
+          <Callout type="info">
+            Answer relevance is part of the proposed offline eval — not yet
+            implemented. It would reuse the existing{" "}
+            <code>VoyageEmbeddingAdapter</code> for the two embeddings.
+          </Callout>
+        </div>
       </Card>
 
       <Card className="mb-6">
@@ -118,9 +141,10 @@ Reply ONLY with valid JSON:
           subtitle="Did the retrieval surface the information needed to answer?"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-2">
-          Context recall measures whether the retrieved chunks contain the information required to
-          produce the reference answer. A low score points to a <strong>retrieval failure</strong> —
-          the right documents were in the knowledge base but were not surfaced.
+          Context recall measures whether the retrieved chunks contain the
+          information required to produce the reference answer. A low score
+          points to a <strong>retrieval failure</strong> — the right documents
+          were in the knowledge base but were not surfaced.
         </p>
         <FormulaBox formula="ContextRecall = claims from expected_answer covered by chunks / total claims" />
 
@@ -129,10 +153,14 @@ Reply ONLY with valid JSON:
         </p>
         <ol className="list-decimal list-inside space-y-1 text-sm text-slate-600 mb-4">
           <li>
-            Decompose <code className="bg-slate-100 px-1 rounded">expected_answer</code> into atomic
-            claims.
+            Decompose{" "}
+            <code className="bg-slate-100 px-1 rounded">expected_answer</code>{" "}
+            into atomic claims.
           </li>
-          <li>For each claim, check whether at least one retrieved chunk supports it.</li>
+          <li>
+            For each claim, check whether at least one retrieved chunk supports
+            it.
+          </li>
           <li>Score = proportion of claims covered.</li>
         </ol>
 
@@ -152,14 +180,17 @@ Reply ONLY with JSON: { "covered": true }`}
         />
 
         <Callout type="warning">
-          Context recall requires a labeled <code>expected_answer</code>. Write reference answers by
-          reading the source document — never by asking the LLM. An LLM-generated reference inherits
-          the same blind spots as the model being evaluated.
+          Part of the proposed offline eval (not yet implemented). It requires a
+          labeled <code>expected_answer</code> — write reference answers by
+          reading the source document, never by asking the LLM. An LLM-generated
+          reference inherits the same blind spots as the model being evaluated.
         </Callout>
       </Card>
 
       <Card>
-        <p className="text-sm font-semibold text-slate-800 mb-3">Score interpretation guide</p>
+        <p className="text-sm font-semibold text-slate-800 mb-3">
+          Score interpretation guide
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -192,11 +223,19 @@ Reply ONLY with JSON: { "covered": true }`}
                   "< 0.70",
                   "Retrieval is incomplete — lower min-score, increase limit, or use hybrid search",
                 ],
-                ["All three", "low", "End-to-end failure — check ingestion and embedding pipeline"],
+                [
+                  "All three",
+                  "low",
+                  "End-to-end failure — check ingestion and embedding pipeline",
+                ],
               ].map(([metric, score, signal]) => (
                 <tr key={metric} className="border-b border-slate-100">
-                  <td className="py-2 pr-4 font-medium text-slate-700">{metric}</td>
-                  <td className="py-2 pr-4 font-mono text-amber-700">{score}</td>
+                  <td className="py-2 pr-4 font-medium text-slate-700">
+                    {metric}
+                  </td>
+                  <td className="py-2 pr-4 font-mono text-amber-700">
+                    {score}
+                  </td>
                   <td className="py-2 text-slate-500">{signal}</td>
                 </tr>
               ))}

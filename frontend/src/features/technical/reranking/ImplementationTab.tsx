@@ -11,50 +11,57 @@ export default function ImplementationTab() {
       <Card className="mb-6">
         <SectionTitle
           icon={<Search size={20} />}
-          title="Implementation — SearchKnowledge"
+          title="Implementation — RetrieveKnowledge"
           subtitle="How the two stages are orchestrated"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-3">
-          The <code className="bg-slate-100 px-1 rounded text-amber-700">SearchKnowledge</code> use
-          case accepts an optional{" "}
-          <code className="bg-slate-100 px-1 rounded text-amber-700">RerankPort</code>. When{" "}
-          <code className="bg-slate-100 px-1 rounded">null</code>, it falls back to single-stage
-          vector search.
+          The{" "}
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
+            RetrieveKnowledge
+          </code>{" "}
+          use case accepts an optional{" "}
+          <code className="bg-slate-100 px-1 rounded text-amber-700">
+            IRerankPort
+          </code>
+          . When <code className="bg-slate-100 px-1 rounded">null</code> (or
+          disabled), it returns the single-stage search results directly. Stage
+          1 honours the active search mode — vector or hybrid.
         </p>
         <CodeBlock
-          code={`// application/SearchKnowledge.ts (simplified)
+          code={`// application/RetrieveKnowledge.ts (simplified)
 
-async execute(query, limit, minScore) {
+async execute(query, limit, minScore, rerankOptions, searchMode) {
   const vector = await embedder.embed(query, "query");
+  const mode = searchMode ?? this.searchMode;
+  const useRerank = this.reranker !== null && rerankOptions?.enabled !== false;
 
-  if (this.reranker) {
-    // Stage 1 — broad retrieval
-    const candidates = await chunkRepo.search(
-      vector,
-      limit * candidateMultiplier,   // e.g. 8 × 3 = 24
-      minScore * 0.5,                // permissive threshold
-    );
+  // Stage 1 — broad retrieval (wider pool + permissive threshold when re-ranking)
+  const candidateLimit = useRerank ? limit * candidateMultiplier : limit; // 8 × 3 = 24
+  const candidateMinScore = useRerank ? minScore * 0.5 : minScore;
+  const candidates = mode === "hybrid"
+    ? await chunkRepo.searchHybrid(query, vector, candidateLimit, candidateMinScore)
+    : await chunkRepo.searchByVector(vector, candidateLimit, candidateMinScore);
 
-    // Stage 2 — cross-encoder re-ranking
-    const rankedIndices = await this.reranker.rerank(
-      query,
-      candidates.map(c => c.chunk.content),
-    );
+  if (!useRerank || candidates.length === 0) return candidates;
 
-    return rankedIndices.slice(0, limit).map(i => candidates[i]);
-  }
-
-  // No reranker — standard vector search
-  return chunkRepo.search(vector, limit, minScore);
+  // Stage 2 — cross-encoder re-ranking (falls back to retrieval order on failure)
+  const rankedIndices = await this.reranker.rerank(
+    query,
+    candidates.map(c => c.chunk.content),
+  );
+  return rankedIndices.slice(0, limit).map(i => candidates[i]);
 }`}
         />
         <div className="mt-4">
           <Callout type="info">
-            <code>RerankPort</code> is a domain interface with a single method:
-            <code className="ml-1">rerank(query, documents): Promise&lt;number[]&gt;</code>. The
-            returned array contains original indices sorted from most to least relevant. Swapping
-            the reranker (e.g. Cohere instead of Voyage) requires only a new adapter — no changes to{" "}
-            <code>SearchKnowledge</code>.
+            <code>IRerankPort</code> is a domain interface with a single method:
+            <code className="ml-1">
+              rerank(query, documents, model?): Promise&lt;number[]&gt;
+            </code>
+            . The returned array contains original indices sorted from most to
+            least relevant. Swapping the reranker (e.g. Cohere instead of
+            Voyage) requires only a new adapter — no changes to{" "}
+            <code>RetrieveKnowledge</code>.
           </Callout>
         </div>
       </Card>
@@ -106,9 +113,9 @@ async execute(query, limit, minScore) {
         </div>
         <div className="mt-4">
           <Callout type="warning">
-            Increasing <code>RERANK_CANDIDATE_MULTIPLIER</code> beyond 5 sends a large document list
-            to the Voyage API and adds noticeable latency. The default of 3 is a good balance
-            between recall and response time.
+            Increasing <code>RERANK_CANDIDATE_MULTIPLIER</code> beyond 5 sends a
+            large document list to the Voyage API and adds noticeable latency.
+            The default of 3 is a good balance between recall and response time.
           </Callout>
         </div>
       </Card>

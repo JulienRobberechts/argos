@@ -7,7 +7,7 @@ export default defineConfig({
     env: {
       UPLOAD_DIR: "/tmp/test-uploads",
       DATABASE_URL: "postgresql://test:test@localhost:5432/test",
-      ANTHROPIC_API_KEY: "test-key",
+      ANTHROPIC_APP_API_KEY: "test-key",
       VOYAGE_API_KEY: process.env.VOYAGE_API_KEY ?? "test-key",
       APP_PASSWORD: "test-password",
     },

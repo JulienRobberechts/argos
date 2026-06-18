@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/JulienRobberechts/devknowledge/actions/workflows/ci.yml/badge.svg)
 
-Argos est une application complète de **Retrieval-Augmented Generation (RAG)** conçue pour interroger une base de connaissances de documents internes via un LLM. Ce projet de démonstration met en œuvre les pratiques d'un système en production : architecture hexagonale stricte, pipeline RAG multi-étapes, recherche hybride, vérification de la qualité des réponses, et suite d'évaluation automatisée.
+Argos est une application complète de **Retrieval-Augmented Generation (RAG)** conçue pour interroger une base de connaissances de documents internes via un LLM. Ce projet de démonstration met en œuvre les pratiques d'un système en production : architecture hexagonale stricte, pipeline RAG multi-étapes, recherche hybride, vérification de la qualité des réponses.
 
 ---
 
@@ -282,7 +282,7 @@ Moyenne                           0.91   0.84   0.82
 ### Variables d'environnement requises
 
 ```env
-ANTHROPIC_API_KEY=sk-ant-...
+ANTHROPIC_APP_API_KEY=sk-ant-...
 VOYAGE_API_KEY=pa-...
 DATABASE_URL=postgresql://devknowledge:<PASSWORD>@localhost:5432/devknowledge
 ```
@@ -341,7 +341,7 @@ Les migrations SQL s'exécutent automatiquement au démarrage de l'API.
 
 | Variable | Description | Obligatoire |
 |----------|-------------|-------------|
-| `ANTHROPIC_API_KEY` | Clé API Anthropic (Claude) | Oui |
+| `ANTHROPIC_APP_API_KEY` | Clé API Anthropic (Claude) | Oui |
 | `VOYAGE_API_KEY` | Clé API Voyage AI (embeddings + reranking) | Oui |
 | `DATABASE_URL` | Connexion PostgreSQL | Oui |
 | `APP_PASSWORD` | Mot de passe d'accès à l'interface | Oui |

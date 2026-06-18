@@ -16,7 +16,7 @@ Renseigner dans `.env` :
 
 | Variable | Description |
 |---|---|
-| `ANTHROPIC_API_KEY` | Clé API Anthropic (génération de réponses) |
+| `ANTHROPIC_APP_API_KEY` | Clé API Anthropic (génération de réponses) |
 | `VOYAGE_API_KEY` | Clé API Voyage AI (embeddings) |
 | `POSTGRES_PASSWORD` | Mot de passe PostgreSQL (libre choix en dev) |
 | `APP_PASSWORD` | Mot de passe de l'écran de login |

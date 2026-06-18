@@ -45,14 +45,26 @@ export default function ImplementationTab() {
         <SectionTitle
           icon={<Layers size={20} />}
           title="Evaluation pipeline"
-          subtitle="What happens for each question in the dataset"
+          subtitle="Proposed design — what would happen for each question in the dataset"
         />
 
-        <div className="flex flex-col gap-1 mb-6">
-          <FlowBox label="dataset.json" sub="14 labeled Q/A pairs" color="yellow" />
+        <Callout type="warning">
+          <strong>Not yet implemented.</strong> The flow below is a design
+          proposal. What exists in the codebase today: an integration retrieval
+          test (<code>tests/retrieval/</code>) and the grounding strategies
+          under <code>responseChecks/strategies/</code>. The dataset, scorers,
+          and <code>npm run eval</code> script described here are not present.
+        </Callout>
+
+        <div className="mt-6 flex flex-col gap-1 mb-6">
+          <FlowBox
+            label="dataset.json"
+            sub="labeled Q/A pairs"
+            color="yellow"
+          />
           <Arrow />
           <FlowBox
-            label="SearchKnowledge.execute(question)"
+            label="RetrieveKnowledge.execute(question)"
             sub="hybrid search + reranking → top-8 chunks"
             color="amber"
           />
@@ -77,9 +89,10 @@ export default function ImplementationTab() {
         </div>
 
         <Callout type="info">
-          Use <code>SearchKnowledge</code> directly — not <code>AskQuestion</code>. The latter
-          writes to the conversation database and generates titles, neither of which is needed for
-          offline eval.
+          The eval would call <code>RetrieveKnowledge</code> directly — not{" "}
+          <code>AskQuestion</code>. The latter writes to the conversation
+          database and generates titles, neither of which is needed for offline
+          eval.
         </Callout>
       </Card>
 
@@ -87,7 +100,7 @@ export default function ImplementationTab() {
         <SectionTitle
           icon={<Code2 size={20} />}
           title="Dataset structure"
-          subtitle="tests/eval/dataset.json — 14 pairs across 2 corpora"
+          subtitle="Proposed shape for tests/eval/dataset.json"
         />
         <CodeBlock
           code={`// Each entry in dataset.json
@@ -119,7 +132,10 @@ export default function ImplementationTab() {
               color: "border-slate-200 bg-slate-50 text-slate-600",
             },
           ].map(({ label, count, color }) => (
-            <div key={label} className={`border rounded-lg p-3 text-center ${color}`}>
+            <div
+              key={label}
+              className={`border rounded-lg p-3 text-center ${color}`}
+            >
               <p className="text-2xl font-bold">{count}</p>
               <p className="text-xs font-medium mt-0.5">{label}</p>
             </div>
@@ -128,9 +144,9 @@ export default function ImplementationTab() {
 
         <div className="mt-4">
           <Callout type="warning">
-            <code>document_ids</code> currently contain relative file paths, not vector database
-            IDs. Mapping to real IDs is required after ingesting the demo documents into the
-            knowledge base.
+            <code>document_ids</code> would hold relative file paths, not vector
+            database IDs. Mapping to real IDs is required after ingesting the
+            demo documents into the knowledge base.
           </Callout>
         </div>
       </Card>
@@ -139,11 +155,11 @@ export default function ImplementationTab() {
         <SectionTitle
           icon={<Code2 size={20} />}
           title="File structure"
-          subtitle="Where each scorer lives"
+          subtitle="Proposed layout — where each scorer would live"
         />
         <CodeBlock
-          code={`devknowledge/backend/tests/eval/
-  dataset.json                  ✅ created — 14 labeled pairs
+          code={`devknowledge/backend/tests/eval/        (proposed — does not exist yet)
+  dataset.json                  labeled Q/A pairs
   run.ts                        main script — npm run eval
   scorers/
     faithfulness.ts             wrapper around checkFaithfulness (already implemented)
@@ -156,7 +172,9 @@ export default function ImplementationTab() {
         </p>
         <CodeBlock code={`"eval": "tsx tests/eval/run.ts"`} />
 
-        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">Expected stdout output</p>
+        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
+          Expected stdout output
+        </p>
         <CodeBlock
           code={`ID        Dataset          Diff    Faith  Relev  Recall
 oe-01     orient-express   easy    1.00   0.92   0.88
@@ -173,7 +191,7 @@ Average                            0.92   0.83   0.81`}
         <SectionTitle
           icon={<Code2 size={20} />}
           title="Environment variables"
-          subtitle="Required to run npm run eval"
+          subtitle="What the proposed eval would need"
         />
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -199,7 +217,7 @@ Average                            0.92   0.83   0.81`}
               <ParamRow
                 name="VOYAGE_API_KEY"
                 value="yes"
-                description="Query embedding (SearchKnowledge), reranking (VoyageRerankAdapter), answer relevance cosine similarity"
+                description="Query embedding (RetrieveKnowledge), reranking (VoyageRerankAdapter), answer relevance cosine similarity"
               />
               <ParamRow
                 name="DATABASE_URL"

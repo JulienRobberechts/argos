@@ -7,7 +7,7 @@ dotenv.config({ path: path.join(__dirname, "../../.env") });
 const envSchema = z
   .object({
     DATABASE_URL: z.string().min(1),
-    ANTHROPIC_API_KEY: z.string().min(1),
+    ANTHROPIC_APP_API_KEY: z.string().min(1),
     VOYAGE_API_KEY: z.string().min(1),
     APP_PASSWORD: z.string().min(1),
     STORAGE_BACKEND: z.enum(["local", "r2"]).default("local"),
@@ -78,7 +78,7 @@ const config = {
   },
   llm: {
     anthropic: {
-      apiKey: env.ANTHROPIC_API_KEY,
+      apiKey: env.ANTHROPIC_APP_API_KEY,
       model: env.LLM_MODEL,
       maxTokens: env.LLM_MAX_TOKENS,
       temperature: env.LLM_TEMPERATURE,
