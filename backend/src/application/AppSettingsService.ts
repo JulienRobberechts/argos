@@ -1,39 +1,21 @@
 import config from "../config";
 import type { IAppSettingsRepository } from "../infra-ports/IAppSettingsRepository";
+import type {
+  AppSettings,
+  AppSettingsPatch,
+  ChunkingConfig,
+  IAppSettingsService,
+  ProviderOption,
+  StorageOption,
+} from "../app-ports/IAppSettingsService";
 
-export interface ProviderOption {
-  provider: string;
-  model: string;
-  label: string;
-  available: boolean;
-}
-
-export interface StorageOption {
-  provider: string;
-  label: string;
-  available: boolean;
-}
-
-export interface AppSettings {
-  embedding: { provider: string; model: string; options: ProviderOption[] };
-  storage: { provider: string; options: StorageOption[] };
-}
-
-export interface AppSettingsPatch {
-  embedding?: { provider: string };
-  storage?: { provider: string };
-  chunking?: {
-    strategy?: "recursive" | "sentence";
-    chunkSize?: number;
-    chunkOverlap?: number;
-  };
-}
-
-export interface ChunkingConfig {
-  strategy: "recursive" | "sentence";
-  chunkSize: number;
-  chunkOverlap: number;
-}
+export type {
+  AppSettings,
+  AppSettingsPatch,
+  ChunkingConfig,
+  ProviderOption,
+  StorageOption,
+};
 
 const EMBEDDING_PRESETS: Omit<ProviderOption, "available">[] = [
   {
@@ -60,7 +42,7 @@ function r2Available(): boolean {
 }
 
 /** Application service: reads and updates the runtime configuration (embedding provider, storage, chunking strategy) persisted in the database. */
-export class AppSettingsService {
+export class AppSettingsService implements IAppSettingsService {
   constructor(private readonly repo: IAppSettingsRepository) {}
 
   async getSettings(): Promise<AppSettings> {

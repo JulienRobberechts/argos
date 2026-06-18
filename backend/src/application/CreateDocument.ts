@@ -3,13 +3,12 @@ import path from "node:path";
 import type { Document } from "../domain/entities/Document";
 import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
 import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
+import type {
+  CreateDocumentInput,
+  ICreateDocument,
+} from "../app-ports/ICreateDocument";
 
-export interface CreateDocumentInput {
-  buffer: Buffer;
-  originalName: string;
-  mimetype: string;
-  title?: string;
-}
+export type { CreateDocumentInput };
 
 function sourceTypeFromMime(
   mimetype: string,
@@ -22,7 +21,7 @@ function sourceTypeFromMime(
 }
 
 /** Use case: uploads the raw file to storage and persists the document entry in the database (status "pending", before ingestion). */
-export class CreateDocument {
+export class CreateDocument implements ICreateDocument {
   constructor(
     private readonly documentRepo: IDocumentRepository,
     private readonly fileStorage: IFileStoragePort,

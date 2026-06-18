@@ -13,12 +13,13 @@ import {
   type ChunkingStrategyName,
   createChunkingStrategy,
 } from "../domain/services/ChunkingStrategy";
-import type { ChunkingConfig } from "./AppSettingsService";
+import type { ChunkingConfig } from "../app-ports/IAppSettingsService";
+import type { IIngestDocument } from "../app-ports/IIngestDocument";
 
 const BATCH_SIZE = 20;
 
 /** Use case: parses, chunks, and generates embeddings for a document to make it queryable. */
-export class IngestDocument {
+export class IngestDocument implements IIngestDocument {
   constructor(
     private readonly documentRepo: IDocumentRepository,
     private readonly chunkRepo: IChunkRepository,

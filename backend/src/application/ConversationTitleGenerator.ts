@@ -1,6 +1,7 @@
 import type { ILLMPort } from "../infra-ports/ILLMPort";
+import type { IConversationTitleGenerator } from "../app-ports/IConversationTitleGenerator";
 
-export class ConversationTitleGenerator {
+export class ConversationTitleGenerator implements IConversationTitleGenerator {
   constructor(private readonly llm: ILLMPort) {}
 
   async generate(question: string, answer: string): Promise<string> {

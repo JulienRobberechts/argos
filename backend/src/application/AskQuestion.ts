@@ -9,6 +9,7 @@ import type { IConversationRepository } from "../infra-ports/IConversationReposi
 import { LLMStreamOptions, type ILLMPort } from "../infra-ports/ILLMPort";
 import type { ILogger } from "../infra-ports/ILogger";
 import type { IRetrieveKnowledge } from "../app-ports/IRetrieveKnowledge";
+import type { IAskQuestion } from "../app-ports/IAskQuestion";
 import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
 import type { CheckResponseGrounding } from "./responseChecks/CheckResponseGrounding";
 import { parseCitationForcingResult } from "./responseChecks/strategies/citationForcing";
@@ -20,7 +21,7 @@ const NO_INFO_RESPONSE =
 const ERROR_RESPONSE = "An error occurred while generating the response.";
 
 /** Use case: answers a user question via RAG — retrieves relevant chunks, streams the LLM response, and applies the configured quality checks. */
-export class AskQuestion {
+export class AskQuestion implements IAskQuestion {
   constructor(
     private readonly retrieveKnowledge: IRetrieveKnowledge,
     private readonly llmAdapter: ILLMPort,

@@ -2,6 +2,7 @@ import { z } from "zod";
 import type { IChunkRepository } from "../infra-ports/IChunkRepository";
 import type { ILogger } from "../infra-ports/ILogger";
 import type { ILLMPort } from "../infra-ports/ILLMPort";
+import type { IGenerateQuiz, QuizQuestion } from "../app-ports/IGenerateQuiz";
 
 const MAX_CHUNKS = 15;
 const MAX_CHUNK_LENGTH = 800;
@@ -16,10 +17,10 @@ const responseSchema = z.object({
   questions: z.array(questionSchema),
 });
 
-export type QuizQuestion = z.infer<typeof questionSchema>;
+export type { QuizQuestion };
 
 /** Use case: generates multiple-choice questions from document content via the LLM. */
-export class GenerateQuiz {
+export class GenerateQuiz implements IGenerateQuiz {
   constructor(
     private readonly chunkRepo: IChunkRepository,
     private readonly llmAdapter: ILLMPort,

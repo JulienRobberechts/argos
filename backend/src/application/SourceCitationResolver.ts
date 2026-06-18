@@ -2,14 +2,15 @@ import type { SourceType } from "../domain/entities/Document";
 import { SourceCitation } from "../domain/entities/Message";
 import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
 import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
+import type {
+  CitationResolution,
+  ISourceCitationResolver,
+} from "../app-ports/ISourceCitationResolver";
 
-export interface CitationResolution {
-  sources: SourceCitation[];
-  titleById: Map<string, string>;
-}
+export type { CitationResolution };
 
 /** Enriches raw search results with document metadata (title, sourceType) to build SourceCitation objects. */
-export class SourceCitationResolver {
+export class SourceCitationResolver implements ISourceCitationResolver {
   constructor(private readonly documentRepo: IDocumentRepository) {}
 
   async resolve(

@@ -4,10 +4,11 @@ import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
 import type { IDocumentSummaryRepository } from "../infra-ports/IDocumentSummaryRepository";
 import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
 import type { ILogger } from "../infra-ports/ILogger";
-import type { AppSettingsPatch } from "./AppSettingsService";
+import type { AppSettingsPatch } from "../app-ports/IAppSettingsService";
+import type { IResetAll } from "../app-ports/IResetAll";
 
 /** Use case: deletes all storage files and truncates all tables, then applies new settings if provided. */
-export class ResetAll {
+export class ResetAll implements IResetAll {
   constructor(
     private readonly fileStorage: IFileStoragePort,
     private readonly updateSettings: (

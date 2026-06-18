@@ -3,11 +3,12 @@ import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
 import type { IDocumentSummaryRepository } from "../infra-ports/IDocumentSummaryRepository";
 import type { ILogger } from "../infra-ports/ILogger";
 import type { ILLMPort } from "../infra-ports/ILLMPort";
+import type { ISummarizeDocument } from "../app-ports/ISummarizeDocument";
 
 const MAX_CONTENT_CHARS = 12000;
 
 /** Use case: generates an LLM summary from a document's chunks and persists it in the database. */
-export class SummarizeDocument {
+export class SummarizeDocument implements ISummarizeDocument {
   constructor(
     private readonly documentRepo: IDocumentRepository,
     private readonly chunkRepo: IChunkRepository,

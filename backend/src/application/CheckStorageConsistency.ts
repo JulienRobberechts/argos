@@ -1,13 +1,12 @@
 import path from "node:path";
 import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
 import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
+import type {
+  ICheckStorageConsistency,
+  StorageConsistencyResult,
+} from "../app-ports/ICheckStorageConsistency";
 
-export interface StorageConsistencyResult {
-  orphanFiles: string[];
-  missingFiles: string[];
-  totalDocuments: number;
-  totalStorageFiles: number;
-}
+export type { StorageConsistencyResult };
 
 // Extracts just the filename from a path that may be absolute or relative.
 // Handles legacy DB records that stored full paths like /app/uploads/uuid.pdf
@@ -17,7 +16,7 @@ function toKey(filePath: string): string {
 }
 
 /** Use case: detects orphan files (storage without DB entry) and missing files (DB entry without file). */
-export class CheckStorageConsistency {
+export class CheckStorageConsistency implements ICheckStorageConsistency {
   constructor(
     private readonly documentRepo: IDocumentRepository,
     private readonly fileStorage: IFileStoragePort,
