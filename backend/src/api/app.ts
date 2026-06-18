@@ -52,8 +52,6 @@ app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/api/config", configRouter(appSettingsService));
-app.use("/api/admin", adminRouter(checkStorageConsistency, appSettingsService, resetAll));
 app.use("/api/auth", authRouter());
 
 const apiLimiter = rateLimit({
@@ -65,6 +63,11 @@ const apiLimiter = rateLimit({
 
 app.use("/api", apiLimiter);
 app.use("/api", apiKeyAuth);
+app.use("/api/config", configRouter(appSettingsService));
+app.use(
+  "/api/admin",
+  adminRouter(checkStorageConsistency, appSettingsService, resetAll),
+);
 app.use(
   "/api/documents",
   documentsRouter(
@@ -77,7 +80,10 @@ app.use(
     summarizeDocument,
   ),
 );
-app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion));
+app.use(
+  "/api/conversations",
+  conversationsRouter(conversationRepo, askQuestion),
+);
 app.use("/api/search", searchRouter(retrieveKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 
