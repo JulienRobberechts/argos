@@ -4,11 +4,11 @@ import type {
   ResponseGroundingStrategy,
   Message,
 } from "../domain/entities/Message";
-import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
-import type { IConversationRepository } from "../domain/ports/IConversationRepository";
-import { LLMStreamOptions, type ILLMPort } from "../domain/ports/ILLMPort";
-import type { ILogger } from "../domain/ports/ILogger";
-import type { IRetrieveKnowledge } from "../domain/ports/IRetrieveKnowledge";
+import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
+import type { IConversationRepository } from "../infra-ports/IConversationRepository";
+import { LLMStreamOptions, type ILLMPort } from "../infra-ports/ILLMPort";
+import type { ILogger } from "../infra-ports/ILogger";
+import type { IRetrieveKnowledge } from "../app-ports/IRetrieveKnowledge";
 import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
 import type { CheckResponseGrounding } from "./responseChecks/CheckResponseGrounding";
 import { parseCitationForcingResult } from "./responseChecks/strategies/citationForcing";

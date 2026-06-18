@@ -1,4 +1,4 @@
-import type { ILLMPort } from "../domain/ports/ILLMPort";
+import type { ILLMPort } from "../infra-ports/ILLMPort";
 
 export class ConversationTitleGenerator {
   constructor(private readonly llm: ILLMPort) {}

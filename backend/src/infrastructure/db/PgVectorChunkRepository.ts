@@ -1,5 +1,5 @@
 import type { Chunk } from "../../domain/entities/Chunk";
-import type { ChunkSearchResult, IChunkRepository } from "../../domain/ports/IChunkRepository";
+import type { ChunkSearchResult, IChunkRepository } from "../../infra-ports/IChunkRepository";
 import pool from "./pool";
 
 export class PgVectorChunkRepository implements IChunkRepository {

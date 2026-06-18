@@ -1,4 +1,4 @@
-import type { Chunk } from "../entities/Chunk";
+import type { Chunk } from "../domain/entities/Chunk";
 
 export interface ChunkSearchResult {
   chunk: Chunk;

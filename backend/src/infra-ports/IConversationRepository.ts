@@ -1,8 +1,8 @@
 import type {
   Conversation,
   ConversationSummary,
-} from "../entities/Conversation";
-import type { Message } from "../entities/Message";
+} from "../domain/entities/Conversation";
+import type { Message } from "../domain/entities/Message";
 
 /** Persists and retrieves conversations and their messages. */
 export interface IConversationRepository {

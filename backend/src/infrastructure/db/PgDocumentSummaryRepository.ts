@@ -1,5 +1,5 @@
 import type { DocumentSummary } from "../../domain/entities/DocumentSummary";
-import type { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
+import type { IDocumentSummaryRepository } from "../../infra-ports/IDocumentSummaryRepository";
 import pool from "./pool";
 
 function toSummary(row: Record<string, unknown>): DocumentSummary {

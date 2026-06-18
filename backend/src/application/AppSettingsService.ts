@@ -1,5 +1,5 @@
 import config from "../config";
-import type { IAppSettingsRepository } from "../domain/ports/IAppSettingsRepository";
+import type { IAppSettingsRepository } from "../infra-ports/IAppSettingsRepository";
 
 export interface ProviderOption {
   provider: string;

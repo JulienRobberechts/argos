@@ -1,4 +1,4 @@
-import type { ChunkSearchResult } from "./IChunkRepository";
+import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
 
 export interface IRetrieveKnowledge {
   execute(

@@ -1,6 +1,6 @@
 import pino from "pino";
 import config from "../../config";
-import type { ILogger } from "../../domain/ports/ILogger";
+import type { ILogger } from "../../infra-ports/ILogger";
 
 const isDev = process.env.NODE_ENV !== "production";
 

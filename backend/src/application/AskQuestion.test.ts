@@ -7,8 +7,8 @@ import {
   type Conversation,
 } from "../domain/entities/Conversation";
 import { SourceCitation, type Message } from "../domain/entities/Message";
-import type { ChunkSearchResult } from "../domain/ports/IChunkRepository";
-import type { IRetrieveKnowledge } from "../domain/ports/IRetrieveKnowledge";
+import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
+import type { IRetrieveKnowledge } from "../app-ports/IRetrieveKnowledge";
 import { nullLogger } from "../../tests/fakes/NullLogger";
 import { AskQuestion } from "./AskQuestion";
 import type { SourceCitationResolver } from "./SourceCitationResolver";

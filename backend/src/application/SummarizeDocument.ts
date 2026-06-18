@@ -1,8 +1,8 @@
-import type { IChunkRepository } from "../domain/ports/IChunkRepository";
-import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
-import type { ILogger } from "../domain/ports/ILogger";
-import type { ILLMPort } from "../domain/ports/ILLMPort";
+import type { IChunkRepository } from "../infra-ports/IChunkRepository";
+import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../infra-ports/IDocumentSummaryRepository";
+import type { ILogger } from "../infra-ports/ILogger";
+import type { ILLMPort } from "../infra-ports/ILLMPort";
 
 const MAX_CONTENT_CHARS = 12000;
 

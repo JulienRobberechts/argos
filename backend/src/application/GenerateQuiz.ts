@@ -1,7 +1,7 @@
 import { z } from "zod";
-import type { IChunkRepository } from "../domain/ports/IChunkRepository";
-import type { ILogger } from "../domain/ports/ILogger";
-import type { ILLMPort } from "../domain/ports/ILLMPort";
+import type { IChunkRepository } from "../infra-ports/IChunkRepository";
+import type { ILogger } from "../infra-ports/ILogger";
+import type { ILLMPort } from "../infra-ports/ILLMPort";
 
 const MAX_CHUNKS = 15;
 const MAX_CHUNK_LENGTH = 800;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseCitationForcingResult } from "./citationForcing";
-import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
+import type { ChunkSearchResult } from "../../../infra-ports/IChunkRepository";
 import { ChunkMetadata, type Chunk } from "../../../domain/entities/Chunk";
 import { randomUUID } from "node:crypto";
 

@@ -1,5 +1,5 @@
 import config from "../../config";
-import type { IRerankPort } from "../../domain/ports/IRerankPort";
+import type { IRerankPort } from "../../infra-ports/IRerankPort";
 import { Logger } from "../logger/Logger";
 
 const logger = new Logger("VoyageRerankAdapter");

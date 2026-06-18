@@ -2,9 +2,9 @@ import type {
   ResponseGroundingResult,
   ResponseGroundingStrategy,
 } from "../../domain/entities/Message";
-import type { ChunkSearchResult } from "../../domain/ports/IChunkRepository";
-import type { ILogger } from "../../domain/ports/ILogger";
-import type { ILLMPort } from "../../domain/ports/ILLMPort";
+import type { ChunkSearchResult } from "../../infra-ports/IChunkRepository";
+import type { ILogger } from "../../infra-ports/ILogger";
+import type { ILLMPort } from "../../infra-ports/ILLMPort";
 import { checkCitationForcing } from "./strategies/citationForcing";
 import { checkCounterfactual } from "./strategies/counterfactual";
 import { checkFaithfulness } from "./strategies/faithfulness";

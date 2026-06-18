@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
 
 export class LocalFileStorage implements IFileStoragePort {
   constructor(private readonly uploadDir: string) {}

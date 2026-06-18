@@ -1,6 +1,6 @@
 import type { ResponseGroundingResult, KnowledgeClaim } from "../../../domain/entities/Message";
-import type { ChunkSearchResult } from "../../../domain/ports/IChunkRepository";
-import type { ILLMPort } from "../../../domain/ports/ILLMPort";
+import type { ChunkSearchResult } from "../../../infra-ports/IChunkRepository";
+import type { ILLMPort } from "../../../infra-ports/ILLMPort";
 import { extractJSON } from "./extractJSON";
 
 export function buildCitationForcingInstruction(): string {

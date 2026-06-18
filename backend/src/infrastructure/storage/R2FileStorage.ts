@@ -7,7 +7,7 @@ import {
   PutObjectCommand,
   type S3Client,
 } from "@aws-sdk/client-s3";
-import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
 
 export class R2FileStorage implements IFileStoragePort {
   constructor(

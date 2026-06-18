@@ -1,6 +1,6 @@
 import path from "node:path";
-import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
+import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
+import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
 
 export interface StorageConsistencyResult {
   orphanFiles: string[];

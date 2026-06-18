@@ -1,6 +1,6 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import config from "../../config";
-import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
 import { LocalFileStorage } from "./LocalFileStorage";
 import { R2FileStorage } from "./R2FileStorage";
 

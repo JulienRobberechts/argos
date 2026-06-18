@@ -1,82 +1,99 @@
 # Dépendances Applications → Ports
 
+## AppSettingsService
+
 ```mermaid
 graph LR
-  subgraph Applications
-    AppSettingsService
-    AskQuestion
-    CheckStorageConsistency
-    ConversationTitleGenerator
-    CreateDocument
-    GenerateQuiz
-    IngestDocument
-    ResetAll
-    RetrieveKnowledge
-    SourceCitationResolver
-    SummarizeDocument
-  end
-
-  subgraph Ports
-    IAppSettingsRepository
-    IChunkRepository
-    IConversationRepository
-    IDocumentRepository
-    IDocumentSummaryRepository
-    IFileParserPort
-    IFileStoragePort
-    ILLMPort
-    ILogger
-    IRerankPort
-    IRetrieveKnowledge
-    ITextEncoder
-  end
-
   AppSettingsService --> IAppSettingsRepository
+```
 
+## AskQuestion
+
+```mermaid
+graph LR
   AskQuestion --> IChunkRepository
   AskQuestion --> IConversationRepository
   AskQuestion --> ILLMPort
-  AskQuestion --> ILogger
   AskQuestion --> IRetrieveKnowledge
+```
 
+## CheckStorageConsistency
+
+```mermaid
+graph LR
   CheckStorageConsistency --> IDocumentRepository
   CheckStorageConsistency --> IFileStoragePort
+```
 
+## ConversationTitleGenerator
+
+```mermaid
+graph LR
   ConversationTitleGenerator --> ILLMPort
+```
 
+## CreateDocument
+
+```mermaid
+graph LR
   CreateDocument --> IDocumentRepository
   CreateDocument --> IFileStoragePort
+```
 
+## GenerateQuiz
+
+```mermaid
+graph LR
   GenerateQuiz --> IChunkRepository
   GenerateQuiz --> ILLMPort
-  GenerateQuiz --> ILogger
+```
 
+## IngestDocument
+
+```mermaid
+graph LR
   IngestDocument --> IChunkRepository
   IngestDocument --> IDocumentRepository
   IngestDocument --> IFileParserPort
   IngestDocument --> IFileStoragePort
-  IngestDocument --> ILogger
   IngestDocument --> ITextEncoder
+```
 
+## ResetAll
+
+```mermaid
+graph LR
   ResetAll --> IChunkRepository
   ResetAll --> IConversationRepository
   ResetAll --> IDocumentRepository
   ResetAll --> IDocumentSummaryRepository
   ResetAll --> IFileStoragePort
-  ResetAll --> ILogger
+```
 
+## RetrieveKnowledge
+
+```mermaid
+graph LR
   RetrieveKnowledge --> IChunkRepository
-  RetrieveKnowledge --> ILogger
   RetrieveKnowledge --> IRerankPort
   RetrieveKnowledge --> ITextEncoder
   RetrieveKnowledge --> IRetrieveKnowledge
+```
 
+## SourceCitationResolver
+
+```mermaid
+graph LR
   SourceCitationResolver --> IChunkRepository
   SourceCitationResolver --> IDocumentRepository
+```
 
+## SummarizeDocument
+
+```mermaid
+graph LR
   SummarizeDocument --> IChunkRepository
   SummarizeDocument --> IDocumentRepository
   SummarizeDocument --> IDocumentSummaryRepository
   SummarizeDocument --> ILLMPort
-  SummarizeDocument --> ILogger
 ```

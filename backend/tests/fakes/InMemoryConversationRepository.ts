@@ -3,7 +3,7 @@ import type {
   ConversationSummary,
 } from "../../src/domain/entities/Conversation";
 import type { Message } from "../../src/domain/entities/Message";
-import type { IConversationRepository } from "../../src/domain/ports/IConversationRepository";
+import type { IConversationRepository } from "../../src/infra-ports/IConversationRepository";
 
 export class InMemoryConversationRepository implements IConversationRepository {
   private conversations: Map<string, Conversation> = new Map();

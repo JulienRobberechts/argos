@@ -1,9 +1,9 @@
-import type { IChunkRepository } from "../domain/ports/IChunkRepository";
-import type { IConversationRepository } from "../domain/ports/IConversationRepository";
-import type { IDocumentRepository } from "../domain/ports/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../domain/ports/IDocumentSummaryRepository";
-import type { IFileStoragePort } from "../domain/ports/IFileStoragePort";
-import type { ILogger } from "../domain/ports/ILogger";
+import type { IChunkRepository } from "../infra-ports/IChunkRepository";
+import type { IConversationRepository } from "../infra-ports/IConversationRepository";
+import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../infra-ports/IDocumentSummaryRepository";
+import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
+import type { ILogger } from "../infra-ports/ILogger";
 import type { AppSettingsPatch } from "./AppSettingsService";
 
 /** Use case: deletes all storage files and truncates all tables, then applies new settings if provided. */

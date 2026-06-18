@@ -8,10 +8,10 @@ const logger = new Logger("documents");
 import type { CreateDocument } from "../../application/CreateDocument";
 import type { IngestDocument } from "../../application/IngestDocument";
 import type { SummarizeDocument } from "../../application/SummarizeDocument";
-import type { IChunkRepository } from "../../domain/ports/IChunkRepository";
-import type { IDocumentRepository } from "../../domain/ports/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../../domain/ports/IDocumentSummaryRepository";
-import type { IFileStoragePort } from "../../domain/ports/IFileStoragePort";
+import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
+import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
+import type { IDocumentSummaryRepository } from "../../infra-ports/IDocumentSummaryRepository";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
 import { createDocumentSchema } from "../dto/document.dto";
 
 const ALLOWED_MIMETYPES = new Set([

@@ -1,4 +1,4 @@
-import type { ILogger } from "../../src/domain/ports/ILogger";
+import type { ILogger } from "../../src/infra-ports/ILogger";
 
 export const nullLogger: ILogger = {
   debug: () => {},
