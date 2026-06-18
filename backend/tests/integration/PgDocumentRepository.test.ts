@@ -1,8 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import type { Document } from "../../src/domain/entities/Document";
-import { PgDocumentRepository } from "../../src/infrastructure/db/PgDocumentRepository";
-import pool from "../../src/infrastructure/db/pool";
+import { PgDocumentRepository } from "../../src/infrastructure/persistence/db/PgDocumentRepository";
+import pool from "../../src/infrastructure/persistence/db/pool";
 
 const repo = new PgDocumentRepository();
 

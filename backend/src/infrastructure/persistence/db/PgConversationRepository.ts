@@ -3,14 +3,14 @@ import {
   type ConversationParamsProps,
   type Conversation,
   type ConversationSummary,
-} from "../../domain/entities/Conversation";
-import { SourceCitation } from "../../domain/entities/Message";
+} from "../../../domain/entities/Conversation";
+import { SourceCitation } from "../../../domain/entities/Message";
 import type {
   ResponseGroundingResult,
   Message,
   MessageRole,
-} from "../../domain/entities/Message";
-import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
+} from "../../../domain/entities/Message";
+import type { IConversationRepository } from "../../../infra-ports/persistence/IConversationRepository";
 import pool from "./pool";
 
 function toMessage(row: Record<string, unknown>): Message {

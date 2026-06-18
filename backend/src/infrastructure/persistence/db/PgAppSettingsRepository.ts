@@ -1,4 +1,4 @@
-import type { IAppSettingsRepository } from "../../infra-ports/persistence/IAppSettingsRepository";
+import type { IAppSettingsRepository } from "../../../infra-ports/persistence/IAppSettingsRepository";
 import pool from "./pool";
 
 export class PgAppSettingsRepository implements IAppSettingsRepository {

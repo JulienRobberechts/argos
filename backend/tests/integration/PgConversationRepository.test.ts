@@ -5,8 +5,8 @@ import {
   type Conversation,
 } from "../../src/domain/entities/Conversation";
 import type { Message } from "../../src/domain/entities/Message";
-import { PgConversationRepository } from "../../src/infrastructure/db/PgConversationRepository";
-import pool from "../../src/infrastructure/db/pool";
+import { PgConversationRepository } from "../../src/infrastructure/persistence/db/PgConversationRepository";
+import pool from "../../src/infrastructure/persistence/db/pool";
 
 const DEFAULT_PARAMS = ConversationParams.create({
   retrievalLimit: 8,

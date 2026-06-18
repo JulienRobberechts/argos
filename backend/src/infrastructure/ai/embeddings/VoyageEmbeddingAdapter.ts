@@ -1,6 +1,6 @@
-import config from "../../config";
-import type { EmbeddingInputType, ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
-import { Logger } from "../logger/Logger";
+import config from "../../../config";
+import type { EmbeddingInputType, ITextEncoder } from "../../../infra-ports/ai/ITextEncoder";
+import { Logger } from "../../logger/Logger";
 
 const logger = new Logger("VoyageEmbeddingAdapter");
 

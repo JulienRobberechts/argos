@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ChunkMetadata, type Chunk } from "../../src/domain/entities/Chunk";
 import type { Document } from "../../src/domain/entities/Document";
-import { PgDocumentRepository } from "../../src/infrastructure/db/PgDocumentRepository";
-import { PgVectorChunkRepository } from "../../src/infrastructure/db/PgVectorChunkRepository";
-import pool from "../../src/infrastructure/db/pool";
+import { PgDocumentRepository } from "../../src/infrastructure/persistence/db/PgDocumentRepository";
+import { PgVectorChunkRepository } from "../../src/infrastructure/persistence/db/PgVectorChunkRepository";
+import pool from "../../src/infrastructure/persistence/db/pool";
 
 const chunkRepo = new PgVectorChunkRepository();
 const docRepo = new PgDocumentRepository();
