@@ -1,7 +1,28 @@
-import { type NextFunction, type Request, type Response, Router } from "express";
-import type { AppSettingsPatch, AppSettingsService } from "../../application/AppSettingsService";
+import {
+  type NextFunction,
+  type Request,
+  type Response,
+  Router,
+} from "express";
+import { z } from "zod";
+import type {
+  AppSettingsPatch,
+  AppSettingsService,
+} from "../../application/AppSettingsService";
 import type { CheckStorageConsistency } from "../../application/CheckStorageConsistency";
 import type { ResetAll } from "../../application/ResetAll";
+
+const appSettingsPatchSchema = z.object({
+  embedding: z.object({ provider: z.string().min(1) }).optional(),
+  storage: z.object({ provider: z.string().min(1) }).optional(),
+  chunking: z
+    .object({
+      strategy: z.enum(["recursive", "sentence"]).optional(),
+      chunkSize: z.number().int().min(64).max(2048).optional(),
+      chunkOverlap: z.number().int().min(0).max(512).optional(),
+    })
+    .optional(),
+});
 
 export function adminRouter(
   checkConsistency: CheckStorageConsistency,
@@ -15,7 +36,8 @@ export function adminRouter(
     async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
         const result = await checkConsistency.execute();
-        const ok = result.orphanFiles.length === 0 && result.missingFiles.length === 0;
+        const ok =
+          result.orphanFiles.length === 0 && result.missingFiles.length === 0;
         res.json({ ok, ...result });
       } catch (err) {
         next(err);
@@ -39,7 +61,14 @@ export function adminRouter(
     "/settings",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const updated = await settingsService.updateSettings(req.body as AppSettingsPatch);
+        const parsed = appSettingsPatchSchema.safeParse(req.body);
+        if (!parsed.success) {
+          res
+            .status(400)
+            .json({ error: "Validation error", fields: parsed.error.issues });
+          return;
+        }
+        const updated = await settingsService.updateSettings(parsed.data);
         res.json(updated);
       } catch (err) {
         next(err);
@@ -51,8 +80,17 @@ export function adminRouter(
     "/reset",
     async (req: Request, res: Response, next: NextFunction): Promise<void> => {
       try {
-        const { newSettings } = req.body as { newSettings?: AppSettingsPatch };
-        await resetAll.execute(newSettings);
+        const bodySchema = z.object({
+          newSettings: appSettingsPatchSchema.optional(),
+        });
+        const parsed = bodySchema.safeParse(req.body);
+        if (!parsed.success) {
+          res
+            .status(400)
+            .json({ error: "Validation error", fields: parsed.error.issues });
+          return;
+        }
+        await resetAll.execute(parsed.data.newSettings);
         res.json({ ok: true });
       } catch (err) {
         next(err);
