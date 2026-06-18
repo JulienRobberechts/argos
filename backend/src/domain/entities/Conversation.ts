@@ -13,7 +13,9 @@ export interface ConversationParamsProps {
   searchMode: "vector" | "hybrid";
 }
 
+/** Value Object : paramètres RAG immuables d'une conversation (retrieval, reranking, LLM, grounding). */
 export class ConversationParams {
+  /** Nominal branding : empêche l'assignation accidentelle entre Value Objects de même forme. */
   declare private readonly _brand: void;
 
   readonly retrievalLimit: number;

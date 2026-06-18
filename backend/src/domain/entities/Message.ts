@@ -14,7 +14,9 @@ interface SourceCitationProps {
   score: number;
 }
 
+/** Value Object : référence vers le chunk source qui appuie une réponse, incluant l'extrait et le score de pertinence. */
 export class SourceCitation {
+  /** Nominal branding : empêche l'assignation accidentelle entre Value Objects de même forme. */
   declare private readonly _brand: void;
 
   readonly chunkId: string;
