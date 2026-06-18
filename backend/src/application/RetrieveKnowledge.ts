@@ -27,69 +27,48 @@ export class RetrieveKnowledge implements IRetrieveKnowledge {
     searchMode?: "vector" | "hybrid",
   ): Promise<ChunkSearchResult[]> {
     const vector = await this.embeddingAdapter.embed(query, "query");
+    const effectiveMode = searchMode ?? this.searchMode;
 
     const useRerank =
       rerankOptions?.enabled !== undefined
         ? rerankOptions.enabled && this.reranker !== null
         : this.reranker !== null;
 
-    const effectiveMode = searchMode ?? this.searchMode;
+    // Reranking nécessite un pool de candidats plus large que le limit final
+    const candidateLimit = useRerank
+      ? limit * (rerankOptions?.candidateMultiplier ?? this.candidateMultiplier)
+      : limit;
+    const candidateMinScore = useRerank ? minScore * 0.5 : minScore;
 
-    if (useRerank) {
-      return this.executeWithRerank(
-        query,
-        vector,
-        limit,
-        minScore,
-        effectiveMode,
-        rerankOptions?.candidateMultiplier,
-        rerankOptions?.model,
-      );
-    }
-
-    const results =
+    const candidates =
       effectiveMode === "hybrid"
-        ? await this.chunkRepo.searchHybrid(query, vector, limit, minScore)
-        : await this.chunkRepo.searchByVector(vector, limit, minScore);
-    if (results.length === 0) {
+        ? await this.chunkRepo.searchHybrid(query, vector, candidateLimit, candidateMinScore)
+        : await this.chunkRepo.searchByVector(vector, candidateLimit, candidateMinScore);
+
+    if (candidates.length === 0) {
       this.logger.warn("No results found", {
         query,
         limit,
         minScore,
         vectorLength: vector.length,
       });
-    }
-    return results;
-  }
-
-  private async executeWithRerank(
-    query: string,
-    vector: number[],
-    limit: number,
-    minScore: number,
-    searchMode: "vector" | "hybrid",
-    candidateMultiplier?: number,
-    model?: string,
-  ): Promise<ChunkSearchResult[]> {
-    const candidateLimit = limit * (candidateMultiplier ?? this.candidateMultiplier);
-    const candidates =
-      searchMode === "hybrid"
-        ? await this.chunkRepo.searchHybrid(query, vector, candidateLimit, minScore * 0.5)
-        : await this.chunkRepo.searchByVector(vector, candidateLimit, minScore * 0.5);
-
-    if (candidates.length === 0) {
-      this.logger.warn("No candidates found for reranking", {
-        query,
-        candidateLimit,
-      });
       return [];
     }
 
-    const rankedIndices = await this.reranker?.rerank(
-      query,
-      candidates.map((c) => c.chunk.content),
-      model,
-    );
+    if (!useRerank) return candidates;
+
+    let rankedIndices: number[] | null = null;
+    try {
+      rankedIndices = await this.reranker!.rerank(
+        query,
+        candidates.map((c) => c.chunk.content),
+        rerankOptions?.model,
+      );
+    } catch (err) {
+      this.logger.warn("Reranker failed, falling back to retrieval order", {
+        error: String(err),
+      });
+    }
 
     if (!rankedIndices) return candidates.slice(0, limit);
     return rankedIndices.slice(0, limit).map((i) => candidates[i]);

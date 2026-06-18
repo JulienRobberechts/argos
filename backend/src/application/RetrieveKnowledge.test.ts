@@ -171,4 +171,126 @@ describe("RetrieveKnowledge", () => {
       expect(results[0].chunk.id).toBe(chunk.id);
     });
   });
+
+  describe("reranking", () => {
+    function makeReranker(order: number[]) {
+      return { rerank: vi.fn().mockResolvedValue(order) };
+    }
+
+    it("applique l'ordre du reranker sur les candidats", async () => {
+      const queryVec = unitVec(1024, 0);
+      const chunkA = makeChunk(unitVec(1024, 0), { content: "A" });
+      const chunkB = makeChunk(unitVec(1024, 0), { content: "B" });
+      const chunkC = makeChunk(unitVec(1024, 0), { content: "C" });
+      await chunkRepo.saveMany([chunkA, chunkB, chunkC]);
+
+      // le reranker inverse l'ordre : candidat[2] devient le meilleur
+      const reranker = makeReranker([2, 1, 0]);
+      const search = new RetrieveKnowledge(
+        chunkRepo,
+        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        nullLogger,
+        reranker,
+        3,
+        "vector",
+      );
+      const results = await search.execute("query", 3, 0);
+      expect(results[0].chunk.content).toBe(chunkC.content);
+    });
+
+    it("utilise searchHybrid (pas searchByVector) quand mode=hybrid avec reranking", async () => {
+      const queryVec = unitVec(1024, 0);
+      const chunk = makeChunk(unitVec(1024, 0), { content: "RAG" });
+      await chunkRepo.save(chunk);
+
+      const searchHybrid = vi.spyOn(chunkRepo, "searchHybrid");
+      const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
+
+      const reranker = makeReranker([0]);
+      const search = new RetrieveKnowledge(
+        chunkRepo,
+        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        nullLogger,
+        reranker,
+        3,
+        "hybrid",
+      );
+      await search.execute("RAG", 1, 0);
+
+      expect(searchHybrid).toHaveBeenCalled();
+      expect(searchByVector).not.toHaveBeenCalled();
+    });
+
+    it("récupère candidateLimit = limit × multiplier candidats avant de reranker", async () => {
+      const queryVec = unitVec(1024, 0);
+      for (let i = 0; i < 9; i++)
+        await chunkRepo.save(makeChunk(unitVec(1024, 0)));
+
+      const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
+      const reranker = makeReranker([0, 1, 2]);
+      const search = new RetrieveKnowledge(
+        chunkRepo,
+        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        nullLogger,
+        reranker,
+        3, // multiplier
+        "vector",
+      );
+      await search.execute("query", 3, 0); // limit=3, multiplier=3 → candidateLimit=9
+      expect(searchByVector).toHaveBeenCalledWith(
+        queryVec,
+        9,
+        expect.any(Number),
+      );
+    });
+
+    it("log un warning et retourne les candidats bruts si le reranker lève une erreur", async () => {
+      const queryVec = unitVec(1024, 0);
+      const chunk = makeChunk(unitVec(1024, 0), {
+        content: "fallback on error",
+      });
+      await chunkRepo.save(chunk);
+
+      const reranker = {
+        rerank: vi.fn().mockRejectedValue(new Error("API timeout")),
+      };
+      const warn = vi.fn();
+      const search = new RetrieveKnowledge(
+        chunkRepo,
+        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        { info: vi.fn(), warn, error: vi.fn() },
+        reranker,
+        3,
+        "vector",
+      );
+      const results = await search.execute("query", 1, 0);
+      expect(results).toHaveLength(1);
+      expect(results[0].chunk.id).toBe(chunk.id);
+      expect(warn).toHaveBeenCalledWith(
+        expect.stringContaining("Reranker failed"),
+        expect.objectContaining({
+          error: expect.stringContaining("API timeout"),
+        }),
+      );
+    });
+
+    it("retourne les candidats bruts si le reranker retourne null", async () => {
+      const queryVec = unitVec(1024, 0);
+      const chunk = makeChunk(unitVec(1024, 0), { content: "fallback" });
+      await chunkRepo.save(chunk);
+
+      const reranker = { rerank: vi.fn().mockResolvedValue(null) };
+      const search = new RetrieveKnowledge(
+        chunkRepo,
+        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        nullLogger,
+        reranker,
+        3,
+        "vector",
+      );
+      const results = await search.execute("query", 1, 0);
+      expect(results).toHaveLength(1);
+      expect(results[0].chunk.id).toBe(chunk.id);
+    });
+  });
 });
