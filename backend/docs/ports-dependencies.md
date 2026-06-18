@@ -1,5 +1,30 @@
 # Dépendances Applications → Ports
 
+## Interface Argos (app-ports)
+
+```mermaid
+graph LR
+  Argos --> admin
+  Argos --> kb[knowledgeBase]
+  Argos --> quiz
+  Argos --> rag
+
+  admin --> IAppSettingsService
+  admin --> ICheckStorageConsistency
+  admin --> IResetAll
+
+  kb --> ICreateDocument
+  kb --> IIngestDocument
+  kb --> ISummarizeDocument
+
+  quiz --> IGenerateQuiz
+
+  rag --> IAskQuestion
+  rag --> IConversationTitleGenerator
+  rag --> IRetrieveKnowledge
+  rag --> ISourceCitationResolver
+```
+
 ## AppSettingsService
 
 ```mermaid
@@ -11,10 +36,9 @@ graph LR
 
 ```mermaid
 graph LR
-  AskQuestion --> IChunkRepository
-  AskQuestion --> IConversationRepository
-  AskQuestion --> ILLMPort
   AskQuestion --> IRetrieveKnowledge
+  AskQuestion --> ILLMPort
+  AskQuestion --> IConversationRepository
 ```
 
 ## CheckStorageConsistency
@@ -77,14 +101,12 @@ graph LR
   RetrieveKnowledge --> IChunkRepository
   RetrieveKnowledge --> IRerankPort
   RetrieveKnowledge --> ITextEncoder
-  RetrieveKnowledge --> IRetrieveKnowledge
 ```
 
 ## SourceCitationResolver
 
 ```mermaid
 graph LR
-  SourceCitationResolver --> IChunkRepository
   SourceCitationResolver --> IDocumentRepository
 ```
 
