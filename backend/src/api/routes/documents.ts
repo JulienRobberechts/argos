@@ -5,9 +5,9 @@ import { Logger } from "../../infrastructure/logger/Logger";
 
 const logger = new Logger("documents");
 
-import type { CreateDocument } from "../../application/CreateDocument";
-import type { IngestDocument } from "../../application/IngestDocument";
-import type { SummarizeDocument } from "../../application/SummarizeDocument";
+import type { CreateDocument } from "../../application/knowledgeBase/CreateDocument";
+import type { IngestDocument } from "../../application/knowledgeBase/IngestDocument";
+import type { SummarizeDocument } from "../../application/knowledgeBase/SummarizeDocument";
 import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
 import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
 import type { IDocumentSummaryRepository } from "../../infra-ports/IDocumentSummaryRepository";

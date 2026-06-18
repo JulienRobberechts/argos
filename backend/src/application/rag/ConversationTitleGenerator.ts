@@ -1,5 +1,5 @@
-import type { ILLMPort } from "../infra-ports/ILLMPort";
-import type { IConversationTitleGenerator } from "../app-ports/IConversationTitleGenerator";
+import type { ILLMPort } from "../../infra-ports/ILLMPort";
+import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
 
 export class ConversationTitleGenerator implements IConversationTitleGenerator {
   constructor(private readonly llm: ILLMPort) {}

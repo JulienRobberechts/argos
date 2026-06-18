@@ -1,14 +1,14 @@
-import type { IAppSettingsService } from "./IAppSettingsService";
-import type { IAskQuestion } from "./IAskQuestion";
-import type { ICheckStorageConsistency } from "./ICheckStorageConsistency";
-import type { IConversationTitleGenerator } from "./IConversationTitleGenerator";
-import type { ICreateDocument } from "./ICreateDocument";
-import type { IGenerateQuiz } from "./IGenerateQuiz";
-import type { IIngestDocument } from "./IIngestDocument";
-import type { IResetAll } from "./IResetAll";
-import type { IRetrieveKnowledge } from "./IRetrieveKnowledge";
-import type { ISourceCitationResolver } from "./ISourceCitationResolver";
-import type { ISummarizeDocument } from "./ISummarizeDocument";
+import type { IAppSettingsService } from "./admin/IAppSettingsService";
+import type { IAskQuestion } from "./rag/IAskQuestion";
+import type { ICheckStorageConsistency } from "./admin/ICheckStorageConsistency";
+import type { IConversationTitleGenerator } from "./rag/IConversationTitleGenerator";
+import type { ICreateDocument } from "./knowledgeBase/ICreateDocument";
+import type { IGenerateQuiz } from "./quiz/IGenerateQuiz";
+import type { IIngestDocument } from "./knowledgeBase/IIngestDocument";
+import type { IResetAll } from "./admin/IResetAll";
+import type { IRetrieveKnowledge } from "./rag/IRetrieveKnowledge";
+import type { ISourceCitationResolver } from "./rag/ISourceCitationResolver";
+import type { ISummarizeDocument } from "./knowledgeBase/ISummarizeDocument";
 
 export interface Argos {
   settingsService: IAppSettingsService;

@@ -1,7 +1,7 @@
 import express from "express";
 import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { RetrieveKnowledge } from "../../application/RetrieveKnowledge";
+import type { RetrieveKnowledge } from "../../application/rag/RetrieveKnowledge";
 import { errorHandler } from "../middleware/errorHandler";
 import { searchRouter } from "./search";
 

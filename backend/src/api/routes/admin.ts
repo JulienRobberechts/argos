@@ -8,9 +8,9 @@ import { z } from "zod";
 import type {
   AppSettingsPatch,
   AppSettingsService,
-} from "../../application/AppSettingsService";
-import type { CheckStorageConsistency } from "../../application/CheckStorageConsistency";
-import type { ResetAll } from "../../application/ResetAll";
+} from "../../application/admin/AppSettingsService";
+import type { CheckStorageConsistency } from "../../application/admin/CheckStorageConsistency";
+import type { ResetAll } from "../../application/admin/ResetAll";
 
 const appSettingsPatchSchema = z.object({
   embedding: z.object({ provider: z.string().min(1) }).optional(),

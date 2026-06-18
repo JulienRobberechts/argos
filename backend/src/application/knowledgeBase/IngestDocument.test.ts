@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { InMemoryChunkRepository } from "../../tests/fakes/InMemoryChunkRepository";
-import { InMemoryDocumentRepository } from "../../tests/fakes/InMemoryDocumentRepository";
-import type { Document } from "../domain/entities/Document";
-import type { ChunkingConfig } from "./AppSettingsService";
-import { nullLogger } from "../../tests/fakes/NullLogger";
+import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
+import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
+import type { Document } from "../../domain/entities/Document";
+import type { ChunkingConfig } from "../admin/AppSettingsService";
+import { nullLogger } from "../../../tests/fakes/NullLogger";
 import { IngestDocument } from "./IngestDocument";
 
 function makeDocument(overrides?: Partial<Document>): Document {

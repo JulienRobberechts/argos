@@ -1,5 +1,5 @@
-import config from "../config";
-import type { IAppSettingsRepository } from "../infra-ports/IAppSettingsRepository";
+import config from "../../config";
+import type { IAppSettingsRepository } from "../../infra-ports/IAppSettingsRepository";
 import type {
   AppSettings,
   AppSettingsPatch,
@@ -7,7 +7,7 @@ import type {
   IAppSettingsService,
   ProviderOption,
   StorageOption,
-} from "../app-ports/IAppSettingsService";
+} from "../../app-ports/admin/IAppSettingsService";
 
 export type {
   AppSettings,

@@ -2,19 +2,19 @@ import { randomUUID } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { IChunkRepository } from "../infra-ports/IChunkRepository";
-import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
-import type { IFileParserPort } from "../infra-ports/IFileParserPort";
-import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
-import type { ILogger } from "../infra-ports/ILogger";
-import type { ITextEncoder } from "../infra-ports/ITextEncoder";
+import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
+import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
+import type { IFileParserPort } from "../../infra-ports/IFileParserPort";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
+import type { ILogger } from "../../infra-ports/ILogger";
+import type { ITextEncoder } from "../../infra-ports/ITextEncoder";
 import {
   ChunkConfig,
   type ChunkingStrategyName,
   createChunkingStrategy,
-} from "../domain/services/ChunkingStrategy";
-import type { ChunkingConfig } from "../app-ports/IAppSettingsService";
-import type { IIngestDocument } from "../app-ports/IIngestDocument";
+} from "../../domain/services/ChunkingStrategy";
+import type { ChunkingConfig } from "../../app-ports/admin/IAppSettingsService";
+import type { IIngestDocument } from "../../app-ports/knowledgeBase/IIngestDocument";
 
 const BATCH_SIZE = 20;
 

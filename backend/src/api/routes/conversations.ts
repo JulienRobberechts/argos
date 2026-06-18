@@ -6,7 +6,7 @@ import {
   Router,
 } from "express";
 import { z } from "zod";
-import type { AskQuestion } from "../../application/AskQuestion";
+import type { AskQuestion } from "../../application/rag/AskQuestion";
 import config from "../../config";
 import { ConversationParams } from "../../domain/entities/Conversation";
 import type { IConversationRepository } from "../../infra-ports/IConversationRepository";

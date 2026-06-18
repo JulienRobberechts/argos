@@ -1,12 +1,12 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import type { Document } from "../domain/entities/Document";
-import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
-import type { IFileStoragePort } from "../infra-ports/IFileStoragePort";
+import type { Document } from "../../domain/entities/Document";
+import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
+import type { IFileStoragePort } from "../../infra-ports/IFileStoragePort";
 import type {
   CreateDocumentInput,
   ICreateDocument,
-} from "../app-ports/ICreateDocument";
+} from "../../app-ports/knowledgeBase/ICreateDocument";
 
 export type { CreateDocumentInput };
 

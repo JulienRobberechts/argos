@@ -3,17 +3,17 @@ import type {
   ResponseGroundingResult,
   ResponseGroundingStrategy,
   Message,
-} from "../domain/entities/Message";
-import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
-import type { IConversationRepository } from "../infra-ports/IConversationRepository";
-import { LLMStreamOptions, type ILLMPort } from "../infra-ports/ILLMPort";
-import type { ILogger } from "../infra-ports/ILogger";
-import type { IRetrieveKnowledge } from "../app-ports/IRetrieveKnowledge";
-import type { IAskQuestion } from "../app-ports/IAskQuestion";
+} from "../../domain/entities/Message";
+import type { ChunkSearchResult } from "../../infra-ports/IChunkRepository";
+import type { IConversationRepository } from "../../infra-ports/IConversationRepository";
+import { LLMStreamOptions, type ILLMPort } from "../../infra-ports/ILLMPort";
+import type { ILogger } from "../../infra-ports/ILogger";
+import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
+import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";
 import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
-import type { CheckResponseGrounding } from "./responseChecks/CheckResponseGrounding";
-import { parseCitationForcingResult } from "./responseChecks/strategies/citationForcing";
-import { buildRagPrompt } from "../domain/services/ragPrompt";
+import type { CheckResponseGrounding } from "../responseChecks/CheckResponseGrounding";
+import { parseCitationForcingResult } from "../responseChecks/strategies/citationForcing";
+import { buildRagPrompt } from "../../domain/services/ragPrompt";
 import type { SourceCitationResolver } from "./SourceCitationResolver";
 
 const NO_INFO_RESPONSE =

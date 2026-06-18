@@ -1,11 +1,11 @@
-import type { SourceType } from "../domain/entities/Document";
-import { SourceCitation } from "../domain/entities/Message";
-import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
-import type { IDocumentRepository } from "../infra-ports/IDocumentRepository";
+import type { SourceType } from "../../domain/entities/Document";
+import { SourceCitation } from "../../domain/entities/Message";
+import type { ChunkSearchResult } from "../../infra-ports/IChunkRepository";
+import type { IDocumentRepository } from "../../infra-ports/IDocumentRepository";
 import type {
   CitationResolution,
   ISourceCitationResolver,
-} from "../app-ports/ISourceCitationResolver";
+} from "../../app-ports/rag/ISourceCitationResolver";
 
 export type { CitationResolution };
 

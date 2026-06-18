@@ -1,15 +1,15 @@
 import { randomUUID } from "node:crypto";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
-import { InMemoryConversationRepository } from "../../tests/fakes/InMemoryConversationRepository";
-import { ChunkMetadata, type Chunk } from "../domain/entities/Chunk";
+import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
+import { ChunkMetadata, type Chunk } from "../../domain/entities/Chunk";
 import {
   ConversationParams,
   type Conversation,
-} from "../domain/entities/Conversation";
-import { SourceCitation, type Message } from "../domain/entities/Message";
-import type { ChunkSearchResult } from "../infra-ports/IChunkRepository";
-import type { IRetrieveKnowledge } from "../app-ports/IRetrieveKnowledge";
-import { nullLogger } from "../../tests/fakes/NullLogger";
+} from "../../domain/entities/Conversation";
+import { SourceCitation, type Message } from "../../domain/entities/Message";
+import type { ChunkSearchResult } from "../../infra-ports/IChunkRepository";
+import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
+import { nullLogger } from "../../../tests/fakes/NullLogger";
 import { AskQuestion } from "./AskQuestion";
 import type { SourceCitationResolver } from "./SourceCitationResolver";
 import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";

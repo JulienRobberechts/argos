@@ -1,8 +1,8 @@
 import { z } from "zod";
-import type { IChunkRepository } from "../infra-ports/IChunkRepository";
-import type { ILogger } from "../infra-ports/ILogger";
-import type { ILLMPort } from "../infra-ports/ILLMPort";
-import type { IGenerateQuiz, QuizQuestion } from "../app-ports/IGenerateQuiz";
+import type { IChunkRepository } from "../../infra-ports/IChunkRepository";
+import type { ILogger } from "../../infra-ports/ILogger";
+import type { ILLMPort } from "../../infra-ports/ILLMPort";
+import type { IGenerateQuiz, QuizQuestion } from "../../app-ports/quiz/IGenerateQuiz";
 
 const MAX_CHUNKS = 15;
 const MAX_CHUNK_LENGTH = 800;
