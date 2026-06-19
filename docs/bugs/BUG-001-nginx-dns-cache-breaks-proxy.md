@@ -28,12 +28,14 @@ resolver ${RESOLVER} valid=10s;
 set $backend "${BACKEND_URL}";
 
 location /api/ {
-    proxy_pass $backend/api/;
+    proxy_pass $backend;
     ...
 }
 ```
 
 `${RESOLVER}` is resolved at container start from `/etc/resolv.conf` — this works across Docker, Railway, and any platform without hardcoding `127.0.0.11`. `valid=10s` forces re-resolution every 10 seconds. Using a variable for `proxy_pass` activates per-request DNS resolution, which requires an explicit `resolver`.
+
+**Critical**: with a variable in `proxy_pass`, nginx cannot do location-prefix stripping at config load time. It passes the original request URI unchanged. Use `proxy_pass $backend` (no path suffix) — adding `/api/` would produce double `/api//api/...` and cause 404.
 
 ## Lessons
 
