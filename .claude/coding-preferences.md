@@ -11,7 +11,7 @@ app-ports/       → application port interfaces
 app/             → use-case implementations
 domain/          → entities, value objects
 infra-ports/     → infrastructure port interfaces
-infrastructure/  → adapter implementations
+infra/           → adapter implementations
 ```
 
 - `domain` has no imports from other layers.
