@@ -64,6 +64,20 @@ Rules:
 - Always use domain language in code and documentation; never invent synonyms for defined terms.
 - When a new term is needed, propose several options to the user before adding it to the glossary.
 
+## Tests
+
+Three test categories, all run with Vitest:
+
+- **Unit** (`src/**/*.test.ts`): application and domain logic. Use in-memory fakes from `tests/fakes/` for repositories; use `vi.fn()` for external adapters (LLM, storage, embeddings). Never use real infrastructure.
+- **Integration** (`tests/integration/**`): infrastructure adapters against a real PostgreSQL database. Excluded from CI (`npm run test` in CI skips them).
+- **Retrieval** (`tests/retrieval/**`): end-to-end RAG quality checks. Excluded from CI.
+
+Rules:
+- Place unit tests next to their source file.
+- Use factory functions (`makeXxx()`) for test data — never inline raw objects.
+- Application-layer tests must not import from `infrastructure/`.
+- Do not mock the database — use fakes or hit a real DB (integration tests).
+
 ## Common Commands
 
 ### Backend (`/backend`)
