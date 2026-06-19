@@ -44,25 +44,37 @@ Le backend applique l'**architecture hexagonale (Ports & Adapters)** de façon s
 ```
 backend/src/
 ├── domain/                  ← cœur métier pur, zéro dépendance externe
-│   ├── entities/            ← Document, Chunk, Conversation, Message
-│   ├── ports/               ← interfaces I* (ILLMPort, IChunkRepository, IFileStoragePort…)
+│   ├── entities/            ← Document, Chunk, ChunkSearchResult, Conversation, Message, DocumentSummary
 │   └── services/            ← logique de chunking (RecursiveChunkingStrategy, SentenceChunkingStrategy)
 │
-├── app/                     ← use cases orchestrant le domaine via les ports
-│   ├── IngestDocument.ts
-│   ├── AskQuestion.ts
-│   ├── RetrieveKnowledge.ts
-│   ├── SummarizeDocument.ts
-│   ├── GenerateQuiz.ts
-│   └── responseChecks/      ← vérification de l'ancrage (faithfulness, citation_forcing, counterfactual)
+├── app-ports/               ← interfaces des use cases (contrats exposés à l'api)
+│   ├── admin/               ← IAppSettingsService, ICheckStorageConsistency, IResetAll
+│   ├── knowledgeBase/       ← ICreateDocument, IIngestDocument, ISummarizeDocument
+│   ├── quiz/                ← IGenerateQuiz
+│   └── rag/                 ← IAskQuestion, IRetrieveKnowledge, ISourceCitationResolver
 │
-├── infra/                   ← adaptateurs implémentant les ports du domaine
-│   ├── db/                  ← PgVectorChunkRepository, PgDocumentRepository… (PostgreSQL + pgvector)
-│   ├── llm/                 ← AnthropicLLMAdapter
-│   ├── embeddings/          ← VoyageEmbeddingAdapter
-│   ├── reranking/           ← VoyageRerankAdapter, NoopRerankAdapter
-│   ├── parsers/             ← MarkdownParser, PdfParser, TextParser, MultiFileParser
-│   └── storage/             ← LocalFileStorage, R2FileStorage, DynamicFileStorage
+├── app/                     ← implémentations des use cases orchestrant le domaine via les ports
+│   ├── admin/               ← AppSettingsService, CheckStorageConsistency, ResetAll
+│   ├── knowledgeBase/       ← CreateDocument, IngestDocument, SummarizeDocument
+│   ├── quiz/                ← GenerateQuiz
+│   └── rag/                 ← AskQuestion, RetrieveKnowledge, SourceCitationResolver
+│       └── responseGrounding/ ← faithfulness, citationForcing, counterfactual
+│
+├── infra-ports/             ← interfaces d'infrastructure
+│   ├── ai/                  ← ILLMPort, IRerankPort, ITextEncoder
+│   ├── persistence/         ← IChunkRepository, IDocumentRepository, IConversationRepository…
+│   └── storage/             ← IFileStoragePort, IDocumentParserPort
+│
+├── infra/                   ← adaptateurs implémentant les ports d'infrastructure
+│   ├── ai/
+│   │   ├── embeddings/      ← VoyageEmbeddingAdapter
+│   │   ├── llm/             ← AnthropicLLMAdapter
+│   │   └── reranking/       ← VoyageRerankAdapter, NoopRerankAdapter
+│   ├── persistence/
+│   │   └── db/              ← PgVectorChunkRepository, PgDocumentRepository… (PostgreSQL + pgvector)
+│   └── storage/
+│       ├── files/           ← LocalFileStorage, R2FileStorage, DynamicFileStorage
+│       └── parsers/         ← MarkdownParser, PdfParser, TextParser, MultiFileParser
 │
 └── api/                     ← adaptateurs entrants (routes Express, middleware, DTOs)
     ├── routes/
@@ -72,15 +84,15 @@ backend/src/
 ### Principe de dépendance
 
 ```
-api → app → domain ← infra
+api → app-ports ← app → domain ← infra-ports ← infra
 ```
 
-Les use cases (`app/`) ne connaissent que les interfaces définies dans `domain/ports/`. La couche `infra/` implémente ces interfaces. La composition finale est réalisée dans `registry.ts` — un seul point de câblage, sans framework d'injection.
+`api` ne connaît que les interfaces d'`app-ports`. `app` les implémente et orchestre le domaine via les ports d'`infra-ports`, que `infra` implémente. La composition finale est réalisée dans `registry.ts` — un seul point de câblage, sans framework d'injection.
 
 ### Exemple : le port ILLMPort
 
 ```typescript
-// domain/ports/ILLMPort.ts — interface pure, aucune dépendance
+// infra-ports/ai/ILLMPort.ts — interface pure, aucune dépendance
 export interface ILLMPort {
   stream(prompt: string, onToken: (token: string) => void,
          signal?: AbortSignal, options?: LLMStreamOptions): Promise<string>;

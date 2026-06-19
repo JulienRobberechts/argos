@@ -2,11 +2,11 @@
 
 Use cases orchestrating the `domain` via ports, with no infrastructure implementation details.
 
-Called by `../api`, depends on ports defined in `../infra-ports` (implemented by `../infra`).
+Called by `../api`, implements interfaces from `../app-ports`, depends on infrastructure ports from `../infra-ports`.
 
 ---
 
-## Documents
+## knowledgeBase/
 
 | Class | Description |
 |---|---|
@@ -14,7 +14,7 @@ Called by `../api`, depends on ports defined in `../infra-ports` (implemented by
 | `IngestDocument` | Parses, splits into chunks, and generates embeddings for a document to make it queryable. |
 | `SummarizeDocument` | Generates an LLM summary from a document's chunks and persists it in the database. |
 
-## RAG (`rag/`)
+## rag/
 
 | Class | Description |
 |---|---|
@@ -32,13 +32,13 @@ Called by `../api`, depends on ports defined in `../infra-ports` (implemented by
 | `citationForcing` | Forces the LLM to cite sources inline, then parses the citations to score grounding. |
 | `counterfactual` | Detects the added value of RAG by comparing the response with and without context. |
 
-## Quiz
+## quiz/
 
 | Class | Description |
 |---|---|
 | `GenerateQuiz` | Generates multiple-choice questions from document content via the LLM. |
 
-## Administration
+## admin/
 
 | Class | Description |
 |---|---|
