@@ -42,6 +42,7 @@ Factory functions (`makeXxx()`) for test data; app tests must not import from `i
 
 ## Architecture Decisions
 
+Before making a significant technical decision, read existing ADRs in `docs/decisions/` for context.
 Create or update an ADR for every significant technical decision.
 Format: `ADR-NNN-short-title.md` — sections: Context, Options Considered, Decision, Consequences.
 
