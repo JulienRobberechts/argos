@@ -17,17 +17,10 @@ RAG application (Retrieval-Augmented Generation) for internal knowledge manageme
 
 ## Tests
 
-Three test categories, all run with Vitest:
-
-- **Unit** (`src/**/*.test.ts`): application and domain logic. Use in-memory fakes from `tests/fakes/` for repositories; use `vi.fn()` for external adapters (LLM, storage, embeddings). Never use real infrastructure.
-- **Integration** (`tests/integration/**`): infrastructure adapters against a real PostgreSQL database. Excluded from CI (`npm run test` in CI skips them).
-- **Retrieval** (`tests/retrieval/**`): end-to-end RAG quality checks. Excluded from CI.
-
-Rules:
-- Place unit tests next to their source file.
-- Use factory functions (`makeXxx()`) for test data — never inline raw objects.
-- Application-layer tests must not import from `infrastructure/`.
-- Do not mock the database — use fakes or hit a real DB (integration tests).
+Runner: Vitest. File locations:
+- Unit: `src/**/*.test.ts` — fakes in `tests/fakes/`
+- Integration: `tests/integration/**` — against PostgreSQL; excluded from CI
+- E2E: `tests/retrieval/**` — RAG quality checks; excluded from CI
 
 ## Common Commands
 

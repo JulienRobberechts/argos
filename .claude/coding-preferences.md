@@ -52,6 +52,20 @@ Rules:
 - **Delete dead code**: never comment out code — delete it. Git history preserves it.
 - **Consistent abstraction level**: a function body should operate at one level of abstraction (don't mix high-level orchestration with low-level string manipulation).
 
+## Tests
+
+Three test categories:
+
+- **Unit**: application and domain logic. Use in-memory fakes for repositories; use `vi.fn()` for external adapters. Never use real infrastructure.
+- **Integration**: infrastructure adapters against a real database. Excluded from CI.
+- **E2E**: end-to-end quality checks. Excluded from CI.
+
+Rules:
+- Place unit tests next to their source file.
+- Use factory functions (`makeXxx()`) for test data — never inline raw objects.
+- Application-layer tests must not import from `infrastructure/`.
+- Do not mock the database — use fakes or hit a real DB (integration tests).
+
 ## Domain Language
 
 - Every project has a glossary file (location defined in project context) — it is the authoritative source for domain terms; keep it up to date with precise definitions.
