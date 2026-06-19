@@ -17,7 +17,7 @@ Added a `resolver` directive (dynamically read from `/etc/resolv.conf`) and swit
 
 `Dockerfile` CMD:
 ```sh
-export RESOLVER=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf)
+export RESOLVER=$(awk '/^nameserver/{ip=$2; if (ip ~ /:/) ip="["ip"]"; print ip; exit}' /etc/resolv.conf)
 envsubst '${BACKEND_URL} ${RESOLVER}' < default.conf.template > default.conf
 nginx -g 'daemon off;'
 ```
@@ -41,3 +41,4 @@ location /api/ {
 - The trio `resolver` + `set $var` + `proxy_pass $var` is required for dynamic DNS resolution in nginx.
 - Never hardcode `127.0.0.11` — read the resolver from `/etc/resolv.conf` for portability across platforms.
 - Railway deploys services in parallel; never assume a dependency is reachable when the container first starts.
+- IPv6 resolvers must be wrapped in brackets in nginx: `resolver [fd12::10]`. Detect with `if (ip ~ /:/) ip="["ip"]"` in awk.

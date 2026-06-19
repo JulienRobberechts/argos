@@ -9,4 +9,4 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf.template
 EXPOSE 80
-CMD ["/bin/sh", "-c", "export RESOLVER=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf) && envsubst '${BACKEND_URL} ${RESOLVER}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "export RESOLVER=$(awk '/^nameserver/{ip=$2; if (ip ~ /:/) ip=\"[\"ip\"]\"; print ip; exit}' /etc/resolv.conf) && envsubst '${BACKEND_URL} ${RESOLVER}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
