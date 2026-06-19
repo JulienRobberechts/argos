@@ -80,7 +80,7 @@ Dans le dashboard Railway → service **argos-api** → **Settings** → **Sourc
 Mettre "/backend"
 
 ```bash
-cd devknowledge/backend
+cd argos/backend
 railway up --service argos-api
 ```
 
@@ -106,7 +106,7 @@ Dans le dashboard Railway → service **argos-frontend** → **Settings** → **
 Mettre "/frontend"
 
 ```bash
-cd devknowledge/frontend
+cd argos/frontend
 railway up --service argos-frontend
 ```
 
@@ -117,7 +117,7 @@ Dans le dashboard Railway → service **argos-frontend** → **Settings** → **
 `railway run` s'exécute en local : `DATABASE_URL` pointe vers le réseau privé Railway (`*.railway.internal`), inaccessible hors du réseau Railway. Il faut overrider avec `DATABASE_PUBLIC_URL` :
 
 ```bash
-cd devknowledge/backend
+cd argos/backend
 npm run build
 railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
 ```
@@ -157,14 +157,14 @@ railway link   # si le terminal n'est pas encore lié au projet
 ### API
 
 ```bash
-cd devknowledge/backend
+cd argos/backend
 railway up --service argos-api
 ```
 
 ### Frontend
 
 ```bash
-cd devknowledge/frontend
+cd argos/frontend
 railway up --service argos-frontend
 ```
 
@@ -173,7 +173,7 @@ railway up --service argos-frontend
 À exécuter après le redéploiement de l'API :
 
 ```bash
-cd devknowledge/backend
+cd argos/backend
 npm run build
 railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infrastructure/db/migrate.js'
 ```
@@ -181,7 +181,7 @@ railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node di
 ### Tout redéployer d'un coup
 
 ```bash
-cd devknowledge/backend && railway up --service argos-api && \
+cd argos/backend && railway up --service argos-api && \
 cd ../frontend && railway up --service argos-frontend
 ```
 

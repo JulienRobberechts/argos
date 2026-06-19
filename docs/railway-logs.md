@@ -27,7 +27,7 @@ railway login
 railway logs
 
 # Logs d'un service spécifique
-railway logs --service devknowledge-api
+railway logs --service argos-api
 ```
 
 ## Format des logs

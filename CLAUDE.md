@@ -1,4 +1,4 @@
-# Project: Argos DevKnowledge
+# Project: Argos
 
 All code, comments, documentation, variable names, commit messages, and PR descriptions must be written in **English**.
 

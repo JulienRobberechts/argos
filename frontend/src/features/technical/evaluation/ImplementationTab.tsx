@@ -158,7 +158,7 @@ export default function ImplementationTab() {
           subtitle="Proposed layout — where each scorer would live"
         />
         <CodeBlock
-          code={`devknowledge/backend/tests/eval/        (proposed — does not exist yet)
+          code={`argos/backend/tests/eval/        (proposed — does not exist yet)
   dataset.json                  labeled Q/A pairs
   run.ts                        main script — npm run eval
   scorers/

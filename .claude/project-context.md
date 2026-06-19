@@ -1,4 +1,4 @@
-# Project Context: Argos DevKnowledge
+# Project Context: Argos
 
 RAG application (Retrieval-Augmented Generation) for internal knowledge management.
 

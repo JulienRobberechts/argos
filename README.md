@@ -1,6 +1,6 @@
 # Argos — Système RAG de démonstration
 
-![CI](https://github.com/JulienRobberechts/devknowledge/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/JulienRobberechts/argos/actions/workflows/ci.yml/badge.svg)
 
 Argos est une application complète de **Retrieval-Augmented Generation (RAG)** conçue pour interroger une base de connaissances de documents internes via un LLM. Ce projet de démonstration met en œuvre les pratiques d'un système en production : architecture hexagonale stricte, pipeline RAG multi-étapes, recherche hybride, vérification de la qualité des réponses.
 
@@ -284,12 +284,12 @@ Moyenne                           0.91   0.84   0.82
 ```env
 ANTHROPIC_APP_API_KEY=sk-ant-...
 VOYAGE_API_KEY=pa-...
-DATABASE_URL=postgresql://devknowledge:<PASSWORD>@localhost:5432/devknowledge
+DATABASE_URL=postgresql://argos:<PASSWORD>@localhost:5432/argos
 ```
 
 > Pour exécuter depuis le host (hors conteneur Docker), surcharger `DATABASE_URL` avec `localhost` :
 > ```bash
-> DATABASE_URL=postgresql://devknowledge:<PASSWORD>@localhost:5432/devknowledge npm run eval
+> DATABASE_URL=postgresql://argos:<PASSWORD>@localhost:5432/argos npm run eval
 > ```
 
 ---

@@ -54,7 +54,7 @@ npm run dev       # écoute sur http://localhost:5173
 
 Utilise `Dockerfile.dev` (Vite dev server + tsx watch, hot-reload actif) — **à ne pas confondre avec `Dockerfile` qui sert au déploiement Railway**.
 
-Depuis le répertoire devknowledge:
+Depuis le répertoire argos:
 
 ```bash
 docker compose up --build
