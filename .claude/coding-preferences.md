@@ -46,6 +46,15 @@ Before making a significant technical decision, read existing ADRs in `docs/deci
 Create or update an ADR for every significant technical decision.
 Format: `ADR-NNN-short-title.md` — sections: Context, Options Considered, Decision, Consequences.
 
+## Bug Documentation
+
+Use the `/record-bug` skill to document a bug when all three conditions hold:
+- Non-trivial root cause (not an obvious typo or config mistake)
+- Worth remembering long-term (subtle, took real time to diagnose)
+- Likely to recur (systemic, library-level, or architectural)
+
+Read existing bug docs when investigating a recurring or unexplained issue.
+
 ## Domain Language
 
 The glossary is the authoritative source — keep it up to date. Never invent synonyms; propose options before adding new terms.

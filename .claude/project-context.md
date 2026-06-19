@@ -19,6 +19,10 @@ RAG application (Retrieval-Augmented Generation) for internal knowledge manageme
 
 - ADRs: `docs/decisions/`
 
+## Bug Documentation
+
+- Bugs: `docs/bugs/`
+
 ## Tests
 
 Runner: Vitest.
