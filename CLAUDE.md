@@ -78,6 +78,16 @@ Rules:
 - Application-layer tests must not import from `infrastructure/`.
 - Do not mock the database — use fakes or hit a real DB (integration tests).
 
+## Commit Policy
+
+- **Commit often**: one logical change per commit — never bundle unrelated changes.
+- **Run checks before committing**: always run `npm run typecheck && npm run check && npm run test` in the affected package before committing.
+- **Fix errors before committing**: never commit with typecheck, lint, or test failures. Fix them first.
+- **Commit format**: `<type>: <short imperative description>` (e.g. `feat: add document ingestion use case`).
+  - Types: `feat`, `fix`, `refac`, `test`, `docs`, `chore`.
+- **Never commit**: `.env` files, secrets, credentials, or generated build artifacts.
+- **Prefer atomic commits over WIP**: if a task is too large, split it into independently-working commits rather than committing broken intermediate states.
+
 ## Common Commands
 
 ### Backend (`/backend`)
