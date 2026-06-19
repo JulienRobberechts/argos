@@ -53,11 +53,17 @@ Trade-offs introduced. What becomes easier or harder. New constraints.
 
 Replace `YYYY-MM-DD` with today's date.
 
+## Updating an existing ADR
+
+If `$ARGUMENTS` refers to an existing ADR (by number or title), update it instead of creating a new one:
+- Changing **Status** (e.g. Proposed → Accepted, Accepted → Deprecated) is always allowed.
+- When deprecating, add a note in the **Consequences** section pointing to the superseding ADR.
+- Do not rewrite the history — only append or update the Status line and Consequences.
+
 ## Rules
 
 - Write in **English**.
 - Be factual and concise — no padding.
 - Options Considered must list at least two alternatives (even if one was quickly ruled out).
 - If no clear technical decision was made in this session and no `$ARGUMENTS` provided, say so and do nothing.
-- Do not modify existing ADR files.
-- After creating the file, print its path and a one-sentence summary of the decision.
+- After creating or updating the file, print its path and a one-sentence summary of the decision.
