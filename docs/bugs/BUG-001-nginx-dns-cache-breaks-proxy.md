@@ -13,10 +13,18 @@ nginx resolves hostnames once at startup and caches the result indefinitely (whe
 
 ## Fix
 
-Added a `resolver` directive and switched `proxy_pass` to use a nginx variable (`$backend`) in `frontend/nginx.conf` (lines 7–9):
+Added a `resolver` directive (dynamically read from `/etc/resolv.conf`) and switched `proxy_pass` to use a nginx variable (`$backend`) in `frontend/nginx.conf` and `frontend/Dockerfile`.
 
+`Dockerfile` CMD:
+```sh
+export RESOLVER=$(awk '/^nameserver/{print $2; exit}' /etc/resolv.conf)
+envsubst '${BACKEND_URL} ${RESOLVER}' < default.conf.template > default.conf
+nginx -g 'daemon off;'
+```
+
+`nginx.conf`:
 ```nginx
-resolver 127.0.0.11 valid=10s;
+resolver ${RESOLVER} valid=10s;
 set $backend "${BACKEND_URL}";
 
 location /api/ {
@@ -25,10 +33,11 @@ location /api/ {
 }
 ```
 
-`127.0.0.11` is Docker/Railway's internal DNS resolver. `valid=10s` forces re-resolution every 10 seconds. Using a variable for `proxy_pass` activates per-request DNS resolution, which requires an explicit `resolver` to be defined.
+`${RESOLVER}` is resolved at container start from `/etc/resolv.conf` — this works across Docker, Railway, and any platform without hardcoding `127.0.0.11`. `valid=10s` forces re-resolution every 10 seconds. Using a variable for `proxy_pass` activates per-request DNS resolution, which requires an explicit `resolver`.
 
 ## Lessons
 
 - nginx with a literal `proxy_pass` URL resolves DNS once at startup — always add a `resolver` directive when proxying to hostnames that may not be available immediately (internal service networks, Railway, Docker Compose).
 - The trio `resolver` + `set $var` + `proxy_pass $var` is required for dynamic DNS resolution in nginx.
+- Never hardcode `127.0.0.11` — read the resolver from `/etc/resolv.conf` for portability across platforms.
 - Railway deploys services in parallel; never assume a dependency is reachable when the container first starts.
