@@ -79,7 +79,10 @@ describe("IngestDocument", () => {
     await docRepo.save(doc);
     await makeIngest().execute(doc.id);
     expect(fileStorage.download).toHaveBeenCalledWith("test.txt");
-    expect(fileParser.parse).toHaveBeenCalledOnce();
+    expect(fileParser.parse).toHaveBeenCalledWith({
+      buffer: Buffer.from("dummy"),
+      fileName: "test.txt",
+    });
   });
 
   it("should split content into chunks using ChunkingStrategy", async () => {

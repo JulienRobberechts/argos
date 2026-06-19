@@ -1,6 +1,4 @@
 import { randomUUID } from "node:crypto";
-import fs from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import type { ChunkingConfig } from "../../app-ports/admin/IAppSettingsService";
 import type { IIngestDocument } from "../../app-ports/knowledgeBase/IIngestDocument";
@@ -13,7 +11,7 @@ import type { ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
 import type { ILogger } from "../../infra-ports/ILogger";
 import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
 import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IFileParserPort } from "../../infra-ports/storage/IFileParserPort";
+import type { IDocumentParserPort } from "../../infra-ports/storage/IDocumentParserPort";
 import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
 
 const BATCH_SIZE = 20;
@@ -25,7 +23,7 @@ export class IngestDocument implements IIngestDocument {
     private readonly chunkRepo: IChunkRepository,
     private readonly embeddingAdapter: ITextEncoder,
     private readonly fileStorage: IFileStoragePort,
-    private readonly fileParser: IFileParserPort,
+    private readonly fileParser: IDocumentParserPort,
     private readonly getChunkingConfig: () => Promise<ChunkingConfig>,
     private readonly logger: ILogger,
   ) {}
@@ -51,7 +49,7 @@ export class IngestDocument implements IIngestDocument {
       const key = document.filePath;
       if (!key) throw new Error(`Document ${documentId} has no file`);
 
-      const text = await this.downloadAndParseFile(documentId, key);
+      const text = await this.downloadAndParseFile(key);
       const chunkResults = chunkingStrategy.chunk(
         text,
         ChunkConfig.create(chunkSize, chunkOverlap),
@@ -84,21 +82,13 @@ export class IngestDocument implements IIngestDocument {
     }
   }
 
-  private async downloadAndParseFile(documentId: string, key: string): Promise<string> {
+  private async downloadAndParseFile(key: string): Promise<string> {
     const buffer = await this.fileStorage.download(key);
-    const ext = path.extname(key);
-    const tempPath = path.join(os.tmpdir(), `ingest-${documentId}${ext}`);
-    await fs.promises.writeFile(tempPath, buffer);
-
-    let rawText: string;
-    try {
-      const parsed = await this.fileParser.parse(tempPath);
-      rawText = parsed.text;
-    } finally {
-      await fs.promises.unlink(tempPath).catch(() => {});
-    }
-
-    return rawText.replaceAll("\x00", "");
+    const parsed = await this.fileParser.parse({
+      buffer,
+      fileName: path.basename(key),
+    });
+    return parsed.text.replaceAll("\x00", "");
   }
 
   private async generateEmbeddingsBatched(contents: string[]): Promise<number[][]> {

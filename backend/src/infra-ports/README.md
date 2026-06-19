@@ -7,7 +7,7 @@ Interfaces (hexagonal architecture) defining contracts between the domain and in
 - `IDocumentRepository` — persistence of documents
 - `IDocumentSummaryRepository` — persistence of document summaries
 - `IEmbeddingPort` — embedding generation
-- `IFileParserPort` — text extraction from a file
+- `IDocumentParserPort` — text extraction from document content (buffer)
 - `IFileStoragePort` — file storage (upload/download/delete)
 - `ILLMPort` — LLM call (streaming)
 - `IRerankPort` — reranking of search results

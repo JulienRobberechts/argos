@@ -88,7 +88,7 @@ An optional post-retrieval step. A large pool of candidates is first retrieved (
 
 The pipeline that processes a document to make it searchable:
 1. Download the file from storage (`IFileStoragePort`),
-2. Parse it into raw text (`IFileParserPort`),
+2. Parse it into raw text (`IDocumentParserPort`),
 3. Split into chunks (configured strategy),
 4. Compute embeddings in batches (`BATCH_SIZE = 20`),
 5. Persist chunks with their vectors (`IChunkRepository`).

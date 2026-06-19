@@ -1,37 +1,32 @@
-import { mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { TextParser } from "./TextParser";
 
-let tmpDir: string;
-
-beforeAll(async () => {
-  tmpDir = await mkdtemp(join(tmpdir(), "text-parser-test-"));
-});
-
 describe("TextParser", () => {
-  it("should read file content as text", async () => {
-    const filePath = join(tmpDir, "test.txt");
-    await writeFile(filePath, "Hello world");
-    const result = await new TextParser().parse(filePath);
+  it("should read buffer content as text", async () => {
+    const result = await new TextParser().parse({
+      buffer: Buffer.from("Hello world"),
+      fileName: "test.txt",
+    });
     expect(result.text).toBe("Hello world");
   });
 
   it("should return correct metadata", async () => {
-    const filePath = join(tmpDir, "meta.txt");
-    await writeFile(filePath, "content");
-    const result = await new TextParser().parse(filePath);
+    const buffer = Buffer.from("content");
+    const result = await new TextParser().parse({
+      buffer,
+      fileName: "meta.txt",
+    });
     expect(result.metadata.fileName).toBe("meta.txt");
     expect(result.metadata.mimeType).toBe("text/plain");
-    expect(typeof result.metadata.fileSize).toBe("number");
+    expect(result.metadata.fileSize).toBe(buffer.length);
     expect(result.metadata.fileSize).toBeGreaterThan(0);
   });
 
   it("should preserve multi-line content", async () => {
-    const filePath = join(tmpDir, "multiline.txt");
-    await writeFile(filePath, "line1\nline2\nline3");
-    const result = await new TextParser().parse(filePath);
+    const result = await new TextParser().parse({
+      buffer: Buffer.from("line1\nline2\nline3"),
+      fileName: "multiline.txt",
+    });
     expect(result.text).toBe("line1\nline2\nline3");
   });
 });

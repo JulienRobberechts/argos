@@ -1,20 +1,12 @@
-import { mkdtemp, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { MarkdownParser } from "./MarkdownParser";
-
-let tmpDir: string;
-
-beforeAll(async () => {
-  tmpDir = await mkdtemp(join(tmpdir(), "md-parser-test-"));
-});
 
 describe("MarkdownParser", () => {
   it("should strip HTML tags produced from markdown", async () => {
-    const filePath = join(tmpDir, "test.md");
-    await writeFile(filePath, "# Hello\n\nThis is **bold** text.");
-    const result = await new MarkdownParser().parse(filePath);
+    const result = await new MarkdownParser().parse({
+      buffer: Buffer.from("# Hello\n\nThis is **bold** text."),
+      fileName: "test.md",
+    });
     expect(result.text).not.toContain("<");
     expect(result.text).not.toContain(">");
     expect(result.text).toContain("Hello");
@@ -22,25 +14,29 @@ describe("MarkdownParser", () => {
   });
 
   it("should decode HTML entities", async () => {
-    const filePath = join(tmpDir, "entities.md");
-    await writeFile(filePath, "a &amp; b &lt;tag&gt;");
-    const result = await new MarkdownParser().parse(filePath);
+    const result = await new MarkdownParser().parse({
+      buffer: Buffer.from("a &amp; b &lt;tag&gt;"),
+      fileName: "entities.md",
+    });
     expect(result.text).toContain("&");
     expect(result.text).toContain("<");
     expect(result.text).toContain(">");
   });
 
   it("should collapse multiple whitespace characters", async () => {
-    const filePath = join(tmpDir, "ws.md");
-    await writeFile(filePath, "word1\n\nword2");
-    const result = await new MarkdownParser().parse(filePath);
+    const result = await new MarkdownParser().parse({
+      buffer: Buffer.from("word1\n\nword2"),
+      fileName: "ws.md",
+    });
     expect(result.text).not.toMatch(/\s{2,}/);
   });
 
   it("should return markdown metadata", async () => {
-    const filePath = join(tmpDir, "doc.md");
-    await writeFile(filePath, "# Title");
-    const result = await new MarkdownParser().parse(filePath);
+    const buffer = Buffer.from("# Title");
+    const result = await new MarkdownParser().parse({
+      buffer,
+      fileName: "doc.md",
+    });
     expect(result.metadata.fileName).toBe("doc.md");
     expect(result.metadata.mimeType).toBe("text/markdown");
     expect(typeof result.metadata.fileSize).toBe("number");

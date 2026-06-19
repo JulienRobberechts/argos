@@ -1,12 +1,13 @@
-import fs from "node:fs";
-import path from "node:path";
-import type { IFileParserPort, ParseResult } from "../../../infra-ports/storage/IFileParserPort";
+import type {
+  IDocumentParserPort,
+  ParseInput,
+  ParseResult,
+} from "../../../infra-ports/storage/IDocumentParserPort";
 
-export class MarkdownParser implements IFileParserPort {
-  async parse(filePath: string): Promise<ParseResult> {
+export class MarkdownParser implements IDocumentParserPort {
+  async parse({ buffer, fileName }: ParseInput): Promise<ParseResult> {
     const { marked } = await import("marked");
-    const content = await fs.promises.readFile(filePath, "utf-8");
-    const stats = await fs.promises.stat(filePath);
+    const content = buffer.toString("utf-8");
     const html = marked.parse(content) as string;
     const text = html
       .replace(/<[^>]*>/g, " ")
@@ -20,8 +21,8 @@ export class MarkdownParser implements IFileParserPort {
     return {
       text,
       metadata: {
-        fileName: path.basename(filePath),
-        fileSize: stats.size,
+        fileName,
+        fileSize: buffer.length,
         mimeType: "text/markdown",
       },
     };

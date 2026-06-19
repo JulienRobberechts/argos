@@ -1,16 +1,16 @@
-import fs from "node:fs";
-import path from "node:path";
-import type { IFileParserPort, ParseResult } from "../../../infra-ports/storage/IFileParserPort";
+import type {
+  IDocumentParserPort,
+  ParseInput,
+  ParseResult,
+} from "../../../infra-ports/storage/IDocumentParserPort";
 
-export class TextParser implements IFileParserPort {
-  async parse(filePath: string): Promise<ParseResult> {
-    const content = await fs.promises.readFile(filePath, "utf-8");
-    const stats = await fs.promises.stat(filePath);
+export class TextParser implements IDocumentParserPort {
+  async parse({ buffer, fileName }: ParseInput): Promise<ParseResult> {
     return {
-      text: content,
+      text: buffer.toString("utf-8"),
       metadata: {
-        fileName: path.basename(filePath),
-        fileSize: stats.size,
+        fileName,
+        fileSize: buffer.length,
         mimeType: "text/plain",
       },
     };
