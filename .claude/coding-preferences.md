@@ -1,5 +1,17 @@
 # Coding Preferences
 
+## Prefered Stack
+
+This is a default stack in case of new projet, but feel free to suggest alterntives tools:
+
+- **Backend**: Node.js / TypeScript, Express, Vitest, Biome. Uses Hexagonal Architecture.
+- **Frontend**: React/ TypeScript, Vite, Biome
+- **DB**: PostgreSQL
+- **Storage**: Cloudflare R2 (compatible AWS S3)
+- **AI**: Anthropic SDK (`@anthropic-ai/sdk`)
+- **Infra**: Docker Compose in dev, Docker in prod on Railway
+- **Deployment Plaform**: Railway
+
 ## Hexagonal Architecture
 
 By default, except different instructions in the project, a backend server should follow **hexagonal architecture** (ports & adapters).
