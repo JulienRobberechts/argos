@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Edit, Bash(ls:*, find:*), Write
+allowed-tools: Read, Edit, Bash(ls:*, find:*, git log:*, git diff:*, git show:*), Write
 description: Document a technical decision into docs/decisions/ as an ADR using the standard template.
 ---
 

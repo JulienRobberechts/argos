@@ -48,22 +48,6 @@ What to watch out for / how to prevent recurrence.
 
 Replace `YYYY-MM-DD` with today's date.
 
-## Code reference comment
-
-After creating the bug file, check if the fix touched specific source files. If yes, add a single-line comment **at the exact location of the fix** in each relevant file, referencing the bug record:
-
-```ts
-// See BUG-NNN-short-title
-```
-
-Adapt the comment syntax to the file language (`//`, `#`, `--`, `<!-- -->`, etc.).
-
-Only add the comment if:
-- The fix location is identifiable (a specific line or block, not a config-wide change).
-- The WHY is non-obvious — a future developer reading that line would benefit from the pointer.
-
-Do **not** add the comment if the fix is already self-explanatory from the code itself.
-
 ## Rules
 
 - Write in **English**.
