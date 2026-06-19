@@ -15,6 +15,10 @@ RAG application (Retrieval-Augmented Generation) for internal knowledge manageme
 
 - Glossary: `docs/glossary.md`
 
+## Architecture Decisions
+
+- ADRs: `docs/decisions/` — technical choices with context and trade-offs
+
 ## Tests
 
 Runner: Vitest. File locations:

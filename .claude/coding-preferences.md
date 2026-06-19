@@ -78,6 +78,12 @@ Rules:
 - Application-layer tests must not import from `infrastructure/`.
 - Do not mock the database — use fakes or hit a real DB (integration tests).
 
+## Architecture Decisions
+
+- Every project has an ADR folder (`docs/decisions/`) — it is the authoritative record of technical choices.
+- When a significant technical decision is made (provider, architecture pattern, algorithm, trade-off), create or update an ADR.
+- ADR format: `ADR-NNN-short-title.md` with sections: Context, Options Considered, Decision, Consequences.
+
 ## Domain Language
 
 - Every project has a glossary file (location defined in project context) — it is the authoritative source for domain terms; keep it up to date with precise definitions.
