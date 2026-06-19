@@ -1,5 +1,10 @@
 # Coding Preferences
 
+<!-- SCOPE: Generic engineering practices only — no project names, stack choices, or tool-specific APIs.
+     Allowed exceptions: folder names that encode an architectural preference (e.g. hexagonal layer names),
+     and recommended doc paths (docs/decisions/, docs/bugs/, docs/learnings/) treated as conventions.
+     All other project-specific details belong in project-context.md. -->
+
 ## Hexagonal Architecture
 
 Backend follows **hexagonal architecture** (ports & adapters):
@@ -35,7 +40,7 @@ Rules:
 
 ## Tests
 
-- **Unit**: app/domain logic; in-memory fakes for repos, `vi.fn()` for adapters. Next to source file.
+- **Unit**: app/domain logic; in-memory fakes for repos, spy/mock functions for adapters. Next to source file.
 - **Integration**: real database. Excluded from CI.
 - **E2E**: quality checks. Excluded from CI.
 Factory functions (`makeXxx()`) for test data; app tests must not import from `infrastructure/`.
