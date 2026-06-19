@@ -1,6 +1,6 @@
 import { Router } from "express";
 import pkg from "../../../package.json";
-import type { AppSettingsService } from "../../application/admin/AppSettingsService";
+import type { AppSettingsService } from "../../app/admin/AppSettingsService";
 import config from "../../config";
 
 export function configRouter(settingsService: AppSettingsService): Router {

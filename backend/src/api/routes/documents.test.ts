@@ -4,7 +4,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
-import { CreateDocument } from "../../application/knowledgeBase/CreateDocument";
+import { CreateDocument } from "../../app/knowledgeBase/CreateDocument";
 import type { Document } from "../../domain/entities/Document";
 import { documentsRouter } from "./documents";
 

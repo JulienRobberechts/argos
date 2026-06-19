@@ -80,7 +80,7 @@ A rank merging algorithm. For each document appearing in a result list, its RRF 
 
 An optional post-retrieval step. A large pool of candidates is first retrieved (`limit × candidateMultiplier`), then a reranking model (e.g. Voyage Rerank) reorders them by fine-grained relevance to the question. More precise than vector similarity alone, but more costly in API calls.
 
-**Key files:** `domain/ports/IRerankPort.ts`, `application/SearchKnowledge.ts`
+**Key files:** `domain/ports/IRerankPort.ts`, `app/SearchKnowledge.ts`
 
 ---
 
@@ -93,7 +93,7 @@ The pipeline that processes a document to make it searchable:
 4. Compute embeddings in batches (`BATCH_SIZE = 20`),
 5. Persist chunks with their vectors (`IChunkRepository`).
 
-**Key file:** `application/IngestDocument.ts`
+**Key file:** `app/IngestDocument.ts`
 
 ---
 
@@ -101,7 +101,7 @@ The pipeline that processes a document to make it searchable:
 
 To avoid overloading the LLM prompt with the full conversation history, only the last `SLIDING_WINDOW_EXCHANGES = 4` exchanges (4 user/assistant pairs, i.e. 8 messages) are injected into the prompt. Older messages are silently dropped.
 
-**Key file:** `application/AskQuestion.ts`
+**Key file:** `app/AskQuestion.ts`
 
 ---
 
@@ -118,7 +118,7 @@ Compares the RAG-generated answer to an answer generated **without** any sources
 ### `citation_forcing`
 Injects an instruction into the prompt forcing the LLM to tag each claim with `[SOURCE N]` or `[OWN KNOWLEDGE]`. These markers are then parsed to build a list of traced claims, and stripped from the final text shown to the user.
 
-**Key files:** `application/responseChecks/`, `domain/entities/Message.ts` → `ResponseGroundingResult`
+**Key files:** `app/responseChecks/`, `domain/entities/Message.ts` → `ResponseGroundingResult`
 
 ---
 
@@ -134,7 +134,7 @@ An object attached to each assistant message, tracing the chunks used to generat
 
 The codebase is organized into three isolated layers:
 - **`domain/`** — pure entities and interfaces (ports), with no external dependencies.
-- **`application/`** — business use cases that orchestrate the domain through ports.
+- **`app/`** — business use cases that orchestrate the domain through ports.
 - **`infra/`** — concrete implementations of ports (PostgreSQL, Anthropic, Voyage AI, file storage).
 
 Ports (`ILLMPort`, `ITextEncoder`, `IRerankPort`, etc.) are TypeScript interfaces that infrastructure implements. This allows swapping an implementation (e.g. replacing Voyage with another provider) without touching business logic.

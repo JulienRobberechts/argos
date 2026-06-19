@@ -48,7 +48,7 @@ backend/src/
 │   ├── ports/               ← interfaces I* (ILLMPort, IChunkRepository, IFileStoragePort…)
 │   └── services/            ← logique de chunking (RecursiveChunkingStrategy, SentenceChunkingStrategy)
 │
-├── application/             ← use cases orchestrant le domaine via les ports
+├── app/                     ← use cases orchestrant le domaine via les ports
 │   ├── IngestDocument.ts
 │   ├── AskQuestion.ts
 │   ├── RetrieveKnowledge.ts
@@ -72,10 +72,10 @@ backend/src/
 ### Principe de dépendance
 
 ```
-api → application → domain ← infra
+api → app → domain ← infra
 ```
 
-Les use cases (`application/`) ne connaissent que les interfaces définies dans `domain/ports/`. La couche `infra/` implémente ces interfaces. La composition finale est réalisée dans `registry.ts` — un seul point de câblage, sans framework d'injection.
+Les use cases (`app/`) ne connaissent que les interfaces définies dans `domain/ports/`. La couche `infra/` implémente ces interfaces. La composition finale est réalisée dans `registry.ts` — un seul point de câblage, sans framework d'injection.
 
 ### Exemple : le port ILLMPort
 
@@ -90,7 +90,7 @@ export interface ILLMPort {
 export class AnthropicLLMAdapter implements ILLMPort { ... }
 ```
 
-Changer de fournisseur LLM (OpenAI, Mistral…) revient à écrire un nouvel adaptateur sans toucher une seule ligne de domaine ni d'application.
+Changer de fournisseur LLM (OpenAI, Mistral…) revient à écrire un nouvel adaptateur sans toucher une seule ligne de domaine ni d'app.
 
 ---
 

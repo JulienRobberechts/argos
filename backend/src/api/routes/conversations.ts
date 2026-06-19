@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import type { AskQuestion } from "../../application/rag/AskQuestion";
+import type { AskQuestion } from "../../app/rag/AskQuestion";
 import config from "../../config";
 import { ConversationParams } from "../../domain/entities/Conversation";
 import { Logger } from "../../infra/logger/Logger";

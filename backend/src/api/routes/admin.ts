@@ -1,11 +1,8 @@
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import type {
-  AppSettingsPatch,
-  AppSettingsService,
-} from "../../application/admin/AppSettingsService";
-import type { CheckStorageConsistency } from "../../application/admin/CheckStorageConsistency";
-import type { ResetAll } from "../../application/admin/ResetAll";
+import type { AppSettingsPatch, AppSettingsService } from "../../app/admin/AppSettingsService";
+import type { CheckStorageConsistency } from "../../app/admin/CheckStorageConsistency";
+import type { ResetAll } from "../../app/admin/ResetAll";
 
 const appSettingsPatchSchema = z.object({
   embedding: z.object({ provider: z.string().min(1) }).optional(),

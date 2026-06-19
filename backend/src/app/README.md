@@ -1,4 +1,4 @@
-# application
+# app
 
 Use cases orchestrating the `domain` via ports, with no infrastructure implementation details.
 
