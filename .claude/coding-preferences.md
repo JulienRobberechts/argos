@@ -1,5 +1,37 @@
 # Coding Preferences
 
+## Hexagonal Architecture
+
+By default, except different instructions in the project, a backend server should follow **hexagonal architecture** (ports & adapters).
+
+The prefered file hierarchy should be:
+
+Input adapters
+
+```
+api/             → for any REST server as input adapter — depends only on app-ports
+cli/             → for any cli — depends only on app-ports
+```
+
+Core
+``` 
+app-ports/       → application port interfaces (use-case contracts)
+app/     → use-case implementations — depends only on ports, never on infrastructure
+domain/          → entities, value objects — no dependencies on other layers
+infra-ports/     → infrastructure port interfaces (DB, storage, LLM, etc.)
+```
+
+Infrastructure
+```
+infrastructure/  → adapter implementations of infra-ports
+```
+
+Rules:
+- `domain` must not import from any other layer.
+- `application` must not import from `infrastructure` or `api`.
+- New use cases must define or reuse ports; never call infrastructure directly from `application`.
+- New infrastructure adapters must implement an existing `infra-ports` interface.
+
 ## Code Conventions
 
 - All application interface classes and methods should have comments.

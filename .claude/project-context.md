@@ -4,34 +4,12 @@ RAG application (Retrieval-Augmented Generation) for internal knowledge manageme
 
 ## Stack
 
-- **Backend**: Node.js / TypeScript, Express 5, Vitest, Biome
+- **Backend**: Node.js / TypeScript, Express 5, Vitest, Biome. Uses Hexagonal Architecture.
 - **Frontend**: React 19 / TypeScript, Vite, Tailwind CSS 4, Biome
 - **DB**: PostgreSQL
 - **Storage**: Cloudflare R2 (compatible AWS S3)
 - **AI**: Anthropic SDK (`@anthropic-ai/sdk`)
 - **Infra**: Docker Compose in dev, Docker in prod on Railway
-
-## Hexagonal Architecture
-
-The backend follows **hexagonal architecture** (ports & adapters). Strictly enforce layer boundaries:
-
-```
-api/             → Express routes — depends only on app-ports
-
-app-ports/       → application port interfaces (use-case contracts)
-application/     → use-case implementations — depends only on ports, never on infrastructure
-
-domain/          → entities, value objects — no dependencies on other layers
-
-infra-ports/     → infrastructure port interfaces (DB, storage, LLM, etc.)
-infrastructure/  → adapter implementations of infra-ports
-```
-
-Rules:
-- `domain` must not import from any other layer.
-- `application` must not import from `infrastructure` or `api`.
-- New use cases must define or reuse ports; never call infrastructure directly from `application`.
-- New infrastructure adapters must implement an existing `infra-ports` interface.
 
 ## Domain Language
 
