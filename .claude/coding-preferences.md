@@ -53,11 +53,11 @@ Format: `ADR-NNN-short-title.md` — sections: Context, Options Considered, Deci
 
 ## Bug Documentation
 
-Use `/record-bug` for: non-trivial root cause, likely to recur. Read existing docs for recurring issues.
+Use `/bug` for: non-trivial root cause, likely to recur. Read existing docs for recurring issues.
 
 ## Tech Debt
 
-Use `/record-tech-debt` when identifying a violation of architecture rules or a design shortcut worth tracking. Read `docs/tech-debt/` before raising a known issue.
+Use `/debt` when identifying a violation of architecture rules or a design shortcut worth tracking. Read `docs/tech-debt/` before raising a known issue.
 
 ## Domain Language
 
