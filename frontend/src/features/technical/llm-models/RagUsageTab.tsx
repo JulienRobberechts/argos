@@ -15,13 +15,12 @@ export default function RagUsageTab() {
           <CheckCircle size={16} className="text-green-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-slate-900">
-              Project default —{" "}
-              <code className="text-amber-700">claude-haiku-4-5-20251001</code>
+              Project default — <code className="text-amber-700">claude-haiku-4-5-20251001</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              What this project ships with (<code>LLM_MODEL</code>). Fast and
-              cheap ($1/$5), and since the LLM only summarises pre-retrieved
-              sources, a small model is enough. Context limited to 200k tokens.
+              What this project ships with (<code>LLM_MODEL</code>). Fast and cheap ($1/$5), and
+              since the LLM only summarises pre-retrieved sources, a small model is enough. Context
+              limited to 200k tokens.
             </p>
           </div>
         </div>
@@ -29,13 +28,11 @@ export default function RagUsageTab() {
           <CheckCircle size={16} className="text-amber-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-slate-900">
-              Production upgrade —{" "}
-              <code className="text-amber-700">claude-sonnet-4-6</code>
+              Production upgrade — <code className="text-amber-700">claude-sonnet-4-6</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              Best intelligence/speed/cost balance: 1M token context, 64k
-              output, fast, $3/$15. Switch to it when answer quality matters
-              more than per-token cost.
+              Best intelligence/speed/cost balance: 1M token context, 64k output, fast, $3/$15.
+              Switch to it when answer quality matters more than per-token cost.
             </p>
           </div>
         </div>
@@ -43,13 +40,11 @@ export default function RagUsageTab() {
           <Zap size={16} className="text-amber-600 mt-0.5 shrink-0" />
           <div>
             <p className="font-semibold text-slate-900">
-              Maximum capability —{" "}
-              <code className="text-amber-700">claude-opus-4-8</code> or{" "}
+              Maximum capability — <code className="text-amber-700">claude-opus-4-8</code> or{" "}
               <code className="text-amber-700">claude-fable-5</code>
             </p>
             <p className="text-xs text-slate-600 mt-0.5">
-              For complex queries, synthesis over very long contexts, or
-              response comparison.
+              For complex queries, synthesis over very long contexts, or response comparison.
             </p>
           </div>
         </div>

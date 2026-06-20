@@ -131,7 +131,11 @@ function CounterfactualDetail({ result }: { result: ResponseGroundingResult }) {
   );
 }
 
-export default function ResponseGroundingPanel({ results }: { results: ResponseGroundingResult[] }) {
+export default function ResponseGroundingPanel({
+  results,
+}: {
+  results: ResponseGroundingResult[];
+}) {
   const [open, setOpen] = useState(false);
   const sorted = [...results].sort(
     (a, b) => STRATEGY_ORDER.indexOf(a.strategy) - STRATEGY_ORDER.indexOf(b.strategy),

@@ -1,11 +1,4 @@
-import {
-  ArrowUpDown,
-  Brain,
-  Combine,
-  FlaskConical,
-  Gauge,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowUpDown, Brain, Combine, FlaskConical, Gauge, ShieldCheck } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 const pages = [

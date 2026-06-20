@@ -49,19 +49,14 @@ export default function ImplementationTab() {
         />
 
         <Callout type="warning">
-          <strong>Not yet implemented.</strong> The flow below is a design
-          proposal. What exists in the codebase today: an integration retrieval
-          test (<code>tests/retrieval/</code>) and the grounding strategies
-          under <code>responseChecks/strategies/</code>. The dataset, scorers,
+          <strong>Not yet implemented.</strong> The flow below is a design proposal. What exists in
+          the codebase today: an integration retrieval test (<code>tests/retrieval/</code>) and the
+          grounding strategies under <code>responseChecks/strategies/</code>. The dataset, scorers,
           and <code>npm run eval</code> script described here are not present.
         </Callout>
 
         <div className="mt-6 flex flex-col gap-1 mb-6">
-          <FlowBox
-            label="dataset.json"
-            sub="labeled Q/A pairs"
-            color="yellow"
-          />
+          <FlowBox label="dataset.json" sub="labeled Q/A pairs" color="yellow" />
           <Arrow />
           <FlowBox
             label="RetrieveKnowledge.execute(question)"
@@ -89,10 +84,9 @@ export default function ImplementationTab() {
         </div>
 
         <Callout type="info">
-          The eval would call <code>RetrieveKnowledge</code> directly — not{" "}
-          <code>AskQuestion</code>. The latter writes to the conversation
-          database and generates titles, neither of which is needed for offline
-          eval.
+          The eval would call <code>RetrieveKnowledge</code> directly — not <code>AskQuestion</code>
+          . The latter writes to the conversation database and generates titles, neither of which is
+          needed for offline eval.
         </Callout>
       </Card>
 
@@ -132,10 +126,7 @@ export default function ImplementationTab() {
               color: "border-slate-200 bg-slate-50 text-slate-600",
             },
           ].map(({ label, count, color }) => (
-            <div
-              key={label}
-              className={`border rounded-lg p-3 text-center ${color}`}
-            >
+            <div key={label} className={`border rounded-lg p-3 text-center ${color}`}>
               <p className="text-2xl font-bold">{count}</p>
               <p className="text-xs font-medium mt-0.5">{label}</p>
             </div>
@@ -144,9 +135,9 @@ export default function ImplementationTab() {
 
         <div className="mt-4">
           <Callout type="warning">
-            <code>document_ids</code> would hold relative file paths, not vector
-            database IDs. Mapping to real IDs is required after ingesting the
-            demo documents into the knowledge base.
+            <code>document_ids</code> would hold relative file paths, not vector database IDs.
+            Mapping to real IDs is required after ingesting the demo documents into the knowledge
+            base.
           </Callout>
         </div>
       </Card>
@@ -172,9 +163,7 @@ export default function ImplementationTab() {
         </p>
         <CodeBlock code={`"eval": "tsx tests/eval/run.ts"`} />
 
-        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">
-          Expected stdout output
-        </p>
+        <p className="text-sm font-medium text-slate-800 mt-4 mb-2">Expected stdout output</p>
         <CodeBlock
           code={`ID        Dataset          Diff    Faith  Relev  Recall
 oe-01     orient-express   easy    1.00   0.92   0.88

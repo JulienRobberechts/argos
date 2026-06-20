@@ -15,17 +15,12 @@ export default function ImplementationTab() {
           subtitle="How the two stages are orchestrated"
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-3">
-          The{" "}
-          <code className="bg-slate-100 px-1 rounded text-amber-700">
-            RetrieveKnowledge
-          </code>{" "}
+          The <code className="bg-slate-100 px-1 rounded text-amber-700">RetrieveKnowledge</code>{" "}
           use case accepts an optional{" "}
-          <code className="bg-slate-100 px-1 rounded text-amber-700">
-            IRerankPort
-          </code>
-          . When <code className="bg-slate-100 px-1 rounded">null</code> (or
-          disabled), it returns the single-stage search results directly. Stage
-          1 honours the active search mode — vector or hybrid.
+          <code className="bg-slate-100 px-1 rounded text-amber-700">IRerankPort</code>. When{" "}
+          <code className="bg-slate-100 px-1 rounded">null</code> (or disabled), it returns the
+          single-stage search results directly. Stage 1 honours the active search mode — vector or
+          hybrid.
         </p>
         <CodeBlock
           code={`// application/RetrieveKnowledge.ts (simplified)
@@ -55,13 +50,10 @@ async execute(query, limit, minScore, rerankOptions, searchMode) {
         <div className="mt-4">
           <Callout type="info">
             <code>IRerankPort</code> is a domain interface with a single method:
-            <code className="ml-1">
-              rerank(query, documents, model?): Promise&lt;number[]&gt;
-            </code>
-            . The returned array contains original indices sorted from most to
-            least relevant. Swapping the reranker (e.g. Cohere instead of
-            Voyage) requires only a new adapter — no changes to{" "}
-            <code>RetrieveKnowledge</code>.
+            <code className="ml-1">rerank(query, documents, model?): Promise&lt;number[]&gt;</code>.
+            The returned array contains original indices sorted from most to least relevant.
+            Swapping the reranker (e.g. Cohere instead of Voyage) requires only a new adapter — no
+            changes to <code>RetrieveKnowledge</code>.
           </Callout>
         </div>
       </Card>
@@ -113,9 +105,9 @@ async execute(query, limit, minScore, rerankOptions, searchMode) {
         </div>
         <div className="mt-4">
           <Callout type="warning">
-            Increasing <code>RERANK_CANDIDATE_MULTIPLIER</code> beyond 5 sends a
-            large document list to the Voyage API and adds noticeable latency.
-            The default of 3 is a good balance between recall and response time.
+            Increasing <code>RERANK_CANDIDATE_MULTIPLIER</code> beyond 5 sends a large document list
+            to the Voyage API and adds noticeable latency. The default of 3 is a good balance
+            between recall and response time.
           </Callout>
         </div>
       </Card>

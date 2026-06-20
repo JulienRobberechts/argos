@@ -1,11 +1,7 @@
 import { Bot } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import type {
-  ResponseGroundingResult,
-  Message,
-  SourceCitation,
-} from "../../types/domain";
+import type { Message, ResponseGroundingResult, SourceCitation } from "../../types/domain";
 import ResponseGroundingPanel from "./ResponseGroundingPanel";
 import SourceCard from "./SourceCard";
 import StreamingMessage from "./StreamingMessage";
@@ -94,10 +90,9 @@ export default function MessageList({
           {streamingSources && streamingSources.length > 0 && (
             <SourcesList sources={streamingSources} />
           )}
-          {streamingResponseGrounding &&
-            streamingResponseGrounding.length > 0 && (
-              <ResponseGroundingPanel results={streamingResponseGrounding} />
-            )}
+          {streamingResponseGrounding && streamingResponseGrounding.length > 0 && (
+            <ResponseGroundingPanel results={streamingResponseGrounding} />
+          )}
         </AssistantBubble>
       )}
       <div ref={bottomRef} />

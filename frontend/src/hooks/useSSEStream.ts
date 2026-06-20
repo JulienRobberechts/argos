@@ -5,9 +5,9 @@ import type { ResponseGroundingResult, SourceCitation } from "../types/domain";
 export function useSSEStream(conversationId: string) {
   const [text, setText] = useState("");
   const [sources, setSources] = useState<SourceCitation[]>([]);
-  const [responseGrounding, setResponseGrounding] = useState<
-    ResponseGroundingResult[] | undefined
-  >(undefined);
+  const [responseGrounding, setResponseGrounding] = useState<ResponseGroundingResult[] | undefined>(
+    undefined,
+  );
   const [isStreaming, setIsStreaming] = useState(false);
   const closeRef = useRef<(() => void) | null>(null);
 

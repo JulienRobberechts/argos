@@ -15,13 +15,11 @@ export default function ImplementationTab() {
         />
         <p className="text-sm text-slate-700 leading-relaxed mb-3">
           The{" "}
-          <code className="bg-slate-100 px-1 rounded text-amber-700">
-            CheckResponseGrounding
-          </code>{" "}
-          use case runs after the LLM has generated its answer. It loops over
-          the requested strategies and accumulates results. A failed strategy
-          returns <code className="bg-slate-100 px-1 rounded">score = -1</code>{" "}
-          with a warning rather than crashing the request.
+          <code className="bg-slate-100 px-1 rounded text-amber-700">CheckResponseGrounding</code>{" "}
+          use case runs after the LLM has generated its answer. It loops over the requested
+          strategies and accumulates results. A failed strategy returns{" "}
+          <code className="bg-slate-100 px-1 rounded">score = -1</code> with a warning rather than
+          crashing the request.
         </p>
         <CodeBlock
           code={`// application/CheckResponseGrounding.ts (simplified)
@@ -52,12 +50,9 @@ async run(
         <div className="mt-4">
           <Callout type="info">
             <code>ResponseGroundingStrategy</code> is a discriminated union:{" "}
-            <code className="ml-1">
-              "faithfulness" | "counterfactual" | "citation_forcing"
-            </code>
-            . The results are stored in the{" "}
-            <code className="ml-1">messages.response_grounding</code> JSONB
-            column and exposed via the conversations API.
+            <code className="ml-1">"faithfulness" | "counterfactual" | "citation_forcing"</code>.
+            The results are stored in the <code className="ml-1">messages.response_grounding</code>{" "}
+            JSONB column and exposed via the conversations API.
           </Callout>
         </div>
       </Card>

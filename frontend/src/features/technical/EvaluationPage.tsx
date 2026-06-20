@@ -18,9 +18,7 @@ function isTab(value: string | null): value is Tab {
 export default function EvaluationPage() {
   const [searchParams] = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<Tab>(
-    isTab(tabParam) ? tabParam : "Overview",
-  );
+  const [activeTab, setActiveTab] = useState<Tab>(isTab(tabParam) ? tabParam : "Overview");
 
   useEffect(() => {
     if (isTab(tabParam)) setActiveTab(tabParam);

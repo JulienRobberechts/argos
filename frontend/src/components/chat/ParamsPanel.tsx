@@ -261,47 +261,47 @@ export default function ParamsPanel({
           <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-0.5">
             Response Grounding
           </p>
-          {(["faithfulness", "citation_forcing", "counterfactual"] as ResponseGroundingStrategy[]).map(
-            (strategy) => {
-              const active = (params.responseGroundingStrategies ?? []).includes(strategy);
-              const labels: Record<ResponseGroundingStrategy, string> = {
-                faithfulness: "Faithfulness (RAGAS)",
-                counterfactual: "Counterfactual",
-                citation_forcing: "Citation forcing",
-              };
-              const infos: Record<ResponseGroundingStrategy, string> = {
-                faithfulness:
-                  "Checks whether each statement in the answer is supported by the retrieved sources.",
-                counterfactual:
-                  "Tests resistance to false context by injecting contradictory information into the sources.",
-                citation_forcing:
-                  "Forces the model to cite its sources and verifies that the citations are accurate.",
-              };
-              return (
-                <Field
-                  key={strategy}
-                  label={labels[strategy]}
-                  info={infos[strategy]}
-                  techLink="/technical/response-grounding"
-                >
-                  <Toggle
-                    checked={active}
-                    onChange={(v) => {
-                      if (readOnly) return;
-                      const current = params.responseGroundingStrategies ?? [];
-                      onChange?.({
-                        ...params,
-                        responseGroundingStrategies: v
-                          ? [...current, strategy]
-                          : current.filter((s) => s !== strategy),
-                      });
-                    }}
-                    disabled={readOnly}
-                  />
-                </Field>
-              );
-            },
-          )}
+          {(
+            ["faithfulness", "citation_forcing", "counterfactual"] as ResponseGroundingStrategy[]
+          ).map((strategy) => {
+            const active = (params.responseGroundingStrategies ?? []).includes(strategy);
+            const labels: Record<ResponseGroundingStrategy, string> = {
+              faithfulness: "Faithfulness (RAGAS)",
+              counterfactual: "Counterfactual",
+              citation_forcing: "Citation forcing",
+            };
+            const infos: Record<ResponseGroundingStrategy, string> = {
+              faithfulness:
+                "Checks whether each statement in the answer is supported by the retrieved sources.",
+              counterfactual:
+                "Tests resistance to false context by injecting contradictory information into the sources.",
+              citation_forcing:
+                "Forces the model to cite its sources and verifies that the citations are accurate.",
+            };
+            return (
+              <Field
+                key={strategy}
+                label={labels[strategy]}
+                info={infos[strategy]}
+                techLink="/technical/response-grounding"
+              >
+                <Toggle
+                  checked={active}
+                  onChange={(v) => {
+                    if (readOnly) return;
+                    const current = params.responseGroundingStrategies ?? [];
+                    onChange?.({
+                      ...params,
+                      responseGroundingStrategies: v
+                        ? [...current, strategy]
+                        : current.filter((s) => s !== strategy),
+                    });
+                  }}
+                  disabled={readOnly}
+                />
+              </Field>
+            );
+          })}
         </section>
       </div>
     </div>

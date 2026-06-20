@@ -58,16 +58,11 @@ export function streamMessage(
         } else if (line.startsWith("data: ") && currentEvent) {
           const data = JSON.parse(line.slice(6)) as Record<string, unknown>;
           if (currentEvent === "delta") handlers.onDelta(data.token as string);
-          else if (currentEvent === "sources")
-            handlers.onSources(data.sources as SourceCitation[]);
+          else if (currentEvent === "sources") handlers.onSources(data.sources as SourceCitation[]);
           else if (currentEvent === "response_grounding")
-            handlers.onResponseGrounding(
-              data.results as ResponseGroundingResult[],
-            );
-          else if (currentEvent === "done")
-            handlers.onDone(data.messageId as string);
-          else if (currentEvent === "error")
-            handlers.onError(data.error as string);
+            handlers.onResponseGrounding(data.results as ResponseGroundingResult[]);
+          else if (currentEvent === "done") handlers.onDone(data.messageId as string);
+          else if (currentEvent === "error") handlers.onError(data.error as string);
           currentEvent = "";
         }
       }
