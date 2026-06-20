@@ -1,5 +1,4 @@
-import type { Conversation, ConversationSummary } from "../../domain/entities/Conversation";
-import type { Message } from "../../domain/entities/Message";
+import type { Conversation, ConversationSummary, Message } from "../../domain/entities";
 
 /** Persists and retrieves conversations and their messages. */
 export interface IConversationRepository {

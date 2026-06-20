@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
-import type { ILogger } from "../../infra-ports/ILogger";
+import type { ILogger } from "../../infra-ports";
 
 export function createErrorHandler(logger: ILogger) {
   return function errorHandler(

@@ -1,11 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";
-import type { IConversationService } from "../../app-ports/rag/IConversationService";
+import type { IAskQuestion, IConversationService } from "../../app-ports/rag";
 import config from "../../config";
-import { ConversationParams } from "../../domain/entities/Conversation";
-import type { ILogger } from "../../infra-ports/ILogger";
+import { ConversationParams } from "../../domain/entities";
+import type { ILogger } from "../../infra-ports";
 
 const responseGroundingStrategySchema = z.enum([
   "faithfulness",

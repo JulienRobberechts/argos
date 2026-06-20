@@ -1,4 +1,4 @@
-import type { Document, DocumentStatus } from "../../domain/entities/Document";
+import type { Document, DocumentStatus } from "../../domain/entities";
 
 /** Persists and retrieves documents and their processing status. */
 export interface IDocumentRepository {

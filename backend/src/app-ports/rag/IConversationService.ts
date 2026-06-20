@@ -1,4 +1,4 @@
-import type { Conversation, ConversationSummary } from "../../domain/entities/Conversation";
+import type { Conversation, ConversationSummary } from "../../domain/entities";
 
 export interface IConversationService {
   /** Persists a new conversation. */

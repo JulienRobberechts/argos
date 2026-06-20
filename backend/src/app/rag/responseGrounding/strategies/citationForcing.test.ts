@@ -1,7 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { type Chunk, ChunkMetadata } from "../../../../domain/entities/Chunk";
-import type { ChunkSearchResult } from "../../../../domain/entities/ChunkSearchResult";
+import { type Chunk, ChunkMetadata, type ChunkSearchResult } from "../../../../domain/entities";
 import { parseCitationForcingResult } from "./citationForcing";
 
 function makeChunkResult(content: string): ChunkSearchResult {

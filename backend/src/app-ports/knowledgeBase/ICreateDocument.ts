@@ -1,4 +1,4 @@
-import type { Document } from "../../domain/entities/Document";
+import type { Document } from "../../domain/entities";
 
 export interface CreateDocumentInput {
   buffer: Buffer;

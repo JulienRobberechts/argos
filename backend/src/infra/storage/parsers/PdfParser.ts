@@ -3,11 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { PDFParse } from "pdf-parse";
-import type {
-  IDocumentParserPort,
-  ParseInput,
-  ParseResult,
-} from "../../../infra-ports/storage/IDocumentParserPort";
+import type { IDocumentParserPort, ParseInput, ParseResult } from "../../../infra-ports/storage";
 
 export class PdfParser implements IDocumentParserPort {
   async parse({ buffer, fileName }: ParseInput): Promise<ParseResult> {

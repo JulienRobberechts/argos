@@ -1,6 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import config from "../../../config";
-import type { ILLMPort, LLMStreamOptions } from "../../../infra-ports/ai/ILLMPort";
+import type { ILLMPort, LLMStreamOptions } from "../../../infra-ports/ai";
 import { Logger } from "../../logger/Logger";
 
 const logger = new Logger("AnthropicLLMAdapter");

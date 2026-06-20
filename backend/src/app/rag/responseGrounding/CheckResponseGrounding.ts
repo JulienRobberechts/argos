@@ -1,11 +1,11 @@
-import type { ICheckResponseGrounding } from "../../../app-ports/rag/ICheckResponseGrounding";
-import type { ChunkSearchResult } from "../../../domain/entities/ChunkSearchResult";
+import type { ICheckResponseGrounding } from "../../../app-ports/rag";
 import type {
+  ChunkSearchResult,
   ResponseGroundingResult,
   ResponseGroundingStrategy,
-} from "../../../domain/entities/Message";
-import type { ILLMPort } from "../../../infra-ports/ai/ILLMPort";
-import type { ILogger } from "../../../infra-ports/ILogger";
+} from "../../../domain/entities";
+import type { ILogger } from "../../../infra-ports";
+import type { ILLMPort } from "../../../infra-ports/ai";
 import { checkCitationForcing } from "./strategies/citationForcing";
 import { checkCounterfactual } from "./strategies/counterfactual";
 import { checkFaithfulness } from "./strategies/faithfulness";

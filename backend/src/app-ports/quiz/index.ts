@@ -1,6 +1,6 @@
-import type { IGenerateQuiz } from "./IGenerateQuiz";
+export * from "./IGenerateQuiz";
 
-export type { IGenerateQuiz };
+import type { IGenerateQuiz } from "./IGenerateQuiz";
 
 export interface ArgosQuiz {
   generateQuiz: IGenerateQuiz;

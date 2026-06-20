@@ -1,7 +1,10 @@
-import type { ChunkSearchResult } from "../../../../domain/entities/ChunkSearchResult";
-import type { KnowledgeClaim, ResponseGroundingResult } from "../../../../domain/entities/Message";
-import { type ILLMPort, LLMStreamOptions } from "../../../../infra-ports/ai/ILLMPort";
-import type { ILogger } from "../../../../infra-ports/ILogger";
+import type {
+  ChunkSearchResult,
+  KnowledgeClaim,
+  ResponseGroundingResult,
+} from "../../../../domain/entities";
+import type { ILogger } from "../../../../infra-ports";
+import { type ILLMPort, LLMStreamOptions } from "../../../../infra-ports/ai";
 import { extractJSON } from "./extractJSON";
 
 function buildFaithfulnessPrompt(

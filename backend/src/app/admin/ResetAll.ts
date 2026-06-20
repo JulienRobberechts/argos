@@ -1,11 +1,12 @@
-import type { AppSettingsPatch } from "../../app-ports/admin/IAppSettingsService";
-import type { IResetAll } from "../../app-ports/admin/IResetAll";
-import type { ILogger } from "../../infra-ports/ILogger";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
-import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../../infra-ports/persistence/IDocumentSummaryRepository";
-import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
+import type { AppSettingsPatch, IResetAll } from "../../app-ports/admin";
+import type { ILogger } from "../../infra-ports";
+import type {
+  IChunkRepository,
+  IConversationRepository,
+  IDocumentRepository,
+  IDocumentSummaryRepository,
+} from "../../infra-ports/persistence";
+import type { IFileStoragePort } from "../../infra-ports/storage";
 
 /** Use case: deletes all storage files and truncates all tables, then applies new settings if provided. */
 export class ResetAll implements IResetAll {

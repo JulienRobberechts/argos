@@ -31,6 +31,18 @@ infra/           → adapter implementations
 - Extract duplication only when the abstraction has a clear name and purpose.
 - Delete dead code — never comment it out.
 
+## Barrel Exports
+
+Each folder exposes a public API via an `index.ts` that re-exports its symbols. Always import from the folder, not the specific file:
+
+```ts
+// ✅ correct
+import type { ICheckResponseGrounding } from "../../app-ports/rag";
+
+// ❌ avoid
+import type { ICheckResponseGrounding } from "../../app-ports/rag/ICheckResponseGrounding";
+```
+
 ## Tests
 
 - **Unit**: app/domain logic; in-memory fakes for repos, spy/mock functions for adapters. Next to source file.

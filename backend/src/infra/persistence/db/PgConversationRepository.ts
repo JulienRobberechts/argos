@@ -3,14 +3,12 @@ import {
   ConversationParams,
   type ConversationParamsProps,
   type ConversationSummary,
-} from "../../../domain/entities/Conversation";
-import type {
-  Message,
-  MessageRole,
-  ResponseGroundingResult,
-} from "../../../domain/entities/Message";
-import { SourceCitation } from "../../../domain/entities/Message";
-import type { IConversationRepository } from "../../../infra-ports/persistence/IConversationRepository";
+  type Message,
+  type MessageRole,
+  type ResponseGroundingResult,
+  SourceCitation,
+} from "../../../domain/entities";
+import type { IConversationRepository } from "../../../infra-ports/persistence";
 import pool from "./pool";
 
 function toMessage(row: Record<string, unknown>): Message {

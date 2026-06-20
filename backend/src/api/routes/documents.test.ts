@@ -8,7 +8,7 @@ import { nullLogger } from "../../../tests/fakes/NullLogger";
 import { CreateDocument } from "../../app/knowledgeBase/CreateDocument";
 import { DeleteDocument } from "../../app/knowledgeBase/DeleteDocument";
 import { DocumentQueries } from "../../app/knowledgeBase/DocumentQueries";
-import type { Document } from "../../domain/entities/Document";
+import type { Document } from "../../domain/entities";
 import { documentsRouter } from "./documents";
 
 function makeDoc(overrides?: Partial<Document>): Document {

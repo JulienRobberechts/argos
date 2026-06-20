@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
-import { type Chunk, ChunkMetadata } from "../../domain/entities/Chunk";
+import { type Chunk, ChunkMetadata } from "../../domain/entities";
 import { RetrieveKnowledge } from "./RetrieveKnowledge";
 
 function makeChunk(embedding: number[], overrides?: Partial<Chunk>): Chunk {

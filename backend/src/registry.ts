@@ -14,7 +14,7 @@ import { RetrieveKnowledge } from "./app/rag/RetrieveKnowledge";
 import { CheckResponseGrounding } from "./app/rag/responseGrounding/CheckResponseGrounding";
 import { SourceCitationResolver } from "./app/rag/SourceCitationResolver";
 import config from "./config";
-import { ConversationParams } from "./domain/entities/Conversation";
+import { ConversationParams } from "./domain/entities";
 import { VoyageEmbeddingAdapter } from "./infra/ai/embeddings/VoyageEmbeddingAdapter";
 import { AnthropicLLMAdapter } from "./infra/ai/llm/AnthropicLLMAdapter";
 import { VoyageRerankAdapter } from "./infra/ai/reranking/VoyageRerankAdapter";

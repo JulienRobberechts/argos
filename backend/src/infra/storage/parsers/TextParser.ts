@@ -1,8 +1,4 @@
-import type {
-  IDocumentParserPort,
-  ParseInput,
-  ParseResult,
-} from "../../../infra-ports/storage/IDocumentParserPort";
+import type { IDocumentParserPort, ParseInput, ParseResult } from "../../../infra-ports/storage";
 
 export class TextParser implements IDocumentParserPort {
   async parse({ buffer, fileName }: ParseInput): Promise<ParseResult> {

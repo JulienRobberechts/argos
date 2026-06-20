@@ -1,6 +1,6 @@
-import type { IConversationService } from "../../app-ports/rag/IConversationService";
-import type { Conversation, ConversationSummary } from "../../domain/entities/Conversation";
-import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
+import type { IConversationService } from "../../app-ports/rag";
+import type { Conversation, ConversationSummary } from "../../domain/entities";
+import type { IConversationRepository } from "../../infra-ports/persistence";
 
 export class ConversationService implements IConversationService {
   constructor(private readonly repo: IConversationRepository) {}

@@ -1,9 +1,8 @@
-import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
-import type { IRerankPort } from "../../infra-ports/ai/IRerankPort";
-import type { ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
-import type { ILogger } from "../../infra-ports/ILogger";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
+import type { IRetrieveKnowledge } from "../../app-ports/rag";
+import type { ChunkSearchResult } from "../../domain/entities";
+import type { ILogger } from "../../infra-ports";
+import type { IRerankPort, ITextEncoder } from "../../infra-ports/ai";
+import type { IChunkRepository } from "../../infra-ports/persistence";
 
 /** Use case: retrieves the most relevant chunks by vector or hybrid search, with optional reranking. */
 export class RetrieveKnowledge implements IRetrieveKnowledge {

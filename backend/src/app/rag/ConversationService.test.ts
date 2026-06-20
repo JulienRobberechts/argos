@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
-import { ConversationParams } from "../../domain/entities/Conversation";
+import { ConversationParams } from "../../domain/entities";
 import { ConversationService } from "./ConversationService";
 
 function makeConversation() {

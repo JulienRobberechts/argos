@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import type { IGenerateQuiz } from "../../app-ports/quiz/IGenerateQuiz";
+import type { IGenerateQuiz } from "../../app-ports/quiz";
 
 const generateQuizSchema = z.object({
   documentIds: z.array(z.string().uuid()).min(1),

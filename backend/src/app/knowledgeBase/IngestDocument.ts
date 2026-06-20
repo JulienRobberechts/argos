@@ -1,18 +1,16 @@
 import { randomUUID } from "node:crypto";
 import path from "node:path";
-import type { ChunkingConfig } from "../../app-ports/admin/IAppSettingsService";
-import type { IIngestDocument } from "../../app-ports/knowledgeBase/IIngestDocument";
+import type { ChunkingConfig } from "../../app-ports/admin";
+import type { IIngestDocument } from "../../app-ports/knowledgeBase";
 import {
   ChunkConfig,
   type ChunkingStrategyName,
   createChunkingStrategy,
-} from "../../domain/services/ChunkingStrategy";
-import type { ITextEncoder } from "../../infra-ports/ai/ITextEncoder";
-import type { ILogger } from "../../infra-ports/ILogger";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IDocumentParserPort } from "../../infra-ports/storage/IDocumentParserPort";
-import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
+} from "../../domain/services";
+import type { ILogger } from "../../infra-ports";
+import type { ITextEncoder } from "../../infra-ports/ai";
+import type { IChunkRepository, IDocumentRepository } from "../../infra-ports/persistence";
+import type { IDocumentParserPort, IFileStoragePort } from "../../infra-ports/storage";
 
 const BATCH_SIZE = 20;
 

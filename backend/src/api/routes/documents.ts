@@ -2,7 +2,7 @@ import path from "node:path";
 import { type NextFunction, type Request, type Response, Router } from "express";
 import multer from "multer";
 import type { ArgosKnowledgeBase } from "../../app-ports/knowledgeBase";
-import type { ILogger } from "../../infra-ports/ILogger";
+import type { ILogger } from "../../infra-ports";
 import { createDocumentSchema } from "../dto/document.dto";
 
 const ALLOWED_MIMETYPES = new Set([

@@ -5,9 +5,9 @@ import type {
   IAppSettingsService,
   ProviderOption,
   StorageOption,
-} from "../../app-ports/admin/IAppSettingsService";
+} from "../../app-ports/admin";
 import config from "../../config";
-import type { IAppSettingsRepository } from "../../infra-ports/persistence/IAppSettingsRepository";
+import type { IAppSettingsRepository } from "../../infra-ports/persistence";
 
 export type { AppSettings, AppSettingsPatch, ChunkingConfig, ProviderOption, StorageOption };
 

@@ -2,13 +2,20 @@ import { randomUUID } from "node:crypto";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
-import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
-import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
-import type { ISourceCitationResolver } from "../../app-ports/rag/ISourceCitationResolver";
-import { type Chunk, ChunkMetadata } from "../../domain/entities/Chunk";
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
-import { type Conversation, ConversationParams } from "../../domain/entities/Conversation";
-import { type Message, SourceCitation } from "../../domain/entities/Message";
+import type {
+  IConversationTitleGenerator,
+  IRetrieveKnowledge,
+  ISourceCitationResolver,
+} from "../../app-ports/rag";
+import {
+  type Chunk,
+  ChunkMetadata,
+  type ChunkSearchResult,
+  type Conversation,
+  ConversationParams,
+  type Message,
+  SourceCitation,
+} from "../../domain/entities";
 import { AskQuestion } from "./AskQuestion";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {

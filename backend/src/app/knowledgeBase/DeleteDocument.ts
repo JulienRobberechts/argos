@@ -1,7 +1,6 @@
-import type { IDeleteDocument } from "../../app-ports/knowledgeBase/IDeleteDocument";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
+import type { IDeleteDocument } from "../../app-ports/knowledgeBase";
+import type { IChunkRepository, IDocumentRepository } from "../../infra-ports/persistence";
+import type { IFileStoragePort } from "../../infra-ports/storage";
 
 export class DeleteDocument implements IDeleteDocument {
   constructor(

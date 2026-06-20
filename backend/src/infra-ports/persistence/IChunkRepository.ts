@@ -1,5 +1,4 @@
-import type { Chunk } from "../../domain/entities/Chunk";
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
+import type { Chunk, ChunkSearchResult } from "../../domain/entities";
 
 export type { ChunkSearchResult };
 

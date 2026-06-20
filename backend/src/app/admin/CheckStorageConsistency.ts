@@ -1,10 +1,7 @@
 import path from "node:path";
-import type {
-  ICheckStorageConsistency,
-  StorageConsistencyResult,
-} from "../../app-ports/admin/ICheckStorageConsistency";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
+import type { ICheckStorageConsistency, StorageConsistencyResult } from "../../app-ports/admin";
+import type { IDocumentRepository } from "../../infra-ports/persistence";
+import type { IFileStoragePort } from "../../infra-ports/storage";
 
 export type { StorageConsistencyResult };
 

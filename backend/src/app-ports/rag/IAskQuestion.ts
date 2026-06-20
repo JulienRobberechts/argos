@@ -1,4 +1,4 @@
-import type { Message } from "../../domain/entities/Message";
+import type { Message } from "../../domain/entities";
 
 export interface IAskQuestion {
   execute(

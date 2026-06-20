@@ -1,9 +1,5 @@
 import path from "node:path";
-import type {
-  IDocumentParserPort,
-  ParseInput,
-  ParseResult,
-} from "../../../infra-ports/storage/IDocumentParserPort";
+import type { IDocumentParserPort, ParseInput, ParseResult } from "../../../infra-ports/storage";
 import { MarkdownParser } from "./MarkdownParser";
 import { PdfParser } from "./PdfParser";
 import { TextParser } from "./TextParser";

@@ -1,16 +1,14 @@
+export * from "./ICreateDocument";
+export * from "./IDeleteDocument";
+export * from "./IIngestDocument";
+export * from "./ISummarizeDocument";
+export * from "./queries";
+
 import type { ICreateDocument } from "./ICreateDocument";
 import type { IDeleteDocument } from "./IDeleteDocument";
 import type { IIngestDocument } from "./IIngestDocument";
 import type { ISummarizeDocument } from "./ISummarizeDocument";
-import type { IDocumentQueries } from "./queries/IDocumentQueries";
-
-export type {
-  ICreateDocument,
-  IDeleteDocument,
-  IDocumentQueries,
-  IIngestDocument,
-  ISummarizeDocument,
-};
+import type { IDocumentQueries } from "./queries";
 
 export interface ArgosKnowledgeBase {
   createDocument: ICreateDocument;

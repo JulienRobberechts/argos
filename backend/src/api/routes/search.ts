@@ -1,6 +1,6 @@
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
-import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
+import type { IRetrieveKnowledge } from "../../app-ports/rag";
 
 const searchSchema = z.object({
   query: z.string().min(1),

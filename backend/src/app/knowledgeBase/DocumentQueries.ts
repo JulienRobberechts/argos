@@ -2,13 +2,14 @@ import type {
   ChunkPreview,
   DocumentContent,
   IDocumentQueries,
-} from "../../app-ports/knowledgeBase/queries/IDocumentQueries";
-import type { Document } from "../../domain/entities/Document";
-import type { DocumentSummary } from "../../domain/entities/DocumentSummary";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../../infra-ports/persistence/IDocumentSummaryRepository";
-import type { IFileStoragePort } from "../../infra-ports/storage/IFileStoragePort";
+} from "../../app-ports/knowledgeBase/queries";
+import type { Document, DocumentSummary } from "../../domain/entities";
+import type {
+  IChunkRepository,
+  IDocumentRepository,
+  IDocumentSummaryRepository,
+} from "../../infra-ports/persistence";
+import type { IFileStoragePort } from "../../infra-ports/storage";
 
 export class DocumentQueries implements IDocumentQueries {
   constructor(

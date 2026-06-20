@@ -1,9 +1,11 @@
-import type { ISummarizeDocument } from "../../app-ports/knowledgeBase/ISummarizeDocument";
-import type { ILLMPort } from "../../infra-ports/ai/ILLMPort";
-import type { ILogger } from "../../infra-ports/ILogger";
-import type { IChunkRepository } from "../../infra-ports/persistence/IChunkRepository";
-import type { IDocumentRepository } from "../../infra-ports/persistence/IDocumentRepository";
-import type { IDocumentSummaryRepository } from "../../infra-ports/persistence/IDocumentSummaryRepository";
+import type { ISummarizeDocument } from "../../app-ports/knowledgeBase";
+import type { ILogger } from "../../infra-ports";
+import type { ILLMPort } from "../../infra-ports/ai";
+import type {
+  IChunkRepository,
+  IDocumentRepository,
+  IDocumentSummaryRepository,
+} from "../../infra-ports/persistence";
 
 const MAX_CONTENT_CHARS = 12000;
 

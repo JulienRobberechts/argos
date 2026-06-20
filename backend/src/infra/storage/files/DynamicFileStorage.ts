@@ -1,4 +1,4 @@
-import type { IFileStoragePort } from "../../../infra-ports/storage/IFileStoragePort";
+import type { IFileStoragePort } from "../../../infra-ports/storage";
 import type { StorageBackends } from "./createFileStorage";
 
 /** Dispatches each operation to the active storage backend (local or R2) by reading the config at runtime. */

@@ -1,5 +1,4 @@
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
-import type { SourceCitation } from "../../domain/entities/Message";
+import type { ChunkSearchResult, SourceCitation } from "../../domain/entities";
 
 export interface CitationResolution {
   sources: SourceCitation[];

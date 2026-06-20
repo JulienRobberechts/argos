@@ -1,8 +1,8 @@
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
 import type {
+  ChunkSearchResult,
   ResponseGroundingResult,
   ResponseGroundingStrategy,
-} from "../../domain/entities/Message";
+} from "../../domain/entities";
 
 export interface ICheckResponseGrounding {
   /** Runs the given grounding strategies and returns their aggregated results. */

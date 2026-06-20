@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
-import type { Document } from "../../domain/entities/Document";
+import type { Document } from "../../domain/entities";
 import type { ChunkingConfig } from "../admin/AppSettingsService";
 import { IngestDocument } from "./IngestDocument";
 

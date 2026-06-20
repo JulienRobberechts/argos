@@ -1,19 +1,21 @@
 import { randomUUID } from "node:crypto";
-import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";
-import type { ICheckResponseGrounding } from "../../app-ports/rag/ICheckResponseGrounding";
-import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
-import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
-import type { ISourceCitationResolver } from "../../app-ports/rag/ISourceCitationResolver";
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
 import type {
+  IAskQuestion,
+  ICheckResponseGrounding,
+  IConversationTitleGenerator,
+  IRetrieveKnowledge,
+  ISourceCitationResolver,
+} from "../../app-ports/rag";
+import type {
+  ChunkSearchResult,
   Message,
   ResponseGroundingResult,
   ResponseGroundingStrategy,
-} from "../../domain/entities/Message";
-import { buildRagPrompt } from "../../domain/services/ragPrompt";
-import { type ILLMPort, LLMStreamOptions } from "../../infra-ports/ai/ILLMPort";
-import type { ILogger } from "../../infra-ports/ILogger";
-import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
+} from "../../domain/entities";
+import { buildRagPrompt } from "../../domain/services";
+import type { ILogger } from "../../infra-ports";
+import { type ILLMPort, LLMStreamOptions } from "../../infra-ports/ai";
+import type { IConversationRepository } from "../../infra-ports/persistence";
 import { parseCitationForcingResult } from "./responseGrounding/strategies/citationForcing";
 
 const NO_INFO_RESPONSE =

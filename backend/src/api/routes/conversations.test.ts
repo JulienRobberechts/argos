@@ -4,8 +4,7 @@ import request from "supertest";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
-import { type Conversation, ConversationParams } from "../../domain/entities/Conversation";
-import type { Message } from "../../domain/entities/Message";
+import { type Conversation, ConversationParams, type Message } from "../../domain/entities";
 import { conversationsRouter } from "./conversations";
 
 const DEFAULT_PARAMS = ConversationParams.create({

@@ -1,4 +1,4 @@
-import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
+import type { ChunkSearchResult } from "../../domain/entities";
 
 export interface IRetrieveKnowledge {
   execute(

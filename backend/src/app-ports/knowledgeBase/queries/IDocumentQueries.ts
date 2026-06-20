@@ -1,5 +1,4 @@
-import type { Document } from "../../../domain/entities/Document";
-import type { DocumentSummary } from "../../../domain/entities/DocumentSummary";
+import type { Document, DocumentSummary } from "../../../domain/entities";
 
 export interface ChunkPreview {
   position: number;
