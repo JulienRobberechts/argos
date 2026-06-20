@@ -2,70 +2,66 @@
 
 ## Hexagonal Architecture
 
-Backend follows **hexagonal architecture** (ports & adapters):
-
 ```
-api/             → REST input adapter
-cli/             → CLI input adapter
-app-ports/       → application port interfaces
-app/             → use-case implementations
-domain/          → entities, value objects
-infra-ports/     → infrastructure port interfaces
-infra/           → adapter implementations
+api/         → REST input adapter
+cli/         → CLI input adapter
+app-ports/   → application port interfaces
+app/         → use-case implementations
+domain/      → entities, value objects
+infra-ports/ → infrastructure port interfaces
+infra/       → adapter implementations
 ```
 
-- `domain` has no imports from other layers.
-- `app` must not import from `infra` or `api`.
-- Use cases must go through ports — never call infra directly.
+- `domain`: no imports from other layers.
+- `app`: no imports from `infra` or `api`; always go through ports.
 - Infra adapters must implement an `infra-ports` interface.
 
 ## Code Style
 
-- Interface methods must have comments. No body comments unless the **why** is non-obvious.
-- Explicit types over `any`; no unused imports, variables, or dead code.
-- One responsibility per function/class — split if "and" is needed to describe it.
+- Interface methods must have comments. Body comments only if **why** is non-obvious.
+- Explicit types; no `any`, no unused imports/variables, no dead code.
+- One responsibility per function/class; split if description needs "and".
 - Functions under 20 lines; extract nested or hard-to-name logic.
-- Names reveal intent — avoid `data`, `info`, `manager`, `handler` without context.
+- Names reveal intent — avoid bare `data`, `info`, `manager`, `handler`.
 - Named constants over magic values; early returns over nested `if/else`.
-- Isolate side effects and I/O at the edges; one abstraction level per function body.
-- Extract duplication only when the abstraction has a clear name and purpose.
+- Side effects and I/O at the edges; one abstraction level per function body.
+- Extract duplication only when the abstraction has a clear name.
 - Delete dead code — never comment it out.
 
 ## Barrel Exports
 
-Each folder exposes a public API via an `index.ts` that re-exports its symbols. Always import from the folder, not the specific file:
+Import from the folder, not the file:
 
 ```ts
-// ✅ correct
-import type { ICheckResponseGrounding } from "../../app-ports/rag";
-
-// ❌ avoid
-import type { ICheckResponseGrounding } from "../../app-ports/rag/ICheckResponseGrounding";
+// ✅
+import type { IAction } from "../app-ports/dir";
+// ❌
+import type { IAction } from "../../app-ports/dir/IAction";
 ```
 
 ## Tests
 
-- **Unit**: app/domain logic; in-memory fakes for repos, spy/mock functions for adapters. Next to source file.
+- **Unit**: app/domain logic; in-memory fakes for repos, spies for adapters. Next to source file.
 - **Integration**: real database. Excluded from CI.
 - **E2E**: quality checks. Excluded from CI.
-Factory functions (`makeXxx()`) for test data; app tests must not import from `infra/`.
+- Factory functions (`makeXxx()`) for test data; app tests must not import from `infra/`.
 
 ## Architecture Decisions
 
-Read ADRs in `docs/decisions/` before significant decisions; create/update one for every significant decision.
+Read ADRs in `docs/decisions/` before significant decisions; create/update one per significant decision.
 Format: `ADR-NNN-short-title.md` — sections: Context, Options Considered, Decision, Consequences.
 
 ## Bug Documentation
 
-Use `/record-bug` when: non-trivial root cause, worth remembering long-term, likely to recur. Read existing bug docs for recurring issues.
+Use `/record-bug` for: non-trivial root cause, likely to recur. Read existing docs for recurring issues.
 
 ## Domain Language
 
-The glossary is the authoritative source — keep it up to date. Never invent synonyms; propose options before adding new terms.
+Glossary is authoritative — keep it up to date. Never invent synonyms; propose options before adding terms.
 
 ## Commit Policy
 
 - One logical change per commit; split large tasks into independently-working commits.
-- Run typecheck, lint, and tests before committing — fix failures first.
+- Run typecheck, lint, tests before committing — fix failures first.
 - Format: `<type>: <short imperative description>` — types: `feat`, `fix`, `refac`, `test`, `docs`, `chore`.
 - Never commit `.env`, secrets, credentials, or build artifacts.
