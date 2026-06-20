@@ -1,6 +1,6 @@
 ---
 allowed-tools: Read, Edit, Bash(ls:*, find:*), Write
-description: Document a tech debt item into docs/tech-debt/ using the standard template.
+description: Record a tech debt item into docs/tech-debt/.
 ---
 
 Your task is to create a tech debt file in `docs/tech-debt/` based on what was discussed in this session.

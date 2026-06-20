@@ -1,6 +1,6 @@
 ---
 allowed-tools: Read, Edit, Bash(ls:*, find:*), Write
-description: Document the last bug encountered in this session into docs/bugs/ using the standard template.
+description: Record a bug into docs/bugs/.
 ---
 
 Your task is to create a bug record file in `docs/bugs/` based on what happened in this session.
