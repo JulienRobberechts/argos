@@ -114,15 +114,9 @@ Dans le dashboard Railway → service **argos-frontend** → **Settings** → **
 
 ## 7. Lancer les migrations en production
 
-`railway run` s'exécute en local : `DATABASE_URL` pointe vers le réseau privé Railway (`*.railway.internal`), inaccessible hors du réseau Railway. Il faut overrider avec `DATABASE_PUBLIC_URL` :
+Les migrations sont automatiques : `backend/railway.toml` configure un `releaseCommand` qui exécute `migrate.js` avant chaque déploiement. Si la migration échoue, Railway annule le déploiement et conserve l'ancienne version.
 
-```bash
-cd argos/backend
-npm run build
-railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infra/persistence/db/migrate.js'
-```
-
-Vérifier :
+Pour vérifier après le premier déploiement :
 
 ```bash
 railway run --service argos-api sh -c \
@@ -130,6 +124,14 @@ railway run --service argos-api sh -c \
 ```
 
 Doit retourner `{ count: '0' }` (table vide mais présente).
+
+Pour lancer les migrations manuellement (si besoin) :
+
+```bash
+cd argos/backend
+npm run build
+railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infra/persistence/db/migrate.js'
+```
 
 ## 8. Test de fumée (premier déploiement)
 
@@ -168,15 +170,9 @@ cd argos/frontend
 railway up --service argos-frontend
 ```
 
-### Migrations (si le schéma a changé)
+### Migrations
 
-À exécuter après le redéploiement de l'API :
-
-```bash
-cd argos/backend
-npm run build
-railway run --service argos-api sh -c 'DATABASE_URL=$DATABASE_PUBLIC_URL node dist/infra/db/migrate.js'
-```
+Les migrations sont automatiques à chaque `railway up` (via `releaseCommand` dans `backend/railway.toml`). Aucune action manuelle requise.
 
 ### Tout redéployer d'un coup
 
