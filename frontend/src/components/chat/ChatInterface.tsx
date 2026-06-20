@@ -3,10 +3,7 @@ import { Settings2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useConfig } from "../../hooks/useConfig";
-import {
-  useConversation,
-  useCreateConversation,
-} from "../../hooks/useConversation";
+import { useConversation, useCreateConversation } from "../../hooks/useConversation";
 import { useSSEStream } from "../../hooks/useSSEStream";
 import type { ConversationParams } from "../../types/domain";
 import ChatInputForm from "./ChatInputForm";
@@ -24,11 +21,15 @@ export default function ChatInterface() {
   const { data: appConfig } = useConfig();
   const [input, setInput] = useState("");
   const [showParams, setShowParams] = useState(false);
-  const [pendingParams, setPendingParams] = useState<
-    Partial<ConversationParams>
-  >({});
+  const [pendingParams, setPendingParams] = useState<Partial<ConversationParams>>({});
   const stream = useSSEStream(id ?? "");
   const pendingSentForIdRef = useRef<string | null>(null);
+  const streamRef = useRef(stream);
+  useEffect(() => {
+    streamRef.current = stream;
+  });
+
+  const pendingMessage = (location.state as { pendingMessage?: string } | null)?.pendingMessage;
 
   useEffect(() => {
     if (appConfig && Object.keys(pendingParams).length === 0) {
@@ -48,23 +49,16 @@ export default function ChatInterface() {
   }, [appConfig, pendingParams]);
 
   useEffect(() => {
-    const pending = (location.state as { pendingMessage?: string } | null)
-      ?.pendingMessage;
-    if (!pending || !id || pendingSentForIdRef.current === id) return;
+    if (!pendingMessage || !id || pendingSentForIdRef.current === id) return;
     pendingSentForIdRef.current = id;
-    navigate(location.pathname, { replace: true, state: {} });
-    stream.send(pending, () => {
+    // Use history.replaceState directly to clear navigation state without
+    // triggering a React Router re-render (which would cause this effect to re-run).
+    window.history.replaceState({ ...window.history.state, usr: null }, "");
+    streamRef.current.send(pendingMessage, () => {
       queryClient.invalidateQueries({ queryKey: ["conversations", id] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
     });
-  }, [
-    id,
-    stream.send,
-    queryClient.invalidateQueries,
-    navigate,
-    location.pathname,
-    (location.state as { pendingMessage?: string } | null)?.pendingMessage,
-  ]);
+  }, [id, pendingMessage, queryClient]);
 
   async function submitNew(content: string) {
     const conv = await createConversation.mutateAsync(pendingParams);
@@ -109,15 +103,11 @@ export default function ChatInterface() {
       <div className="flex h-screen bg-slate-50">
         <div className="flex-1 flex flex-col min-w-0">
           <div className="border-b border-slate-200 bg-white px-6 py-3 shrink-0 flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-400">
-              New conversation
-            </span>
+            <span className="text-sm font-medium text-slate-400">New conversation</span>
             {settingsButton}
           </div>
           <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
-            <p className="text-slate-400 text-sm">
-              Ask anything about your knowledge base
-            </p>
+            <p className="text-slate-400 text-sm">Ask anything about your knowledge base</p>
             <div className="w-full max-w-2xl">
               <ChatInputForm
                 input={input}
@@ -143,9 +133,7 @@ export default function ChatInterface() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-slate-400 text-sm">
-        Loading…
-      </div>
+      <div className="flex items-center justify-center h-full text-slate-400 text-sm">Loading…</div>
     );
   }
   if (!conversation) {
@@ -168,9 +156,7 @@ export default function ChatInterface() {
         <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {isEmpty ? (
             <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
-              <p className="text-slate-400 text-sm">
-                Ask anything about your knowledge base
-              </p>
+              <p className="text-slate-400 text-sm">Ask anything about your knowledge base</p>
               <div className="w-full max-w-2xl">
                 <ChatInputForm
                   input={input}
