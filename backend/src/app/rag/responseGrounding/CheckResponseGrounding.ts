@@ -1,3 +1,4 @@
+import type { ICheckResponseGrounding } from "../../../app-ports/rag/ICheckResponseGrounding";
 import type { ChunkSearchResult } from "../../../domain/entities/ChunkSearchResult";
 import type {
   ResponseGroundingResult,
@@ -10,7 +11,7 @@ import { checkCounterfactual } from "./strategies/counterfactual";
 import { checkFaithfulness } from "./strategies/faithfulness";
 
 /** Orchestrates response quality check strategies (faithfulness, counterfactual, citation_forcing) and aggregates their results. */
-export class CheckResponseGrounding {
+export class CheckResponseGrounding implements ICheckResponseGrounding {
   constructor(
     private readonly llm: ILLMPort,
     private readonly logger: ILogger,

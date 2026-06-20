@@ -8,7 +8,7 @@ import {
   appSettingsService,
   askQuestion,
   checkStorageConsistency,
-  conversationRepo,
+  conversationService,
   createDocument,
   deleteDocument,
   documentQueries,
@@ -78,7 +78,7 @@ app.use(
     apiLogger,
   ),
 );
-app.use("/api/conversations", conversationsRouter(conversationRepo, askQuestion, apiLogger));
+app.use("/api/conversations", conversationsRouter(conversationService, askQuestion, apiLogger));
 app.use("/api/search", searchRouter(retrieveKnowledge));
 app.use("/api/quizzes", quizzesRouter(generateQuiz));
 

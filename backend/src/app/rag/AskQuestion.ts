@@ -1,6 +1,9 @@
 import { randomUUID } from "node:crypto";
 import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";
+import type { ICheckResponseGrounding } from "../../app-ports/rag/ICheckResponseGrounding";
+import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
 import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
+import type { ISourceCitationResolver } from "../../app-ports/rag/ISourceCitationResolver";
 import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
 import type {
   Message,
@@ -11,10 +14,7 @@ import { buildRagPrompt } from "../../domain/services/ragPrompt";
 import { type ILLMPort, LLMStreamOptions } from "../../infra-ports/ai/ILLMPort";
 import type { ILogger } from "../../infra-ports/ILogger";
 import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
-import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
-import type { CheckResponseGrounding } from "./responseGrounding/CheckResponseGrounding";
 import { parseCitationForcingResult } from "./responseGrounding/strategies/citationForcing";
-import type { SourceCitationResolver } from "./SourceCitationResolver";
 
 const NO_INFO_RESPONSE =
   "I don't have enough information to answer this question based on the available knowledge base.";
@@ -26,10 +26,10 @@ export class AskQuestion implements IAskQuestion {
     private readonly retrieveKnowledge: IRetrieveKnowledge,
     private readonly llmAdapter: ILLMPort,
     private readonly conversationRepo: IConversationRepository,
-    private readonly citationResolver: SourceCitationResolver,
-    private readonly titleGenerator: ConversationTitleGenerator,
+    private readonly citationResolver: ISourceCitationResolver,
+    private readonly titleGenerator: IConversationTitleGenerator,
     private readonly logger: ILogger,
-    private readonly responseGrounder?: CheckResponseGrounding,
+    private readonly responseGrounder?: ICheckResponseGrounding,
   ) {}
 
   async execute(

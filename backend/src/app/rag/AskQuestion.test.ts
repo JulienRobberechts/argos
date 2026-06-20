@@ -2,14 +2,14 @@ import { randomUUID } from "node:crypto";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
+import type { IConversationTitleGenerator } from "../../app-ports/rag/IConversationTitleGenerator";
 import type { IRetrieveKnowledge } from "../../app-ports/rag/IRetrieveKnowledge";
+import type { ISourceCitationResolver } from "../../app-ports/rag/ISourceCitationResolver";
 import { type Chunk, ChunkMetadata } from "../../domain/entities/Chunk";
 import type { ChunkSearchResult } from "../../domain/entities/ChunkSearchResult";
 import { type Conversation, ConversationParams } from "../../domain/entities/Conversation";
 import { type Message, SourceCitation } from "../../domain/entities/Message";
 import { AskQuestion } from "./AskQuestion";
-import type { ConversationTitleGenerator } from "./ConversationTitleGenerator";
-import type { SourceCitationResolver } from "./SourceCitationResolver";
 
 function makeConversation(overrides?: Partial<Conversation>): Conversation {
   return {
@@ -90,8 +90,8 @@ describe("AskQuestion", () => {
       mockRetrieveKnowledge as unknown as IRetrieveKnowledge,
       llmAdapter,
       convRepo,
-      mockCitationResolver as unknown as SourceCitationResolver,
-      mockTitleGenerator as unknown as ConversationTitleGenerator,
+      mockCitationResolver as unknown as ISourceCitationResolver,
+      mockTitleGenerator as unknown as IConversationTitleGenerator,
       nullLogger,
     );
   }

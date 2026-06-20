@@ -8,6 +8,7 @@ import { IngestDocument } from "./app/knowledgeBase/IngestDocument";
 import { SummarizeDocument } from "./app/knowledgeBase/SummarizeDocument";
 import { GenerateQuiz } from "./app/quiz/GenerateQuiz";
 import { AskQuestion } from "./app/rag/AskQuestion";
+import { ConversationService } from "./app/rag/ConversationService";
 import { ConversationTitleGenerator } from "./app/rag/ConversationTitleGenerator";
 import { RetrieveKnowledge } from "./app/rag/RetrieveKnowledge";
 import { CheckResponseGrounding } from "./app/rag/responseGrounding/CheckResponseGrounding";
@@ -80,6 +81,7 @@ const responseGrounder = new CheckResponseGrounding(
 );
 const citationResolver = new SourceCitationResolver(documentRepo);
 const titleGenerator = new ConversationTitleGenerator(llmAdapter);
+export const conversationService = new ConversationService(conversationRepo);
 export const askQuestion = new AskQuestion(
   retrieveKnowledge,
   llmAdapter,

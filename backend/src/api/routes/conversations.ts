@@ -2,10 +2,10 @@ import { randomUUID } from "node:crypto";
 import { type NextFunction, type Request, type Response, Router } from "express";
 import { z } from "zod";
 import type { IAskQuestion } from "../../app-ports/rag/IAskQuestion";
+import type { IConversationService } from "../../app-ports/rag/IConversationService";
 import config from "../../config";
 import { ConversationParams } from "../../domain/entities/Conversation";
 import type { ILogger } from "../../infra-ports/ILogger";
-import type { IConversationRepository } from "../../infra-ports/persistence/IConversationRepository";
 
 const responseGroundingStrategySchema = z.enum([
   "faithfulness",
@@ -42,7 +42,7 @@ const sendMessageSchema = z.object({
 const PING_INTERVAL_MS = 15_000;
 
 export function conversationsRouter(
-  conversationRepo: IConversationRepository,
+  conversationService: IConversationService,
   askQuestion: IAskQuestion,
   logger: ILogger,
 ): Router {
@@ -82,7 +82,7 @@ export function conversationsRouter(
       createdAt: new Date(),
     };
 
-    await conversationRepo.save(conversation);
+    await conversationService.save(conversation);
 
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
@@ -135,7 +135,7 @@ export function conversationsRouter(
 
   router.get("/", async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const conversations = await conversationRepo.findAll();
+      const conversations = await conversationService.findAll();
       res.json(conversations);
     } catch (err) {
       next(err);
@@ -144,7 +144,7 @@ export function conversationsRouter(
 
   router.get("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const conversation = await conversationRepo.findById(String(req.params.id));
+      const conversation = await conversationService.findById(String(req.params.id));
       if (!conversation) {
         res.status(404).json({ error: "Conversation not found" });
         return;
@@ -162,12 +162,12 @@ export function conversationsRouter(
         res.status(400).json({ error: "Validation error" });
         return;
       }
-      const conversation = await conversationRepo.findById(String(req.params.id));
+      const conversation = await conversationService.findById(String(req.params.id));
       if (!conversation) {
         res.status(404).json({ error: "Conversation not found" });
         return;
       }
-      await conversationRepo.updateTitle(String(req.params.id), body.data.title);
+      await conversationService.updateTitle(String(req.params.id), body.data.title);
       res.json({ ...conversation, title: body.data.title });
     } catch (err) {
       next(err);
@@ -176,12 +176,12 @@ export function conversationsRouter(
 
   router.delete("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const conversation = await conversationRepo.findById(String(req.params.id));
+      const conversation = await conversationService.findById(String(req.params.id));
       if (!conversation) {
         res.status(404).json({ error: "Conversation not found" });
         return;
       }
-      await conversationRepo.delete(String(req.params.id));
+      await conversationService.delete(String(req.params.id));
       res.status(204).send();
     } catch (err) {
       next(err);
@@ -201,7 +201,7 @@ export function conversationsRouter(
       return;
     }
 
-    const conversation = await conversationRepo.findById(String(req.params.id));
+    const conversation = await conversationService.findById(String(req.params.id));
     if (!conversation) {
       res.status(404).json({ error: "Conversation not found" });
       return;
