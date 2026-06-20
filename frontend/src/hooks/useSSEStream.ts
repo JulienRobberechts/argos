@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { streamMessage } from "../services/sse";
-import type { ResponseGroundingResult, SourceCitation } from "../types/domain";
+import { createConversationAndStream, streamMessage } from "../services/sse";
+import type { ConversationParams, ResponseGroundingResult, SourceCitation } from "../types/domain";
 
 export function useSSEStream(conversationId: string) {
   const [text, setText] = useState("");
@@ -43,5 +43,35 @@ export function useSSEStream(conversationId: string) {
     [conversationId],
   );
 
-  return { text, sources, responseGrounding, isStreaming, send };
+  const startNew = useCallback(
+    (
+      params: Partial<ConversationParams>,
+      content: string,
+      onComplete: (conversationId: string) => void,
+    ) => {
+      setText("");
+      setSources([]);
+      setResponseGrounding(undefined);
+      setIsStreaming(true);
+
+      let createdId = "";
+
+      closeRef.current = createConversationAndStream(params, content, {
+        onCreated: (id) => {
+          createdId = id;
+        },
+        onDelta: (token) => setText((t) => t + token),
+        onSources: (s) => setSources(s),
+        onResponseGrounding: (r) => setResponseGrounding(r),
+        onDone: () => {
+          setIsStreaming(false);
+          onComplete(createdId);
+        },
+        onError: () => setIsStreaming(false),
+      });
+    },
+    [],
+  );
+
+  return { text, sources, responseGrounding, isStreaming, send, startNew };
 }

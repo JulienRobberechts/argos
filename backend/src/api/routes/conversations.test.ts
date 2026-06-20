@@ -61,17 +61,25 @@ describe("conversationsRouter", () => {
     convRepo = new InMemoryConversationRepository();
   });
 
-  it("POST /conversations creates a conversation", async () => {
-    const res = await request(makeApp(convRepo)).post("/conversations").send({ title: "My chat" });
-    expect(res.status).toBe(201);
-    expect(res.body.title).toBe("My chat");
-    expect(typeof res.body.id).toBe("string");
+  it("POST /conversations creates a conversation and streams SSE", async () => {
+    const res = await request(makeApp(convRepo))
+      .post("/conversations")
+      .send({ firstMessage: "Hello" });
+    expect(res.status).toBe(200);
+    expect(res.headers["content-type"]).toContain("text/event-stream");
+    expect(res.text).toContain("event: created");
+    expect(res.text).toContain("event: done");
   });
 
-  it("POST /conversations uses default title when omitted", async () => {
+  it("POST /conversations saves the conversation to the repository", async () => {
+    await request(makeApp(convRepo)).post("/conversations").send({ firstMessage: "Hello" });
+    const all = await convRepo.findAll();
+    expect(all).toHaveLength(1);
+  });
+
+  it("POST /conversations returns 400 when firstMessage is missing", async () => {
     const res = await request(makeApp(convRepo)).post("/conversations").send({});
-    expect(res.status).toBe(201);
-    expect(res.body.title).toBe("New conversation");
+    expect(res.status).toBe(400);
   });
 
   it("GET /conversations returns all conversations", async () => {

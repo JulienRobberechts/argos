@@ -29,7 +29,7 @@ const conversationParamsSchema = z.object({
 });
 
 const createConversationSchema = z.object({
-  title: z.string().min(1).default("New conversation"),
+  firstMessage: z.string().min(1),
   params: conversationParamsSchema.optional(),
 });
 
@@ -49,34 +49,88 @@ export function conversationsRouter(
 ): Router {
   const router = Router();
 
-  router.post("/", async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+  router.post("/", async (req: Request, res: Response): Promise<void> => {
+    const body = createConversationSchema.safeParse(req.body);
+    if (!body.success) {
+      res.status(400).json({
+        error: "Validation error",
+        fields: body.error.issues.map((e) => ({
+          path: e.path.join("."),
+          message: e.message,
+        })),
+      });
+      return;
+    }
+
+    const p = body.data.params ?? {};
+    const conversation = {
+      id: randomUUID(),
+      title: "New conversation",
+      params: ConversationParams.create({
+        retrievalLimit: p.retrievalLimit ?? config.rag.retrievalLimit,
+        retrievalMinScore: p.retrievalMinScore ?? config.rag.retrievalMinScore,
+        rerankEnabled: p.rerankEnabled ?? config.rerank.enabled,
+        rerankModel: p.rerankModel ?? config.rerank.model,
+        rerankCandidateMultiplier: p.rerankCandidateMultiplier ?? config.rerank.candidateMultiplier,
+        llmModel: p.llmModel ?? config.llm.anthropic.model,
+        llmTemperature: p.llmTemperature ?? config.llm.anthropic.temperature,
+        llmMaxTokens: p.llmMaxTokens ?? config.llm.anthropic.maxTokens,
+        responseGroundingStrategies:
+          p.responseGroundingStrategies ?? config.rag.responseGroundingStrategies,
+        searchMode: p.searchMode ?? config.rag.searchMode,
+      }),
+      messages: [],
+      createdAt: new Date(),
+    };
+
+    await conversationRepo.save(conversation);
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+
+    res.write(`event: created\ndata: ${JSON.stringify({ conversationId: conversation.id })}\n\n`);
+
+    const ping = setInterval(() => {
+      res.write("event: ping\ndata: {}\n\n");
+    }, PING_INTERVAL_MS);
+
+    const controller = new AbortController();
+    const cleanup = () => {
+      clearInterval(ping);
+      controller.abort();
+    };
+    req.on("close", cleanup);
+
     try {
-      const body = createConversationSchema.parse(_req.body);
-      const p = body.params ?? {};
-      const conversation = {
-        id: randomUUID(),
-        title: body.title,
-        params: ConversationParams.create({
-          retrievalLimit: p.retrievalLimit ?? config.rag.retrievalLimit,
-          retrievalMinScore: p.retrievalMinScore ?? config.rag.retrievalMinScore,
-          rerankEnabled: p.rerankEnabled ?? config.rerank.enabled,
-          rerankModel: p.rerankModel ?? config.rerank.model,
-          rerankCandidateMultiplier:
-            p.rerankCandidateMultiplier ?? config.rerank.candidateMultiplier,
-          llmModel: p.llmModel ?? config.llm.anthropic.model,
-          llmTemperature: p.llmTemperature ?? config.llm.anthropic.temperature,
-          llmMaxTokens: p.llmMaxTokens ?? config.llm.anthropic.maxTokens,
-          responseGroundingStrategies:
-            p.responseGroundingStrategies ?? config.rag.responseGroundingStrategies,
-          searchMode: p.searchMode ?? config.rag.searchMode,
-        }),
-        messages: [],
-        createdAt: new Date(),
-      };
-      await conversationRepo.save(conversation);
-      res.status(201).json(conversation);
+      const assistantMessage = await askQuestion.execute(
+        conversation.id,
+        body.data.firstMessage,
+        (token: string) => {
+          res.write(`event: delta\ndata: ${JSON.stringify({ token })}\n\n`);
+        },
+        controller.signal,
+      );
+
+      res.write(
+        `event: sources\ndata: ${JSON.stringify({ sources: assistantMessage.sources })}\n\n`,
+      );
+      if (assistantMessage.responseGrounding?.length) {
+        res.write(
+          `event: response_grounding\ndata: ${JSON.stringify({ results: assistantMessage.responseGrounding })}\n\n`,
+        );
+      }
+      res.write(
+        `event: done\ndata: ${JSON.stringify({ messageId: assistantMessage.id, contentLength: assistantMessage.content.length })}\n\n`,
+      );
     } catch (err) {
-      next(err);
+      res.write(`event: error\ndata: ${JSON.stringify({ error: "Stream error" })}\n\n`);
+      logger.error("SSE stream error", err instanceof Error ? err : new Error(String(err)));
+    } finally {
+      cleanup();
+      res.end();
     }
   });
 

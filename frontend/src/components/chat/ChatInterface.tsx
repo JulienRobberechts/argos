@@ -1,11 +1,11 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { Settings2 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useConfig } from "../../hooks/useConfig";
-import { useConversation, useCreateConversation } from "../../hooks/useConversation";
+import { useConversation } from "../../hooks/useConversation";
 import { useSSEStream } from "../../hooks/useSSEStream";
-import type { ConversationParams } from "../../types/domain";
+import type { ConversationParams, Message } from "../../types/domain";
 import ChatInputForm from "./ChatInputForm";
 import EditableTitle from "./EditableTitle";
 import MessageList from "./MessageList";
@@ -14,22 +14,14 @@ import ParamsPanel from "./ParamsPanel";
 export default function ChatInterface() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
   const queryClient = useQueryClient();
-  const createConversation = useCreateConversation();
   const { data: conversation, isLoading } = useConversation(id ?? null);
   const { data: appConfig } = useConfig();
   const [input, setInput] = useState("");
   const [showParams, setShowParams] = useState(false);
   const [pendingParams, setPendingParams] = useState<Partial<ConversationParams>>({});
+  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
   const stream = useSSEStream(id ?? "");
-  const pendingSentForIdRef = useRef<string | null>(null);
-  const streamRef = useRef(stream);
-  useEffect(() => {
-    streamRef.current = stream;
-  });
-
-  const pendingMessage = (location.state as { pendingMessage?: string } | null)?.pendingMessage;
 
   useEffect(() => {
     if (appConfig && Object.keys(pendingParams).length === 0) {
@@ -48,23 +40,12 @@ export default function ChatInterface() {
     }
   }, [appConfig, pendingParams]);
 
-  useEffect(() => {
-    if (!pendingMessage || !id || pendingSentForIdRef.current === id) return;
-    pendingSentForIdRef.current = id;
-    // Use history.replaceState directly to clear navigation state without
-    // triggering a React Router re-render (which would cause this effect to re-run).
-    window.history.replaceState({ ...window.history.state, usr: null }, "");
-    streamRef.current.send(pendingMessage, () => {
-      queryClient.invalidateQueries({ queryKey: ["conversations", id] });
+  function submitNew(content: string) {
+    setPendingUserMessage(content);
+    stream.startNew(pendingParams, content, (newId) => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
-    });
-  }, [id, pendingMessage, queryClient]);
-
-  async function submitNew(content: string) {
-    const conv = await createConversation.mutateAsync(pendingParams);
-    navigate(`/conversations/${conv.id}`, {
-      replace: true,
-      state: { pendingMessage: content },
+      queryClient.invalidateQueries({ queryKey: ["conversations", newId] });
+      navigate(`/conversations/${newId}`, { replace: true });
     });
   }
 
@@ -73,7 +54,7 @@ export default function ChatInterface() {
     if (!content || stream.isStreaming) return;
     setInput("");
     if (!id) {
-      void submitNew(content);
+      submitNew(content);
       return;
     }
     stream.send(content, () => {
@@ -99,6 +80,19 @@ export default function ChatInterface() {
   );
 
   if (!id) {
+    const pendingMessages: Message[] = pendingUserMessage
+      ? [
+          {
+            id: "pending-user",
+            conversationId: "",
+            role: "user",
+            content: pendingUserMessage,
+            sources: [],
+            createdAt: new Date().toISOString(),
+          },
+        ]
+      : [];
+
     return (
       <div className="flex h-screen bg-slate-50">
         <div className="flex-1 flex flex-col min-w-0">
@@ -106,17 +100,41 @@ export default function ChatInterface() {
             <span className="text-sm font-medium text-slate-400">New conversation</span>
             {settingsButton}
           </div>
-          <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
-            <p className="text-slate-400 text-sm">Ask anything about your knowledge base</p>
-            <div className="w-full max-w-2xl">
-              <ChatInputForm
-                input={input}
-                setInput={setInput}
-                onSubmit={submit}
-                disabled={createConversation.isPending}
-              />
+          {stream.isStreaming || stream.text ? (
+            <>
+              <div className="flex-1 overflow-y-auto">
+                <MessageList
+                  messages={pendingMessages}
+                  streamingText={stream.isStreaming ? stream.text : undefined}
+                  streamingSources={stream.sources}
+                  streamingResponseGrounding={stream.responseGrounding}
+                  isStreaming={stream.isStreaming}
+                />
+              </div>
+              <div className="border-t border-slate-200 bg-white px-4 py-3 shrink-0">
+                <div className="max-w-3xl mx-auto">
+                  <ChatInputForm
+                    input={input}
+                    setInput={setInput}
+                    onSubmit={submit}
+                    disabled={stream.isStreaming}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="flex-1 flex flex-col items-center justify-center px-6 gap-4">
+              <p className="text-slate-400 text-sm">Ask anything about your knowledge base</p>
+              <div className="w-full max-w-2xl">
+                <ChatInputForm
+                  input={input}
+                  setInput={setInput}
+                  onSubmit={submit}
+                  disabled={stream.isStreaming}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </div>
         {showParams && (
           <aside className="w-72 border-l border-slate-200 shrink-0 flex flex-col overflow-hidden">
