@@ -2,17 +2,29 @@
 
 Based on `.claude/test-taxonomy.md`.
 
-## Summary Table
+## Unit Tests (Level 0)
 
 | Type | Taxonomy name | ROI | Status | Test files | Done | ~Possibles | Densité |
 |------|--------------|-----|--------|------------|-----:|----------:|-------:|
 | Unit — Core (B) | `u-core` | 17.0 | ✅ Present | `domain/services/ChunkingStrategies.test.ts` (15), `app/rag/responseGrounding/strategies/citationForcing.test.ts` (9) | 24 | ~28 | 86% |
 | Unit — Frontend (F) | `u-ui` | 5.0 | ✅ Present | `services/sse.test.ts` (6), `hooks/useSSEStream.test.ts` (6), `hooks/useDocuments.test.ts` (5) | 17 | ~28 | 61% |
-| Module — API (A) | `1-api` | 3.18 | ✅ Present | `api/routes/conversations.test.ts` (11), `documents.test.ts` (12), `search.test.ts` (3), `middleware/apiKeyAuth.test.ts` (3), `errorHandler.test.ts` (3) | 32 | ~40 | 80% |
+| Unit — API internals (A) | `u-api` | 12.0 | ✅ Present | `api/middleware/apiKeyAuth.test.ts` (3), `api/middleware/errorHandler.test.ts` (3) | 6 | ~10 | 60% |
+| Unit — Infra internals (C) | `u-infra` | 8.13 | ✅ Present | `infra/storage/parsers/` (4 adapters) | 16 | ~20 | 80% |
+
+## Module Tests (Level 1)
+
+| Type | Taxonomy name | ROI | Status | Test files | Done | ~Possibles | Densité |
+|------|--------------|-----|--------|------------|-----:|----------:|-------:|
+| Module — API (A) | `1-api` | 3.18 | ✅ Present | `api/routes/` (7 files: `admin`, `auth`, `config`, `conversations`, `documents`, `quizzes`, `search`) | 26 | ~34 | 76% |
 | Module — CLI (A) | `1-cli` | 3.18 | N/A | No CLI in project | — | — | — |
 | Module — Core + fakes (B) | `1-core` | 3.0 | ✅ Present | `app/knowledgeBase/IngestDocument.test.ts` (8), `app/rag/AskQuestion.test.ts` (8), `ConversationService.test.ts` (5), `RetrieveKnowledge.test.ts` (13) | 34 | ~55 | 62% |
-| Module — Infra adapters (C) | `1-infra-*` | 1.25 | ✅ Partial | → see detail table below | 41 | ~50 | 82% |
+| Module — Infra adapters (C) | `1-infra-*` | 1.25 | ✅ Partial | → see detail table below | 25 | ~34 | 74% |
 | Module — Infra Postgres (C, real DB) | `1-infra-Pg*` | 1.25 | ✅ Partial | → see detail table below | 19 | ~24 | 79% |
+
+## Summary Table
+
+| Type | Taxonomy name | ROI | Status | Test files | Done | ~Possibles | Densité |
+|------|--------------|-----|--------|------------|-----:|----------:|-------:|
 | Int — API + Core (A+B) | `2-api-X-core` | 1.45 | — Volume=0 | Intentionally absent (taxonomy recommends 0) | 0 | 0 | — |
 | Int — Core + Infra (B+C) | `2-core-X-infra` | 1.23 | — Volume=0 | Intentionally absent | 0 | 0 | — |
 | Int — Front + API (F+A) | `2-front-X-api` | 1.10 | — Volume=0 | Intentionally absent | 0 | 0 | — |
@@ -42,7 +54,7 @@ Based on `.claude/test-taxonomy.md`.
 | `LocalFileStorage` | `IFileStoragePort` | ✅ | `infra/storage/files/LocalFileStorage.test.ts` | 6 | ~6 | 100% |
 | `R2FileStorage` | `IFileStoragePort` | ✅ | `infra/storage/files/R2FileStorage.test.ts` | 6 | ~6 | 100% |
 
-### `infra/storage/parsers/`
+### `infra/storage/parsers/` — `u-infra` (pure transformation, no external I/O)
 
 | Adapter | Port | Status | Test file | Done | ~Possible | Densité |
 |---------|------|--------|-----------|-----:|----------:|-------:|

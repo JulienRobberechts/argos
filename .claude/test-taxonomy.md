@@ -47,6 +47,38 @@
 | **Volume** | 20 — cover all hooks and non-trivial component logic; skip pure presentational |
 | **When to use** | When a component or hook has non-trivial internal logic independent of the API. Skip for pure presentational components. |
 
+#### 0c. Unit — API internals (A)
+
+| | |
+|---|---|
+| **Scope** | A internals (middleware, helpers, utils) — no B, no C |
+| **Name** | `u-api` |
+| **Suggested names** | `unit-api`, `api-unit`, `middleware-unit` |
+| **Description** | Tests individual middleware or utility functions in the entry adapter in full isolation. No use-case mock needed; B is simply absent. |
+| **Pros** | Ultra-fast, deterministic, zero setup beyond faking req/res |
+| **Cons** | Does not validate routing or the HTTP contract end-to-end |
+| **Burden** | 5 — fake req/res/next objects, no framework to spin up |
+| **Value** | 60 — validates transport guards and error shaping; lower signal than u-core |
+| **ROI** | 12.00 — near-zero cost for meaningful coverage of cross-cutting transport logic |
+| **Volume** | 10 — one test per middleware or pure adapter utility; skip thin pass-throughs |
+| **When to use** | When adding or modifying a middleware (auth, error handling, logging) or a stateless adapter utility. Do not use for route handlers — those belong to `1-api`. |
+
+#### 0d. Unit — Infra internals (C)
+
+| | |
+|---|---|
+| **Scope** | C internals (parsers, pure transformers) — no external I/O |
+| **Name** | `u-infra` |
+| **Suggested names** | `unit-infra`, `infra-unit`, `parser-unit` |
+| **Description** | Tests pure transformation logic inside an infra adapter (e.g. file parsers, data mappers) without hitting any external system. |
+| **Pros** | Ultra-fast, no infrastructure required, immediate feedback |
+| **Cons** | Does not validate the adapter's integration with the real external system |
+| **Burden** | 8 — may need in-memory fixtures (buffers, sample data); no containers |
+| **Value** | 65 — validates parsing and mapping correctness; complements `1-infra-*` |
+| **ROI** | 8.13 — very cheap given the absence of I/O; worthwhile whenever adapter logic is non-trivial |
+| **Volume** | 20 — one test per parser method or non-trivial mapping; skip adapters that are pure delegation |
+| **When to use** | When an infra adapter contains pure transformation logic (parsing, mapping, encoding) that can be exercised with in-memory data. Do not use when the adapter's core value is the external call itself — use `1-infra-*` instead. |
+
 ---
 
 ### Level 1 — Module tests (1 module, via its interface)
@@ -277,7 +309,7 @@
 
 | Level | Name(s) | Scope | Modules | Speed | Confidence | CI |
 |-------|---------|-------|---------|-------|------------|----|
-| 0 — Unit | `u-core`, `u-ui` | 1 module internal | 0 boundaries | ⚡⚡⚡ | pure logic | ✅ |
+| 0 — Unit | `u-core`, `u-ui`, `u-api`, `u-infra` | 1 module internal | 0 boundaries | ⚡⚡⚡ | pure logic | ✅ |
 | 1 — Module | `1-api/cli`, `1-core`, `1-infra-*` | 1 module via interface | 1 | ⚡⚡⚡ | full module | ✅ |
 | 2 — Int | `2-api-X-core`, `2-core-X-infra`, `2-front-X-api` | 2 modules | 2 | ⚡⚡ | partial integration | ✅ (if no DB) |
 | 3 — Int | `3-front-to-core`, `3-api-to-infra` | 3 modules | 3 | ⚡ | near-system | ⚠️ optional |
@@ -290,6 +322,8 @@ Mock levels: `—` none · `fake` in-memory port implementation · `mock` stub/s
 |------|-------|---------|------|-------|--------|-------|-----|--------|----|
 | `u-core` | 0 — Unit | B | — | ⚡⚡⚡ | 5 | 85 | 17.00 | 80 | ✅ |
 | `u-ui` | 0 — Unit | F | — | ⚡⚡⚡ | 12 | 60 | 5.00 | 20 | ✅ |
+| `u-api` | 0 — Unit | A | — | ⚡⚡⚡ | 5 | 60 | 12.00 | 10 | ✅ |
+| `u-infra` | 0 — Unit | C | — | ⚡⚡⚡ | 8 | 65 | 8.13 | 20 | ✅ |
 | `1-api` | 1 — Module | A | mock (B) | ⚡⚡⚡ | 22 | 70 | 3.18 | 40 | ✅ |
 | `1-cli` | 1 — Module | A | mock (B) | ⚡⚡⚡ | 22 | 70 | 3.18 | 30 | ✅ |
 | `1-core` | 1 — Module | B | fake (C) | ⚡⚡⚡ | 30 | 90 | 3.00 | 85 | ✅ |
@@ -322,6 +356,14 @@ graph LR
 
     subgraph uc["u-core"]
         uc_b[B]:::real
+    end
+
+    subgraph ua["u-api"]
+        ua_a[A]:::real
+    end
+
+    subgraph ui["u-infra"]
+        ui_c[C]:::real
     end
 
     subgraph ma["1-api / 1-cli"]
