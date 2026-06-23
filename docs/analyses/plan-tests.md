@@ -75,3 +75,65 @@ Based on `.claude/test-taxonomy.md`.
 ## High-ROI Gaps (priority order)
 
 1. **`port-contract`** (ROI 2.02) — in-memory fakes (`InMemoryChunkRepository`, etc.) are never validated against real Pg implementations
+
+---
+
+## Conformity Audit — Inconsistencies and Required Changes
+
+### `1-infra` — 4 tests misclassified (should be `u-infra`)
+
+The taxonomy defines `1-infra` as testing each C adapter against **real external systems** (no mock, may use Testcontainers). Four tests labeled `1-infra` mock the entire external call and only test request formation and response parsing — which matches `u-infra` ("pure transformation logic inside an infra adapter without hitting any external system"):
+
+| Test file | Current suffix | Issue | Correct suffix |
+|-----------|---------------|-------|---------------|
+| `infra/ai/embeddings/VoyageEmbeddingAdapter.1-infra.test.ts` | `1-infra` | `vi.stubGlobal("fetch", …)` — no real HTTP call | `u-infra` |
+| `infra/ai/reranking/VoyageRerankAdapter.1-infra.test.ts` | `1-infra` | `vi.stubGlobal("fetch", …)` — no real HTTP call | `u-infra` |
+| `infra/ai/llm/AnthropicLLMAdapter.1-infra.test.ts` | `1-infra` | `vi.mock("@anthropic-ai/sdk")` — entire SDK replaced | `u-infra` |
+| `infra/storage/files/R2FileStorage.1-infra.test.ts` | `1-infra` | S3 client `send` fully mocked — no real R2/S3 call | `u-infra` |
+
+The three Pg repository tests (`PgDocumentRepository`, `PgConversationRepository`, `PgChunkRepository`) and `LocalFileStorage` are correctly classified as `1-infra` — they use a real DB connection or real filesystem I/O.
+
+**Required change:** Rename the four files above from `*.1-infra.test.ts` to `*.u-infra.test.ts` and move them to the `u-infra` row of the plan table (bump `u-infra` Done from 16 → 36, add ~20 possible → ~40; move `1-infra` Done from 44 → 24, possible from ~58 → ~38).
+
+---
+
+### `1-core` — 3 tests use `vi.fn()` stubs instead of in-memory fakes
+
+The taxonomy specifies `1-core` = `fake (C)` (in-memory port implementations). Using `vi.fn()` stubs is `mock`, which can drift silently from the real contract. Three `1-core` tests substitute some C dependencies with stubs:
+
+| Test file | Stubbed C dependencies |
+|-----------|----------------------|
+| `app/knowledgeBase/IngestDocument.1-core.test.ts` | `fileStorage`, `fileParser`, `embeddingAdapter` — all `vi.fn()` |
+| `app/rag/AskQuestion.1-core.test.ts` | `llmAdapter` — `vi.fn()` (app-layer deps like `IRetrieveKnowledge` are correctly mocked since they are B-level collaborators, not C) |
+| `app/rag/RetrieveKnowledge.1-core.test.ts` | `embeddingAdapter` — `vi.fn()` |
+
+**Required change:** Replace `vi.fn()` stubs for C ports with dedicated in-memory fake classes (e.g., `InMemoryEmbeddingAdapter`, `InMemoryFileStorage`, `InMemoryFileParser`, `InMemoryLLMAdapter`) placed in `tests/fakes/`. This ensures fake/real parity and makes them eligible for `port-contract` validation.
+
+---
+
+### ~~Summary Table — naming inconsistency~~ ✅ Resolved
+
+`e2e-api` is now the canonical name in `test-taxonomy.md` (was `3-api-to-infra`). Plan and taxonomy are aligned.
+
+---
+
+### Retrieval test — wrong scope and non-taxonomy suffix
+
+`tests/retrieval/venise-simplon-orient-express.retrieval.test.ts` is mapped in the plan to `e2e-api` (A+B+C). Actual scope:
+
+- **A (API layer):** absent — no Express/HTTP involved.
+- **B (app):** `IngestDocument`, `RetrieveKnowledge` — real use-case code.
+- **C real:** `VoyageEmbeddingAdapter` (real HTTP when `VOYAGE_API_KEY` available), `MarkdownParser`.
+- **C fake:** `InMemoryDocumentRepository`, `InMemoryChunkRepository`.
+
+True scope is **B + partial C** → closest taxonomy level is `2-core-X-infra`, not A+B+C. The `.retrieval.` suffix is not defined in the taxonomy.
+
+**Required change:** Reclassify the test in the plan table from the `e2e-api` / `3-api-to-infra` row to `2-core-X-infra` (or a dedicated "retrieval quality" entry if kept separate). Rename the suffix from `.retrieval.` to `.2-core-X-infra.` if the naming convention is enforced, or document the exception explicitly.
+
+---
+
+### `RetrieveKnowledge.1-core.test.ts` — French test description
+
+Line 270: `it("retourne les candidats bruts si le reranker retourne null", …)` — test description is in French. Project rule: all code, comments, and documentation must be in English.
+
+**Required change:** Translate to English, e.g. `it("returns raw candidates when reranker returns null", …)`.

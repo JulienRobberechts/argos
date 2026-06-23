@@ -200,7 +200,7 @@
 | **Burden** | 65 — complex setup: browser + full app wiring + C fakes |
 | **Value** | 65 — good user journey coverage but C fake drift limits real-world confidence |
 | **ROI** | 1.00 — break-even; only justified for critical flows not covered elsewhere |
-| **Volume** | 0 — skip; prefer 1-core for business logic and 3-api-to-infra for backend coverage |
+| **Volume** | 0 — skip; prefer 1-core for business logic and e2e-api for backend coverage |
 | **When to use** | When validating a complete user journey without infrastructure cost. Limit to critical functional scenarios. Prefer `1-core` for business logic coverage. |
 
 #### 3b. Adapter + Core + Infra (A + B + C, no mock)
@@ -208,8 +208,8 @@
 | | |
 |---|---|
 | **Scope** | A + B + C, no mock |
-| **Name** | `3-api-to-infra` |
-| **Suggested names** | `int-api-full`, `backend-e2e`, `full-backend`, `api-infra` |
+| **Name** | `e2e-api` |
+| **Suggested names** | `int-api-full`, `backend-e2e`, `full-backend`, `api-infra`, `3-api-to-infra` |
 | **Description** | Tests the full backend integration (REST → use case → database). Validates critical paths without a UI. |
 | **Pros** | Maximum confidence on the backend side |
 | **Cons** | Slow, requires full infrastructure |
@@ -312,7 +312,7 @@
 | 0 — Unit | `u-core`, `u-ui`, `u-api`, `u-infra` | 1 module internal | 0 boundaries | ⚡⚡⚡ | pure logic | ✅ |
 | 1 — Module | `1-api/cli`, `1-core`, `1-infra-*` | 1 module via interface | 1 | ⚡⚡⚡ | full module | ✅ |
 | 2 — Int | `2-api-X-core`, `2-core-X-infra`, `2-front-X-api` | 2 modules | 2 | ⚡⚡ | partial integration | ✅ (if no DB) |
-| 3 — Int | `3-front-to-core`, `3-api-to-infra` | 3 modules | 3 | ⚡ | near-system | ⚠️ optional |
+| 3 — Int | `3-front-to-core`, `e2e-api` | 3 modules | 3 | ⚡ | near-system | ⚠️ optional |
 | 4 — E2E | `4-e2e` | 4 modules | 4 | 🐢🐢 | full system | ❌ excluded |
 | Contract | `port-contract`, `api-contract`, `arch` | interface | variable | ⚡⚡ | compatibility | ✅ |
 
@@ -332,7 +332,7 @@ Mock levels: `—` none · `fake` in-memory port implementation · `mock` stub/s
 | `2-core-X-infra` | 2 — Int | B + C | — | 🐢 | 65 | 80 | 1.23 | 0 | ⚠️ infra |
 | `2-front-X-api` | 2 — Int | F + A | mock (B) | ⚡ | 50 | 55 | 1.10 | 0 | ✅ |
 | `3-front-to-core` | 3 — Int | F + A + B | fake (C) | ⚡ | 65 | 65 | 1.00 | 0 | ⚠️ ui testing |
-| `3-api-to-infra` | 3 — Int | A + B + C | — | 🐢 | 70 | 80 | 1.14 | 40 | ⚠️ infra |
+| `e2e-api` | 3 — Int | A + B + C | — | 🐢 | 70 | 80 | 1.14 | 40 | ⚠️ infra |
 | `4-e2e` | 4 — E2E | F + A + B + C | — | 🐢🐢 | 92 | 95 | 1.03 | 20 | ⚠️ ui testing + infra |
 | `port-contract` | Contract | B↔C | fake + real (C) | ⚡⚡ | 42 | 5 | 2.02 | 35 | ✅ |
 | `api-contract` | Contract | F↔A | — | ⚡⚡ | 58 | 80 | 1.38 | 5 | ✅ |
@@ -400,7 +400,7 @@ graph LR
         ifab_f[F]:::real --> ifab_a[A]:::real --> ifab_b[B]:::real --> ifab_c[C fake]:::fake
     end
 
-    subgraph iabc["3-api-to-infra"]
+    subgraph iabc["e2e-api"]
         direction LR
         iabc_a[A]:::real --> iabc_b[B]:::real --> iabc_c[C]:::real
     end
