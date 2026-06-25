@@ -9,16 +9,16 @@ Based on `.claude/test-taxonomy.md`.
 | Unit — Core (B) | `u-core` | 17.0 | ✅ Present | `domain/services/ChunkingStrategies.u-core.test.ts` (15), `app/rag/responseGrounding/strategies/citationForcing.u-core.test.ts` (9) | 24 | ~28 | 86% |
 | Unit — Frontend (F) | `u-ui` | 5.0 | ✅ Present | `services/sse.u-ui.test.ts` (6), `hooks/useSSEStream.u-ui.test.ts` (6), `hooks/useDocuments.u-ui.test.ts` (5) | 17 | ~28 | 61% |
 | Unit — API internals (A) | `u-api` | 12.0 | ✅ Present | `api/middleware/apiKeyAuth.u-api.test.ts` (3), `api/middleware/errorHandler.u-api.test.ts` (3) | 6 | ~10 | 60% |
-| Unit — Infra internals (C) | `u-infra` | 8.13 | ✅ Present | `infra/storage/parsers/` (4 adapters, `*.u-infra.test.ts`) | 16 | ~20 | 80% |
+| Unit — Infra internals (C) | `u-infra` | 8.13 | ✅ Present | `infra/storage/parsers/` (4), `infra/ai/` (3 adapters), `infra/storage/files/R2FileStorage` — all `*.u-infra.test.ts` | 35 | ~43 | 81% |
 
 ## Module Tests (Level 1)
 
 | Type | Taxonomy name | ROI | Status | Test files | Done | ~Possibles | Densité |
 |------|--------------|-----|--------|------------|-----:|----------:|-------:|
-| Module — API (A) | `1-api` | 3.18 | ✅ Present | `api/routes/` (7 files: `admin`, `auth`, …, `*.1-api.test.ts`) | 26 | ~34 | 76% |
+| Module — API (A) | `1-api` | 3.18 | ✅ Present | `api/routes/` (7 files: `admin`(14), `auth`(12), `config`(5), `conversations`(26), `documents`(23), `quizzes`(9), `search`(8)) | 97 | ~105 | 92% |
 | Module — CLI (A) | `1-cli` | 3.18 | N/A | No CLI in project | — | — | — |
 | Module — Core + fakes (B) | `1-core` | 3.0 | ✅ Present | `app/knowledgeBase/IngestDocument.1-core.test.ts` (8), `app/rag/AskQuestion.1-core.test.ts` (8), `ConversationService.1-core.test.ts` (5), `RetrieveKnowledge.1-core.test.ts` (13) | 34 | ~55 | 62% |
-| Module — Infra (C) | `1-infra` | 1.25 | ✅ Partial | → see detail table below (all `*.1-infra.test.ts`) | 44 | ~58 | 76% |
+| Module — Infra (C) | `1-infra` | 1.25 | ✅ Partial | → see detail table below (all `*.1-infra.test.ts`) | 25 | ~42 | 60% |
 
 ## Summary Table
 
@@ -41,10 +41,10 @@ Based on `.claude/test-taxonomy.md`.
 
 | Adapter | Port | Status | Test file | Done | ~Possible | Densité |
 |---------|------|--------|-----------|-----:|----------:|-------:|
-| `VoyageEmbeddingAdapter` | `ITextEncoder` | ✅ | `infra/ai/embeddings/VoyageEmbeddingAdapter.1-infra.test.ts` | 5 | ~6 | 83% |
-| `AnthropicLLMAdapter` | `ILLMPort` | ✅ | `infra/ai/llm/AnthropicLLMAdapter.1-infra.test.ts` | 4 | ~6 | 67% |
+| `VoyageEmbeddingAdapter` | `ITextEncoder` | ✅ | `infra/ai/embeddings/VoyageEmbeddingAdapter.u-infra.test.ts` | 5 | ~6 | 83% |
+| `AnthropicLLMAdapter` | `ILLMPort` | ✅ | `infra/ai/llm/AnthropicLLMAdapter.u-infra.test.ts` | 4 | ~6 | 67% |
 | `NoopRerankAdapter` | `IRerankPort` | ❌ | — | 0 | ~2 | 0% |
-| `VoyageRerankAdapter` | `IRerankPort` | ✅ | `infra/ai/reranking/VoyageRerankAdapter.1-infra.test.ts` | 4 | ~5 | 80% |
+| `VoyageRerankAdapter` | `IRerankPort` | ✅ | `infra/ai/reranking/VoyageRerankAdapter.u-infra.test.ts` | 4 | ~5 | 80% |
 
 ### `infra/storage/files/`
 
@@ -52,7 +52,7 @@ Based on `.claude/test-taxonomy.md`.
 |---------|------|--------|-----------|-----:|----------:|-------:|
 | `DynamicFileStorage` | `IFileStoragePort` | ❌ | — | 0 | ~4 | 0% |
 | `LocalFileStorage` | `IFileStoragePort` | ✅ | `infra/storage/files/LocalFileStorage.1-infra.test.ts` | 6 | ~6 | 100% |
-| `R2FileStorage` | `IFileStoragePort` | ✅ | `infra/storage/files/R2FileStorage.1-infra.test.ts` | 6 | ~6 | 100% |
+| `R2FileStorage` | `IFileStoragePort` | ✅ | `infra/storage/files/R2FileStorage.u-infra.test.ts` | 6 | ~6 | 100% |
 
 ### `infra/storage/parsers/` — `u-infra` (pure transformation, no external I/O)
 
