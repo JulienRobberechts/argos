@@ -79,35 +79,6 @@ Based on `.claude/test-taxonomy.md`.
 
 ---
 
-## Conformity Audit — Inconsistencies and Required Changes
-
-### `1-infra` — 4 tests misclassified (should be `u-infra`)
-
-The taxonomy defines `1-infra` as testing each C adapter against **real external systems** (no mock, may use Testcontainers). Four tests labeled `1-infra` mock the entire external call and only test request formation and response parsing — which matches `u-infra` ("pure transformation logic inside an infra adapter without hitting any external system"):
-
-| Test file | Current suffix | Issue | Correct suffix |
-|-----------|---------------|-------|---------------|
-| `infra/ai/embeddings/VoyageEmbeddingAdapter.1-infra.test.ts` | `1-infra` | `vi.stubGlobal("fetch", …)` — no real HTTP call | `u-infra` |
-| `infra/ai/reranking/VoyageRerankAdapter.1-infra.test.ts` | `1-infra` | `vi.stubGlobal("fetch", …)` — no real HTTP call | `u-infra` |
-| `infra/ai/llm/AnthropicLLMAdapter.1-infra.test.ts` | `1-infra` | `vi.mock("@anthropic-ai/sdk")` — entire SDK replaced | `u-infra` |
-| `infra/storage/files/R2FileStorage.1-infra.test.ts` | `1-infra` | S3 client `send` fully mocked — no real R2/S3 call | `u-infra` |
-
-The three Pg repository tests (`PgDocumentRepository`, `PgConversationRepository`, `PgChunkRepository`) and `LocalFileStorage` are correctly classified as `1-infra` — they use a real DB connection or real filesystem I/O.
-
-**Required change:** Rename the four files above from `*.1-infra.test.ts` to `*.u-infra.test.ts` and move them to the `u-infra` row of the plan table (bump `u-infra` Done from 16 → 36, add ~20 possible → ~40; move `1-infra` Done from 44 → 24, possible from ~58 → ~38).
-
----
-
-### `1-core` — 3 tests use `vi.fn()` stubs instead of in-memory fakes
-
-The taxonomy specifies `1-core` = `fake (C)` (in-memory port implementations). Using `vi.fn()` stubs is `mock`, which can drift silently from the real contract. Three `1-core` tests substitute some C dependencies with stubs:
-
-| Test file | Stubbed C dependencies |
-|-----------|----------------------|
-| `app/knowledgeBase/IngestDocument.1-core.test.ts` | `fileStorage`, `fileParser`, `embeddingAdapter` — all `vi.fn()` |
-| `app/rag/AskQuestion.1-core.test.ts` | `llmAdapter` — `vi.fn()` (app-layer deps like `IRetrieveKnowledge` are correctly mocked since they are B-level collaborators, not C) |
-| `app/rag/RetrieveKnowledge.1-core.test.ts` | `embeddingAdapter` — `vi.fn()` |
-
-**Required change:** Replace `vi.fn()` stubs for C ports with dedicated in-memory fake classes (e.g., `InMemoryEmbeddingAdapter`, `InMemoryFileStorage`, `InMemoryFileParser`, `InMemoryLLMAdapter`) placed in `tests/fakes/`. This ensures fake/real parity and makes them eligible for `port-contract` validation.
+## Conformity Audit — No remaining inconsistencies
 
 

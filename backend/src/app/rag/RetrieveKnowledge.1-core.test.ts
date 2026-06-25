@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
 import { InMemoryEmbeddingAdapter } from "../../../tests/fakes/InMemoryEmbeddingAdapter";
+import { InMemoryRerankAdapter } from "../../../tests/fakes/InMemoryRerankAdapter";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
 import { type Chunk, ChunkMetadata } from "../../domain/entities";
 import { RetrieveKnowledge } from "./RetrieveKnowledge";
@@ -152,10 +153,6 @@ describe("RetrieveKnowledge", () => {
   });
 
   describe("reranking", () => {
-    function makeReranker(order: number[]) {
-      return { rerank: vi.fn().mockResolvedValue(order) };
-    }
-
     it("applique l'ordre du reranker sur les candidats", async () => {
       const queryVec = unitVec(1024, 0);
       const chunkA = makeChunk(unitVec(1024, 0), { content: "A" });
@@ -163,7 +160,7 @@ describe("RetrieveKnowledge", () => {
       const chunkC = makeChunk(unitVec(1024, 0), { content: "C" });
       await chunkRepo.saveMany([chunkA, chunkB, chunkC]);
 
-      const reranker = makeReranker([2, 1, 0]);
+      const reranker = new InMemoryRerankAdapter([2, 1, 0]);
       const embeddingAdapter = new InMemoryEmbeddingAdapter();
       vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
@@ -186,7 +183,7 @@ describe("RetrieveKnowledge", () => {
       const searchHybrid = vi.spyOn(chunkRepo, "searchHybrid");
       const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
 
-      const reranker = makeReranker([0]);
+      const reranker = new InMemoryRerankAdapter([0]);
       const embeddingAdapter = new InMemoryEmbeddingAdapter();
       vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
@@ -208,7 +205,7 @@ describe("RetrieveKnowledge", () => {
       for (let i = 0; i < 9; i++) await chunkRepo.save(makeChunk(unitVec(1024, 0)));
 
       const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
-      const reranker = makeReranker([0, 1, 2]);
+      const reranker = new InMemoryRerankAdapter([0, 1, 2]);
       const embeddingAdapter = new InMemoryEmbeddingAdapter();
       vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
@@ -230,9 +227,8 @@ describe("RetrieveKnowledge", () => {
       });
       await chunkRepo.save(chunk);
 
-      const reranker = {
-        rerank: vi.fn().mockRejectedValue(new Error("API timeout")),
-      };
+      const reranker = new InMemoryRerankAdapter([]);
+      vi.spyOn(reranker, "rerank").mockRejectedValue(new Error("API timeout"));
       const warn = vi.fn();
       const embeddingAdapter = new InMemoryEmbeddingAdapter();
       vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
@@ -260,7 +256,7 @@ describe("RetrieveKnowledge", () => {
       const chunk = makeChunk(unitVec(1024, 0), { content: "fallback" });
       await chunkRepo.save(chunk);
 
-      const reranker = { rerank: vi.fn().mockResolvedValue(null) };
+      const reranker = new InMemoryRerankAdapter(null);
       const embeddingAdapter = new InMemoryEmbeddingAdapter();
       vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
