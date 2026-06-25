@@ -267,7 +267,7 @@ describe("RetrieveKnowledge", () => {
       );
     });
 
-    it("retourne les candidats bruts si le reranker retourne null", async () => {
+    it("returns raw candidates when reranker returns null", async () => {
       const queryVec = unitVec(1024, 0);
       const chunk = makeChunk(unitVec(1024, 0), { content: "fallback" });
       await chunkRepo.save(chunk);
