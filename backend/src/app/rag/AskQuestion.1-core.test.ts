@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { assert, beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryConversationRepository } from "../../../tests/fakes/InMemoryConversationRepository";
+import { InMemoryLLMAdapter } from "../../../tests/fakes/InMemoryLLMAdapter";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
 import type {
   IConversationTitleGenerator,
@@ -62,25 +63,16 @@ function makeChunkResult(content = "Relevant content"): ChunkSearchResult {
   return { chunk, score: 0.9 };
 }
 
-function makeLLMAdapter(response = "Test LLM response") {
-  return {
-    stream: vi.fn().mockImplementation(async (_prompt: string, onToken: (t: string) => void) => {
-      onToken(response);
-      return response;
-    }),
-  };
-}
-
 describe("AskQuestion", () => {
   let convRepo: InMemoryConversationRepository;
-  let llmAdapter: ReturnType<typeof makeLLMAdapter>;
+  let llmAdapter: InMemoryLLMAdapter;
   let mockRetrieveKnowledge: { execute: ReturnType<typeof vi.fn> };
   let mockCitationResolver: { resolve: ReturnType<typeof vi.fn> };
   let mockTitleGenerator: { generate: ReturnType<typeof vi.fn> };
 
   beforeEach(() => {
     convRepo = new InMemoryConversationRepository();
-    llmAdapter = makeLLMAdapter();
+    llmAdapter = new InMemoryLLMAdapter("Test LLM response");
     mockRetrieveKnowledge = {
       execute: vi.fn().mockResolvedValue([makeChunkResult()]),
     };
@@ -123,8 +115,9 @@ describe("AskQuestion", () => {
       makeChunkResult("First relevant chunk"),
       makeChunkResult("Second relevant chunk"),
     ]);
+    const streamSpy = vi.spyOn(llmAdapter, "stream");
     await makeAskQuestion().execute(conv.id, "Question?", vi.fn());
-    const prompt: string = llmAdapter.stream.mock.calls[0][0];
+    const prompt: string = streamSpy.mock.calls[0][0];
     expect(prompt).toContain("SOURCE 1:");
     expect(prompt).toContain("First relevant chunk");
     expect(prompt).toContain("SOURCE 2:");
@@ -138,8 +131,9 @@ describe("AskQuestion", () => {
       await convRepo.addMessage(conv.id, makeMessage(conv.id, "user", `User msg ${i}`));
       await convRepo.addMessage(conv.id, makeMessage(conv.id, "assistant", `Assistant msg ${i}`));
     }
+    const streamSpy = vi.spyOn(llmAdapter, "stream");
     await makeAskQuestion().execute(conv.id, "Current question", vi.fn());
-    const prompt: string = llmAdapter.stream.mock.calls[0][0];
+    const prompt: string = streamSpy.mock.calls[0][0];
     expect(prompt).toContain("User msg 1");
     expect(prompt).toContain("Assistant msg 1");
     expect(prompt).toContain("User msg 4");
@@ -151,11 +145,13 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     const onToken = vi.fn();
-    llmAdapter.stream.mockImplementation(async (_p: string, cb: (t: string) => void) => {
-      cb("token1");
-      cb("token2");
-      return "token1token2";
-    });
+    vi.spyOn(llmAdapter, "stream").mockImplementation(
+      async (_p: string, cb: (t: string) => void) => {
+        cb("token1");
+        cb("token2");
+        return "token1token2";
+      },
+    );
     await makeAskQuestion().execute(conv.id, "Question?", onToken);
     expect(onToken).toHaveBeenCalledWith("token1");
     expect(onToken).toHaveBeenCalledWith("token2");
@@ -204,7 +200,7 @@ describe("AskQuestion", () => {
   it("should handle LLM adapter error gracefully — message saved with error content", async () => {
     const conv = makeConversation();
     await convRepo.save(conv);
-    llmAdapter.stream.mockRejectedValue(new Error("LLM failed"));
+    vi.spyOn(llmAdapter, "stream").mockRejectedValue(new Error("LLM failed"));
     await expect(makeAskQuestion().execute(conv.id, "Question?", vi.fn())).resolves.toBeDefined();
     const updated = await convRepo.findById(conv.id);
     expect(updated?.messages).toHaveLength(2);
@@ -216,8 +212,9 @@ describe("AskQuestion", () => {
     const conv = makeConversation();
     await convRepo.save(conv);
     mockRetrieveKnowledge.execute.mockResolvedValue([]);
+    const streamSpy = vi.spyOn(llmAdapter, "stream");
     const result = await makeAskQuestion().execute(conv.id, "Unknown topic", vi.fn());
-    expect(llmAdapter.stream).not.toHaveBeenCalled();
+    expect(streamSpy).not.toHaveBeenCalled();
     expect(result.role).toBe("assistant");
     expect(result.sources).toHaveLength(0);
     const saved = await convRepo.findById(conv.id);

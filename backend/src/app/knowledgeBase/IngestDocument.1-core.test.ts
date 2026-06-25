@@ -2,6 +2,9 @@ import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
 import { InMemoryDocumentRepository } from "../../../tests/fakes/InMemoryDocumentRepository";
+import { InMemoryEmbeddingAdapter } from "../../../tests/fakes/InMemoryEmbeddingAdapter";
+import { InMemoryFileParser } from "../../../tests/fakes/InMemoryFileParser";
+import { InMemoryFileStorage } from "../../../tests/fakes/InMemoryFileStorage";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
 import type { Document } from "../../domain/entities";
 import type { ChunkingConfig } from "../admin/AppSettingsService";
@@ -19,43 +22,20 @@ function makeDocument(overrides?: Partial<Document>): Document {
   };
 }
 
-function makeFileStorage(content = Buffer.from("dummy")) {
-  return {
-    upload: vi.fn().mockResolvedValue("test.txt"),
-    download: vi.fn().mockResolvedValue(content),
-    delete: vi.fn().mockResolvedValue(undefined),
-    list: vi.fn().mockResolvedValue([]),
-    deleteAll: vi.fn().mockResolvedValue(undefined),
-  };
-}
-
-function makeFileParser(text = "word1 word2 word3 word4 word5") {
-  return {
-    parse: vi.fn().mockResolvedValue({ text, metadata: { fileName: "test.txt" } }),
-  };
-}
-
-function makeEmbeddingAdapter() {
-  return {
-    embed: vi.fn(),
-    embedMany: vi
-      .fn()
-      .mockImplementation(async (texts: string[]) => texts.map(() => Array(1024).fill(0.1))),
-  };
-}
-
 describe("IngestDocument", () => {
   let docRepo: InMemoryDocumentRepository;
   let chunkRepo: InMemoryChunkRepository;
-  let embeddingAdapter: ReturnType<typeof makeEmbeddingAdapter>;
-  let fileStorage: ReturnType<typeof makeFileStorage>;
-  let fileParser: ReturnType<typeof makeFileParser>;
+  let embeddingAdapter: InMemoryEmbeddingAdapter;
+  let fileStorage: InMemoryFileStorage;
+  let fileParser: InMemoryFileParser;
+
   beforeEach(() => {
     docRepo = new InMemoryDocumentRepository();
     chunkRepo = new InMemoryChunkRepository();
-    embeddingAdapter = makeEmbeddingAdapter();
-    fileStorage = makeFileStorage();
-    fileParser = makeFileParser();
+    embeddingAdapter = new InMemoryEmbeddingAdapter();
+    fileStorage = new InMemoryFileStorage();
+    fileStorage.seed("test.txt", Buffer.from("dummy"));
+    fileParser = new InMemoryFileParser();
   });
 
   function makeIngest(config?: Partial<ChunkingConfig>) {
@@ -77,9 +57,11 @@ describe("IngestDocument", () => {
   it("should download the file from storage then parse it", async () => {
     const doc = makeDocument({ filePath: "test.txt" });
     await docRepo.save(doc);
+    const downloadSpy = vi.spyOn(fileStorage, "download");
+    const parseSpy = vi.spyOn(fileParser, "parse");
     await makeIngest().execute(doc.id);
-    expect(fileStorage.download).toHaveBeenCalledWith("test.txt");
-    expect(fileParser.parse).toHaveBeenCalledWith({
+    expect(downloadSpy).toHaveBeenCalledWith("test.txt");
+    expect(parseSpy).toHaveBeenCalledWith({
       buffer: Buffer.from("dummy"),
       fileName: "test.txt",
     });
@@ -90,7 +72,7 @@ describe("IngestDocument", () => {
       .fill("word")
       .map((w, i) => `${w}${i}`)
       .join(" ");
-    fileParser = makeFileParser(text);
+    fileParser.setText(text);
     const doc = makeDocument();
     await docRepo.save(doc);
     await makeIngest({ chunkSize: 3, chunkOverlap: 0 }).execute(doc.id);
@@ -103,13 +85,14 @@ describe("IngestDocument", () => {
       .fill("word")
       .map((w, i) => `${w}${i}`)
       .join(" ");
-    fileParser = makeFileParser(text);
+    fileParser.setText(text);
     const doc = makeDocument();
     await docRepo.save(doc);
+    const embedManySpy = vi.spyOn(embeddingAdapter, "embedMany");
     await makeIngest({ chunkSize: 1, chunkOverlap: 0 }).execute(doc.id);
-    expect(embeddingAdapter.embedMany).toHaveBeenCalledTimes(2);
-    expect(embeddingAdapter.embedMany.mock.calls[0][0]).toHaveLength(20);
-    expect(embeddingAdapter.embedMany.mock.calls[1][0]).toHaveLength(5);
+    expect(embedManySpy).toHaveBeenCalledTimes(2);
+    expect(embedManySpy.mock.calls[0][0]).toHaveLength(20);
+    expect(embedManySpy.mock.calls[1][0]).toHaveLength(5);
   });
 
   it("should save all chunks to the chunk repository", async () => {
@@ -129,32 +112,16 @@ describe("IngestDocument", () => {
   });
 
   it('should mark document status as "error" if embedding adapter throws', async () => {
-    const errorAdapter = {
-      embed: vi.fn(),
-      embedMany: vi.fn().mockRejectedValue(new Error("API error")),
-    };
+    vi.spyOn(embeddingAdapter, "embedMany").mockRejectedValue(new Error("API error"));
     const doc = makeDocument();
     await docRepo.save(doc);
-    const ingest = new IngestDocument(
-      docRepo,
-      chunkRepo,
-      errorAdapter,
-      fileStorage,
-      fileParser,
-      async () => ({
-        strategy: "recursive",
-        chunkSize: 512,
-        chunkOverlap: 128,
-      }),
-      nullLogger,
-    );
-    await ingest.execute(doc.id);
+    await makeIngest().execute(doc.id);
     const updated = await docRepo.findById(doc.id);
     expect(updated?.status).toBe("error");
   });
 
   it('should mark document status as "error" if storage download fails', async () => {
-    fileStorage.download.mockRejectedValue(new Error("Storage error"));
+    vi.spyOn(fileStorage, "download").mockRejectedValue(new Error("Storage error"));
     const doc = makeDocument();
     await docRepo.save(doc);
     await makeIngest().execute(doc.id);

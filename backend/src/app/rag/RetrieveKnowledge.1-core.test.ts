@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InMemoryChunkRepository } from "../../../tests/fakes/InMemoryChunkRepository";
+import { InMemoryEmbeddingAdapter } from "../../../tests/fakes/InMemoryEmbeddingAdapter";
 import { nullLogger } from "../../../tests/fakes/NullLogger";
 import { type Chunk, ChunkMetadata } from "../../domain/entities";
 import { RetrieveKnowledge } from "./RetrieveKnowledge";
@@ -28,17 +29,11 @@ describe("RetrieveKnowledge", () => {
   });
 
   it("should embed the query using the embedding adapter", async () => {
-    const embed = vi.fn().mockResolvedValue(Array(1024).fill(0.1));
-    const search = new RetrieveKnowledge(
-      chunkRepo,
-      {
-        embed,
-        embedMany: vi.fn(),
-      },
-      nullLogger,
-    );
+    const embeddingAdapter = new InMemoryEmbeddingAdapter();
+    const embedSpy = vi.spyOn(embeddingAdapter, "embed");
+    const search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     await search.execute("my query");
-    expect(embed).toHaveBeenCalledWith("my query", "query");
+    expect(embedSpy).toHaveBeenCalledWith("my query", "query");
   });
 
   it("should return chunks sorted by score descending", async () => {
@@ -51,14 +46,9 @@ describe("RetrieveKnowledge", () => {
     const chunk3 = makeChunk(unitVec(1024, 1), { content: "poor match" });
     await chunkRepo.saveMany([chunk1, chunk2, chunk3]);
 
-    const search = new RetrieveKnowledge(
-      chunkRepo,
-      {
-        embed: vi.fn().mockResolvedValue(queryVec),
-        embedMany: vi.fn(),
-      },
-      nullLogger,
-    );
+    const embeddingAdapter = new InMemoryEmbeddingAdapter();
+    vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
+    const search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     const results = await search.execute("query", 10, 0);
     expect(results[0].chunk.id).toBe(chunk1.id);
     expect(results[0].score).toBeGreaterThan(results[1].score);
@@ -72,28 +62,18 @@ describe("RetrieveKnowledge", () => {
       makeChunk(unitVec(1024, 1), { content: "low score" }),
     ]);
 
-    const search = new RetrieveKnowledge(
-      chunkRepo,
-      {
-        embed: vi.fn().mockResolvedValue(queryVec),
-        embedMany: vi.fn(),
-      },
-      nullLogger,
-    );
+    const embeddingAdapter = new InMemoryEmbeddingAdapter();
+    vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
+    const search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     const results = await search.execute("query", 10, 0.5);
     expect(results).toHaveLength(1);
     expect(results[0].chunk.content).toBe("high score");
   });
 
   it("should return empty array when no chunks match the threshold", async () => {
-    const search = new RetrieveKnowledge(
-      chunkRepo,
-      {
-        embed: vi.fn().mockResolvedValue(Array(1024).fill(0.1)),
-        embedMany: vi.fn(),
-      },
-      nullLogger,
-    );
+    const embeddingAdapter = new InMemoryEmbeddingAdapter();
+    vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(Array(1024).fill(0.1));
+    const search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     const results = await search.execute("query", 10, 0.5);
     expect(results).toHaveLength(0);
   });
@@ -106,14 +86,9 @@ describe("RetrieveKnowledge", () => {
       makeChunk(unitVec(1024, 0)),
     ]);
 
-    const search = new RetrieveKnowledge(
-      chunkRepo,
-      {
-        embed: vi.fn().mockResolvedValue(queryVec),
-        embedMany: vi.fn(),
-      },
-      nullLogger,
-    );
+    const embeddingAdapter = new InMemoryEmbeddingAdapter();
+    vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
+    const search = new RetrieveKnowledge(chunkRepo, embeddingAdapter, nullLogger);
     const results = await search.execute("query", 2, 0);
     expect(results).toHaveLength(2);
   });
@@ -122,9 +97,11 @@ describe("RetrieveKnowledge", () => {
     it("should call searchHybrid when searchMode is hybrid", async () => {
       const queryVec = unitVec(1024, 0);
       const searchHybrid = vi.spyOn(chunkRepo, "searchHybrid");
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         null,
         3,
@@ -136,17 +113,19 @@ describe("RetrieveKnowledge", () => {
 
     it("should call search (vector only) when searchMode is vector", async () => {
       const queryVec = unitVec(1024, 0);
-      const search = vi.spyOn(chunkRepo, "searchByVector");
+      const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const retrieveKnowledge = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         null,
         3,
         "vector",
       );
       await retrieveKnowledge.execute("my query", 5, 0);
-      expect(search).toHaveBeenCalledWith(queryVec, 5, 0);
+      expect(searchByVector).toHaveBeenCalledWith(queryVec, 5, 0);
     });
 
     it("should return hybrid results passed to caller", async () => {
@@ -156,9 +135,11 @@ describe("RetrieveKnowledge", () => {
       });
       await chunkRepo.save(chunk);
 
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         null,
         3,
@@ -182,11 +163,12 @@ describe("RetrieveKnowledge", () => {
       const chunkC = makeChunk(unitVec(1024, 0), { content: "C" });
       await chunkRepo.saveMany([chunkA, chunkB, chunkC]);
 
-      // le reranker inverse l'ordre : candidat[2] devient le meilleur
       const reranker = makeReranker([2, 1, 0]);
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         reranker,
         3,
@@ -205,9 +187,11 @@ describe("RetrieveKnowledge", () => {
       const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
 
       const reranker = makeReranker([0]);
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         reranker,
         3,
@@ -225,15 +209,17 @@ describe("RetrieveKnowledge", () => {
 
       const searchByVector = vi.spyOn(chunkRepo, "searchByVector");
       const reranker = makeReranker([0, 1, 2]);
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         reranker,
-        3, // multiplier
+        3,
         "vector",
       );
-      await search.execute("query", 3, 0); // limit=3, multiplier=3 → candidateLimit=9
+      await search.execute("query", 3, 0);
       expect(searchByVector).toHaveBeenCalledWith(queryVec, 9, expect.any(Number));
     });
 
@@ -248,9 +234,11 @@ describe("RetrieveKnowledge", () => {
         rerank: vi.fn().mockRejectedValue(new Error("API timeout")),
       };
       const warn = vi.fn();
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         { info: vi.fn(), warn, error: vi.fn(), debug: vi.fn() },
         reranker,
         3,
@@ -273,9 +261,11 @@ describe("RetrieveKnowledge", () => {
       await chunkRepo.save(chunk);
 
       const reranker = { rerank: vi.fn().mockResolvedValue(null) };
+      const embeddingAdapter = new InMemoryEmbeddingAdapter();
+      vi.spyOn(embeddingAdapter, "embed").mockResolvedValue(queryVec);
       const search = new RetrieveKnowledge(
         chunkRepo,
-        { embed: vi.fn().mockResolvedValue(queryVec), embedMany: vi.fn() },
+        embeddingAdapter,
         nullLogger,
         reranker,
         3,
