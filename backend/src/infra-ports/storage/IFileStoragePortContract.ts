@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
-import type { IFileStoragePort } from "../../src/infra-ports/storage";
+import type { IFileStoragePort } from ".";
 
 export function testFileStoragePort(
   setupStorage: () => Promise<{

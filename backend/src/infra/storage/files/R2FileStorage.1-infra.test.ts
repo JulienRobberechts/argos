@@ -1,6 +1,6 @@
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { beforeAll, describe, expect } from "vitest";
-import { testFileStoragePort } from "../../../../tests/fakes/fileStoragePortContract";
+import { testFileStoragePort } from "../../../infra-ports/storage/IFileStoragePortContract";
 import { R2FileStorage } from "./R2FileStorage";
 
 const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } = process.env;
