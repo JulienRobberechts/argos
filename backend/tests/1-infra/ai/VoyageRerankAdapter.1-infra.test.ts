@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { VoyageRerankAdapter } from "../../src/infra/ai/reranking/VoyageRerankAdapter";
-import type { IRerankPort } from "../../src/infra-ports/ai";
-import { testIRerankPort } from "./ai/testIRerankPort";
+import { VoyageRerankAdapter } from "../../../src/infra/ai/reranking/VoyageRerankAdapter";
+import type { IRerankPort } from "../../../src/infra-ports/ai";
+import { testIRerankPort } from "./testIRerankPort";
 
 describe("VoyageRerankAdapter", () => {
   let sharedAdapter: IRerankPort;

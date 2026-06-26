@@ -1,6 +1,6 @@
 import { describe } from "vitest";
-import { AnthropicLLMAdapter } from "../../src/infra/ai/llm/AnthropicLLMAdapter";
-import { testILLMPort } from "./ai/testILLMPort";
+import { AnthropicLLMAdapter } from "../../../src/infra/ai/llm/AnthropicLLMAdapter";
+import { testILLMPort } from "./testILLMPort";
 
 describe("AnthropicLLMAdapter", () => {
   testILLMPort(() => {

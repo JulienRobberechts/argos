@@ -66,7 +66,7 @@ export default defineConfig({
         test: {
           ...shared,
           name: "1-infra",
-          include: ["src/**/*.1-infra.test.ts", "tests/integration/**/*.1-infra.test.ts"],
+          include: ["src/**/*.1-infra.test.ts", "tests/1-infra/**/*.1-infra.test.ts"],
         },
       },
       {

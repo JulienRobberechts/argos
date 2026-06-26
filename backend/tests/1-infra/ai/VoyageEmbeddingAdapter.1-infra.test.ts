@@ -1,6 +1,6 @@
 import { describe } from "vitest";
-import { VoyageEmbeddingAdapter } from "../../src/infra/ai/embeddings/VoyageEmbeddingAdapter";
-import { testITextEncoderPort } from "./ai/testITextEncoderPort";
+import { VoyageEmbeddingAdapter } from "../../../src/infra/ai/embeddings/VoyageEmbeddingAdapter";
+import { testITextEncoderPort } from "./testITextEncoderPort";
 
 describe("VoyageEmbeddingAdapter", () => {
   testITextEncoderPort(() => {
