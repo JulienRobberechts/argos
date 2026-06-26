@@ -122,7 +122,7 @@
 | **Scope** | Each C adapter individually, real external systems |
 | **Name** | `1-infra-{ImplName}` |
 | **Suggested names** | `infra-module`, `adapter-out`, `repo-test`, `driven-adapter` |
-| **Description** | Tests SQL queries, third-party HTTP client configuration, and entity↔DB mapping. Uses ephemeral containers (Testcontainers). Compares implementations of the same port to validate interchangeability. |
+| **Description** | Tests each outbound adapter against its real external system: SQL queries and entity↔DB mapping (via Testcontainers for databases), real HTTP API calls for third-party clients (LLM, embedding, rerank APIs), or filesystem operations. Validates the port contract per implementation. |
 | **Pros** | Real confidence on the data layer, validates SQL syntax |
 | **Cons** | Slow, costly (containers), hard to parallelize |
 | **Burden** | 60 — Testcontainers setup, DB migrations, slow execution, hard to parallelize |
@@ -138,7 +138,7 @@ A `1-infra` test must be written **against the port interface**, not the concret
 **Structure — three-layer pattern:**
 
 ```
-setupStorage factory       ← adapter-specific: creates the real adapter + cleanup + verifyOnMedium
+setupAdapter factory       ← adapter-specific: creates the real adapter + cleanup [+ verifyOnMedium]
 testXxxPort(setup)         ← shared contract: all tests use only the port interface
 describe("AdapterName")    ← one per implementation; calls testXxxPort with its factory
 ```
@@ -146,12 +146,12 @@ describe("AdapterName")    ← one per implementation; calls testXxxPort with it
 **Rules:**
 1. The shared contract function (`testXxxPort`) imports only the port interface type — never a concrete class.
 2. Every `it` block inside the contract calls port methods only. No `instanceof`, no adapter internals.
-3. The setup factory returns three things:
+3. The setup factory returns:
    - `adapter` — the real implementation, typed as the port interface.
    - `cleanup` — tears down the real resource (delete tmp dir, flush bucket, close connection…).
-   - `verifyOnMedium(key, expected)` — bypasses the port to assert the data landed on the real underlying system (filesystem, S3 API, DB query…). This is the one place where adapter internals are allowed, because the point is to prove the write reached the medium, not just that the port round-trips.
+   - `verifyOnMedium(key, expected)` *(write-oriented adapters only)* — bypasses the port to assert the data landed on the real underlying system (filesystem, S3 API, DB query…). This is the one place where adapter internals are allowed. Omit for read-only adapters (LLM, embedding, rerank) where the return value is the only observable output.
 4. The `describe("AdapterName")` block is the only place that imports the concrete class.
-5. When the real system requires credentials or a running service, fail loudly in `beforeAll` with a message listing the missing variables — do not skip silently.
+5. When the real system requires credentials or a running service, fail loudly in `beforeAll` with a message listing the missing variables — do not skip silently. Throw if the key is absent or equals a known placeholder (e.g. `"test-key"`): `if (!key || key === "test-key") throw new Error("Missing env var: FOO_KEY")`.
 
 **What to keep in `u-infra` alongside `1-infra`:**
 The `1-infra` suite covers behavioral correctness (round-trips, error cases). Keep a `u-infra` test only for logic that cannot be exercised with a real system at reasonable cost: pagination driven by server-side flags, exact command/query parameters passed to a driver, encoding edge cases. Delete `u-infra` cases that duplicate `1-infra` coverage.
