@@ -135,21 +135,36 @@
 
 A `1-infra` test must be written **against the port interface**, not the concrete adapter class. The adapter is injected via a setup factory so the contract suite is reusable across implementations.
 
+**File locations:**
+- `testI<PortName>.ts` — shared contract function, in `tests/1-infra/<category>/`. Never in `src/` — test utilities must stay in `tests/`.
+- `<AdapterName>.1-infra.test.ts` — one per implementation, in the same directory.
+
 **Structure — three-layer pattern:**
 
 ```
-setupAdapter factory       ← adapter-specific: creates the real adapter + cleanup [+ verifyOnMedium]
-testXxxPort(setup)         ← shared contract: all tests use only the port interface
-describe("AdapterName")    ← one per implementation; calls testXxxPort with its factory
+testI<PortName>.ts              ← shared contract: imports only the port interface type
+<AdapterName>.1-infra.test.ts  ← one per implementation; calls the contract with its factory
+```
+
+Inside each `<AdapterName>.1-infra.test.ts`:
+
+```
+describe("AdapterName")    ← only place that imports the concrete class
+  setup factory            ← creates the real adapter + cleanup [+ verifyOnMedium + helpers]
+  testIXxxPort(setup)      ← delegates all tests to the shared contract
 ```
 
 **Rules:**
-1. The shared contract function (`testXxxPort`) imports only the port interface type — never a concrete class.
+1. The shared contract function (`testIXxxPort`) imports only the port interface type — never a concrete class.
 2. Every `it` block inside the contract calls port methods only. No `instanceof`, no adapter internals.
 3. The setup factory returns:
    - `adapter` — the real implementation, typed as the port interface.
-   - `cleanup` — tears down the real resource (delete tmp dir, flush bucket, close connection…).
-   - `verifyOnMedium(key, expected)` *(write-oriented adapters only)* — bypasses the port to assert the data landed on the real underlying system (filesystem, S3 API, DB query…). This is the one place where adapter internals are allowed. Omit for read-only adapters (LLM, embedding, rerank) where the return value is the only observable output.
+   - `cleanup` — resets the resource to a clean state. Called in `beforeEach` for stateless adapters (DB repos: delete all rows), or in `afterEach` for stateful ones (file storage: delete tmp dir or flush bucket).
+   - `verifyOnMedium` *(write-oriented adapters only)* — bypasses the port to assert the data landed on the real underlying system. This is the one place where adapter internals are allowed. Two forms:
+     - `verifyOnMedium(key, expected)` — for file/object storage (filesystem read, S3 GetObject).
+     - Named helpers — for DB adapters where a single `(key, expected)` signature doesn't fit (e.g. `countChunksForDocument(documentId): Promise<number>`, `countMessagesForConversation(id): Promise<number>`).
+     - Omit entirely for read-only adapters (LLM, embedding, rerank) where the return value is the only observable output.
+   - Prerequisite helpers *(when FK constraints require pre-existing state)* — e.g. `createDocument(): Promise<string>` when testing a chunk repository that requires a parent document row. Belongs in the factory; never in the shared contract.
 4. The `describe("AdapterName")` block is the only place that imports the concrete class.
 5. When the real system requires credentials or a running service, fail loudly in `beforeAll` with a message listing the missing variables — do not skip silently. Throw if the key is absent or equals a known placeholder (e.g. `"test-key"`): `if (!key || key === "test-key") throw new Error("Missing env var: FOO_KEY")`.
 

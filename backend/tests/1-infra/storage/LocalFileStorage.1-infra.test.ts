@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { describe, expect } from "vitest";
 import { LocalFileStorage } from "../../../src/infra/storage/files/LocalFileStorage";
-import { testFileStoragePort } from "../../../src/infra-ports/storage/IFileStoragePortContract";
+import { testFileStoragePort } from "./testIFileStoragePort";
 
 describe("LocalFileStorage", () => {
   testFileStoragePort(async () => {
