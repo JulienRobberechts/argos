@@ -24,6 +24,11 @@ Runner: Vitest.
 - Integration: `tests/integration/` — excluded from CI
 - E2E: `tests/retrieval/` — excluded from CI
 
+## Shell
+
+- Host: Windows; repo in WSL Ubuntu at `/home/dev1/proj/rag-project/argos`.
+- Git commands: `wsl bash -l -c "cd /home/dev1/proj/rag-project/argos && git <cmd>"`
+
 ## Common Commands
 
 ### Backend (`/backend`)

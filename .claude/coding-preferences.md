@@ -64,6 +64,13 @@ Use `/debt` when identifying a violation of architecture rules or a design short
 
 Glossary is authoritative — keep it up to date. Never invent synonyms; propose options before adding terms.
 
+## Shell & WSL Conventions
+
+- **Git**: use `wsl bash -l -c "cd <repo-path> && git <cmd>"` — login shell ensures full PATH (node, hooks work).
+- **File exploration**: prefer `Read`, `Glob`, `Grep` over Bash `find`/`ls`.
+- Never use `//wsl.localhost/` paths for git — dubious ownership errors.
+- Never use `wsl --exec git` — incomplete PATH, hooks fail.
+
 ## Commit Policy
 
 - One logical change per commit; split large tasks into independently-working commits.
