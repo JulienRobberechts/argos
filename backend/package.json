@@ -9,7 +9,7 @@
     "test:infra": "vitest run --project=1-infra --project=e2e-api",
     "test:all": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "check:ci": "biome check src tests",
+    "check:ci": "biome check --error-on-warnings src tests",
     "check:fix": "biome check --write src tests",
     "typecheck": "tsc --noEmit",
     "migrate": "tsx src/infra/persistence/db/migrate.ts",
