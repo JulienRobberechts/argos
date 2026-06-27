@@ -5,7 +5,7 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.build.json && cp -r src/infra/persistence/db/migrations dist/infra/persistence/db/",
     "start": "node dist/index.js",
-    "test": "vitest run --project=u-core --project=u-api --project=u-infra --project=1-api --project=1-core --project=arch",
+    "test": "vitest run --project=u-core --project=u-api --project=u-infra --project=1-api --project=1-core --project=arch --project=port-contract",
     "test:infra": "vitest run --project=1-infra --project=e2e-api",
     "test:all": "vitest run",
     "test:coverage": "vitest run --coverage",

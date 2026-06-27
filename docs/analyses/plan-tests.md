@@ -31,7 +31,7 @@ Based on `.claude/test-taxonomy.md`.
 | Int — API→Infra (A+B+C) | `e2e-api` | 1.14 | — Volume=0 | Intentionally absent | 0 | ~8 | — |
 | Quality — Retrieval accuracy | `retrieval-quality` | 2.33 | ✅ Present | `tests/retrieval/venise-simplon-orient-express.retrieval-quality.test.ts` (2) | 2 | ~5 | 40% |
 | E2E full (F+A+B+C) | `e2e-ui` | 1.03 | ❌ Missing | — | 0 | ~4 | 0% |
-| Contract — Port interface | `port-contract` | 2.02 | ⚠️ Partial | `testI*Port.ts` contracts exist in `tests/1-infra/` and run against real adapters; InMemory fakes not yet wired | 0 | ~20 | 0% |
+| Contract — Port interface | `port-contract` | 2.02 | ✅ Full | `tests/port-contract/` (9 files) — all InMemory fakes wired to shared `testI*Port.ts` contracts; 1 skipped: cascade FK (DB-only behavior) | 50 | ~55 | 91% |
 | Contract — External API | `api-contract` | 1.38 | ❌ Missing | — | 0 | ~5 | 0% |
 | Contract — Architecture | `arch` | 6.67 | ✅ Present | `tests/arch/architecture.arch.test.ts` (1) | 1 | 1 | 100% |
 
@@ -75,9 +75,9 @@ Based on `.claude/test-taxonomy.md`.
 | `PgDocumentSummaryRepository` | `IDocumentSummaryRepository` | ✅ | `testIDocumentSummaryRepositoryPort.ts` | 5 | ~6 | 83% |
 | `PgVectorChunkRepository` | `IChunkRepository` | ✅ | `testIChunkRepositoryPort.ts` | 8 | ~8 | 100% |
 
-## High-ROI Gaps (priority order)
+## High-ROI Gaps
 
-1. **`port-contract`** (ROI 2.02) — shared contract functions (`testI*Port.ts`) already exist in `tests/1-infra/` and run against real adapters. Gap: run the same contracts against in-memory fakes (`tests/fakes/InMemory*.ts`) to validate interchangeability.
+No remaining high-ROI gaps.
 
 ---
 
