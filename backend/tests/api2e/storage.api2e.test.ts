@@ -28,7 +28,7 @@ beforeEach(async () => {
   await pool.query("DELETE FROM documents");
 });
 
-describe("R2 storage round-trip — e2e-api", () => {
+describe("R2 storage round-trip — api2e", () => {
   it("uploads a PDF to R2, downloads the raw file, then deletes it", async () => {
     // Upload → fileStorage.upload() on R2
     const uploadRes = await request(app)

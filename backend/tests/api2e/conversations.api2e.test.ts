@@ -27,7 +27,7 @@ function extractConversationId(sseBody: string): string {
   return (JSON.parse(dataLine.replace("data: ", "")) as { conversationId: string }).conversationId;
 }
 
-describe("Conversation list/get/delete — e2e-api", () => {
+describe("Conversation list/get/delete — api2e", () => {
   it("returns an empty list when no conversations exist", async () => {
     const res = await request(app).get("/api/conversations").set("x-api-key", KEY);
 
@@ -45,7 +45,7 @@ describe("Conversation list/get/delete — e2e-api", () => {
   });
 });
 
-describe("Conversation lifecycle — e2e-api", () => {
+describe("Conversation lifecycle — api2e", () => {
   it("creates a conversation via SSE, lists it, updates its title, then deletes it", async () => {
     // Create — SSE stream, real Voyage embedding + Anthropic LLM
     const createRes = await request(app)

@@ -11,7 +11,7 @@ beforeEach(async () => {
 
 const KEY = "test-password";
 
-describe("Document lifecycle — e2e-api", () => {
+describe("Document lifecycle — api2e", () => {
   it("uploads a file, lists it, fetches it by id, then deletes it", async () => {
     // Upload
     const uploadRes = await request(app)

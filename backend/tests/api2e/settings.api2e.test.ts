@@ -9,7 +9,7 @@ beforeEach(async () => {
 
 const KEY = "test-password";
 
-describe("App settings persistence — e2e-api", () => {
+describe("App settings persistence — api2e", () => {
   it("reads default chunking config, updates it, and verifies it persisted in the DB", async () => {
     const cfg1 = await request(app).get("/api/config").set("x-api-key", KEY);
 

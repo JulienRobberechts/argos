@@ -88,8 +88,8 @@ export default defineConfig({
       {
         test: {
           ...shared,
-          name: "e2e-api",
-          include: ["tests/e2e-api/**/*.e2e-api.test.ts"],
+          name: "api2e",
+          include: ["tests/api2e/**/*.api2e.test.ts"],
           globalSetup: ["./tests/globalSetup.pg.ts"],
           setupFiles: ["./tests/setup.ts", "./tests/setup.infra.ts"],
         },

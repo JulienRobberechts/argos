@@ -28,7 +28,7 @@ Based on `.claude/test-taxonomy.md`.
 | Int — Core + Infra (B+C) | `2-core-X-infra` | 1.23 | — | — Volume=0 | Intentionally absent | 0 | 0 | — |
 | Int — Front + API (F+A) | `2-front-X-api` | 1.10 | — | — Volume=0 | Intentionally absent | 0 | 0 | — |
 | Int — Front→Core (F+A+B) | `3-front-to-core` | 1.00 | — | — Volume=0 | Intentionally absent | 0 | 0 | — |
-| Int — API→Infra (A+B+C) | `e2e-api` | 1.14 | ⚠️ | — Volume=0 | Intentionally absent | 0 | ~8 | — |
+| Int — API→Infra (A+B+C) | `api2e` | 1.14 | ⚠️ | — Volume=0 | Intentionally absent | 0 | ~8 | — |
 | Quality — Retrieval accuracy | `retrieval-quality` | 2.33 | ❌ | ✅ Present | `tests/retrieval/venise-simplon-orient-express.retrieval-quality.test.ts` (2) | 2 | ~5 | 40% |
 | E2E full (F+A+B+C) | `e2e-ui` | 1.03 | ❌ | ❌ Missing | — | 0 | ~4 | 0% |
 | Contract — Port interface | `port-contract` | 2.02 | ✅ | ✅ Full | `tests/port-contract/` (9 files) — all InMemory fakes wired to shared `testI*Port.ts` contracts; 1 skipped: cascade FK (DB-only behavior) | 50 | ~55 | 91% |
