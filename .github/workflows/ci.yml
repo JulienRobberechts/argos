@@ -38,8 +38,8 @@ jobs:
       - run: npm run test
         working-directory: frontend
 
-  lint:
-    name: Lint
+  check-backend:
+    name: Lint & Typecheck Backend
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -47,42 +47,34 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: backend/package-lock.json
       - run: npm ci
         working-directory: backend
       - run: npm run lint
-        working-directory: backend
-      - run: npm ci
-        working-directory: frontend
-      - run: npm run lint
-        working-directory: frontend
-
-  build:
-    name: TypeScript check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: '22'
-          cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
-      - run: npm ci
         working-directory: backend
       - run: npm run typecheck
         working-directory: backend
+
+  check-frontend:
+    name: Lint & Typecheck Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+        working-directory: frontend
+      - run: npm run lint
         working-directory: frontend
       - run: npm run typecheck
         working-directory: frontend
 
   deploy-api:
     name: Deploy API to Railway
-    needs: [test-backend, test-frontend, lint, build]
+    needs: [test-backend, test-frontend, check-backend, check-frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     timeout-minutes: 10
@@ -101,7 +93,7 @@ jobs:
 
   deploy-frontend:
     name: Deploy Frontend to Railway
-    needs: [test-backend, test-frontend, lint, build]
+    needs: [test-backend, test-frontend, check-backend, check-frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     timeout-minutes: 10
