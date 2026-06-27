@@ -74,6 +74,13 @@ export default defineConfig({
       {
         test: {
           ...shared,
+          name: "port-contract",
+          include: ["tests/port-contract/**/*.port-contract.test.ts"],
+        },
+      },
+      {
+        test: {
+          ...shared,
           name: "e2e-api",
           include: ["tests/retrieval/**/*.retrieval.test.ts"],
         },

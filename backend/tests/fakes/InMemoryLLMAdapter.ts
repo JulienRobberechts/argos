@@ -16,10 +16,13 @@ export class InMemoryLLMAdapter implements ILLMPort {
     onToken: (token: string) => void,
     _signal?: AbortSignal,
   ): Promise<string> {
-    const tokens = this.response.split(" ");
-    for (const token of tokens) {
-      onToken(`${token} `);
+    const words = this.response.split(" ");
+    let assembled = "";
+    for (const word of words) {
+      const token = `${word} `;
+      onToken(token);
+      assembled += token;
     }
-    return this.response;
+    return assembled;
   }
 }

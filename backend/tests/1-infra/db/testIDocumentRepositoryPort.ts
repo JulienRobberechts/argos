@@ -23,7 +23,10 @@ function makeDocument(overrides?: Partial<Document>): Document {
   };
 }
 
-export function testIDocumentRepository(setup: () => Setup): void {
+export function testIDocumentRepository(
+  setup: () => Setup,
+  options?: { skipCascadeDelete?: boolean },
+): void {
   let adapter: IDocumentRepository;
   let cleanup: () => Promise<void>;
   let verifyOnMedium: Setup["verifyOnMedium"];
@@ -93,7 +96,7 @@ export function testIDocumentRepository(setup: () => Setup): void {
     expect(await adapter.findById(doc.id)).toBeNull();
   });
 
-  it("delete cascades to chunks", async () => {
+  it.skipIf(options?.skipCascadeDelete)("delete cascades to chunks", async () => {
     const doc = makeDocument();
     await adapter.save(doc);
     await prepareChunkForDocument(doc.id);

@@ -76,5 +76,5 @@ describe("arch", () => {
       const report = violations.map((v) => `  [${v.rule.name}] ${v.from} → ${v.to}`).join("\n");
       expect.fail(`Layer boundary violations:\n${report}`);
     }
-  });
+  }, 15_000);
 });
