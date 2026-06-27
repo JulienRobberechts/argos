@@ -260,11 +260,17 @@ The `1-infra` suite covers behavioral correctness (round-trips, error cases). Ke
 | **When to use** | When validating critical backend paths end-to-end before a release or after major backend changes. Covers the full REST → use case → DB chain. |
 
 **How to write an `api2e` test:**
-- Import the production `app` from `src/api/app.ts` directly — never use a custom wiring helper. The goal is to test the real production assembly.
-- Use `supertest` as the HTTP client; start a Testcontainers PostgreSQL in `globalSetup`.
+- Place test files in `tests/api2e/` with the suffix `*.api2e.test.ts`.
+- Import the production `app` from `src/api/app.ts` directly — never use a custom wiring helper.
+- Use `supertest` as the HTTP client.
+- DB setup: reuse the shared `globalSetup.pg.ts` (same as `1-infra`) — it starts a Testcontainers PostgreSQL and runs migrations. No separate container config needed.
 - DB cleanup in `beforeEach` via `pool.query("DELETE FROM …")` (respect FK order).
-- All C adapters are real, including AI adapters (embedding, LLM). Never inject InMemory fakes.
-- If required API keys are missing or equal the placeholder value `"test-key"`, throw in `beforeAll` with a clear error message — do not skip silently.
+- Use real C adapters for whatever the test exercises — never inject fakes. Not every test needs AI adapters: document or settings flows only touch the DB; conversation flows require Voyage + Anthropic; storage flows require R2.
+- Guard in `beforeAll` only for the env vars your test actually uses. Throw if a key is absent or equals `"test-key"`. Examples:
+  - Conversation tests: `VOYAGE_API_KEY`, `ANTHROPIC_APP_API_KEY`
+  - Storage tests: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`
+  - DB-only tests (documents, settings): no guard needed — pool fails loudly on its own.
+- CI: runs via a dedicated `workflow_dispatch` workflow (`test-api2e.yml`) using GitHub environment `infra-tests`. Not triggered automatically on push.
 
 ---
 
