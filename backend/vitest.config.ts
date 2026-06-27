@@ -66,7 +66,7 @@ export default defineConfig({
         test: {
           ...shared,
           name: "1-infra",
-          include: ["src/**/*.1-infra.test.ts", "tests/1-infra/**/*.1-infra.test.ts"],
+          include: ["tests/1-infra/**/*.1-infra.test.ts"],
           globalSetup: ["./tests/globalSetup.pg.ts"],
           setupFiles: ["./tests/setup.ts", "./tests/setup.infra.ts"],
         },
@@ -81,8 +81,17 @@ export default defineConfig({
       {
         test: {
           ...shared,
+          name: "retrieval-quality",
+          include: ["tests/retrieval/**/*.retrieval-quality.test.ts"],
+        },
+      },
+      {
+        test: {
+          ...shared,
           name: "e2e-api",
-          include: ["tests/retrieval/**/*.retrieval.test.ts"],
+          include: ["tests/e2e-api/**/*.e2e-api.test.ts"],
+          globalSetup: ["./tests/globalSetup.pg.ts"],
+          setupFiles: ["./tests/setup.ts", "./tests/setup.infra.ts"],
         },
       },
     ],
