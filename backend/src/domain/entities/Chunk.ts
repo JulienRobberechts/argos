@@ -1,7 +1,7 @@
 /** Value Object: ordinal position and character range of a chunk within the source document. */
 export class ChunkMetadata {
   /** Nominal branding: prevents accidental assignment between Value Objects of the same shape. */
-  private declare readonly _brand: void;
+  private declare readonly _brand: undefined;
 
   readonly position: number;
   readonly startChar: number;

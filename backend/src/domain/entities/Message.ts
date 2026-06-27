@@ -14,7 +14,7 @@ interface SourceCitationProps {
 /** Value Object: reference to the source chunk backing a response, including the excerpt and relevance score. */
 export class SourceCitation {
   /** Nominal branding: prevents accidental assignment between Value Objects of the same shape. */
-  private declare readonly _brand: void;
+  private declare readonly _brand: undefined;
 
   readonly chunkId: string;
   readonly documentId: string;

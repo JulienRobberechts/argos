@@ -57,9 +57,11 @@ export class RetrieveKnowledge implements IRetrieveKnowledge {
 
     if (!useRerank) return candidates;
 
+    const reranker = this.reranker;
+    if (!reranker) return candidates.slice(0, limit);
     let rankedIndices: number[] | null = null;
     try {
-      rankedIndices = await this.reranker!.rerank(
+      rankedIndices = await reranker.rerank(
         query,
         candidates.map((c) => c.chunk.content),
         rerankOptions?.model,

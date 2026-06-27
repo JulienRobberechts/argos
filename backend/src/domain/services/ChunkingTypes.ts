@@ -5,7 +5,7 @@ export type ChunkingStrategyName = "recursive" | "sentence";
 /** Value Object: text splitting configuration — invariant: chunkOverlap < chunkSize. */
 export class ChunkConfig {
   /** Nominal branding: prevents accidental assignment between Value Objects of the same shape. */
-  private declare readonly _brand: void;
+  private declare readonly _brand: undefined;
 
   readonly chunkSize: number;
   readonly chunkOverlap: number;

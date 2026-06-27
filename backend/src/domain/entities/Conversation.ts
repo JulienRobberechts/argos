@@ -16,7 +16,7 @@ export interface ConversationParamsProps {
 /** Value Object: immutable RAG parameters for a conversation (retrieval, reranking, LLM, grounding). */
 export class ConversationParams {
   /** Nominal branding: prevents accidental assignment between Value Objects of the same shape. */
-  private declare readonly _brand: void;
+  private declare readonly _brand: undefined;
 
   readonly retrievalLimit: number;
   readonly retrievalMinScore: number;
